@@ -3851,8 +3851,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 							+ " Per.Apellidos1 || Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,  Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO, Per.Fechanacimiento FECHANACIMIENTO,"
 							+ "  Ins.Fechavalidacion AS ANTIGUEDADCOLA ");
 
-			sql.FROM(
-					" Scs_Turno              Tur, Cen_Colegiado          Col, Cen_Persona            Per,Scs_Inscripcionturno   Ins");
+			sql.FROM("Scs_Inscripcionturno Ins");	
+			sql.JOIN("Scs_Turno Tur ON ins.IDINSTITUCION = tur.IDINSTITUCION AND ins.IDTURNO = tur.IDTURNO"); 
+			sql.JOIN("Cen_Colegiado Col ON ins.IDINSTITUCION = col.IDINSTITUCION AND ins.IDPERSONA = col.IDPERSONA"); 
+			sql.JOIN("Cen_Persona Per ON col.IDPERSONA = per.IDPERSONA"); 
 			sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
 			sql.WHERE(" Tur.Idinstitucion ='" + idInstitucion + "'");
 			sql.WHERE(" Tur.Idturno ='" + idTurno + "'");
