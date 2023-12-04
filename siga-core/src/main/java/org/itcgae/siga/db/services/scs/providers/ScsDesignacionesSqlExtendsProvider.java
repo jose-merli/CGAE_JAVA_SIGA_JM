@@ -1236,7 +1236,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
 		sqlDefendidos.FROM("scs_defendidosdesigna ded");
 		sqlDefendidos.JOIN("scs_personajg per ON ded.idinstitucion = per.idinstitucion	AND ded.idpersona = per.idpersona");
-		sqlDefendidos.WHERE("calidad IS NOT NULL");
+		//sqlDefendidos.WHERE("calidad IS NOT NULL");
 		sqlDefendidos.WHERE("ded.anio = des.anio");
 		sqlDefendidos.WHERE("ded.numero = des.numero");
 		sqlDefendidos.WHERE("ded.idinstitucion = des.idinstitucion");
@@ -1930,6 +1930,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			subquery.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
 			subquery.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
 			subquery.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+			subquery.WHERE("DESIGNALETRADO.IDPERSONA = LET2.IDPERSONA");
 			subquery.WHERE("DESIGNALETRADO.IDTURNO = LET2.IDTURNO");
 			//Se elimina esta condición para que se muestren las actuaciones con fecha anterior a la fecha de designa.			
 			//subquery.WHERE("TRUNC(LET2.FECHADESIGNA) <= act.fecha");
@@ -2077,7 +2078,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		}else {
-			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO ");
+			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO, DL.IDPERSONA ");
 		
 		}
 		
@@ -2098,11 +2099,18 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                AND ejd.numeroejg = ejg.numero ");
 		sql.append(" WHERE D.IDINSTITUCION = " + idInstitucion);
 
-		if(item.getNumEJG()!=null) {
-			sql.append(" AND ejg.numero = "+item.getNumEJG());
+		if(item.getNumEJG()!=null && !item.getNumEJG().isEmpty()) {
+			sql.append(" AND ejg.numejg = "+item.getNumEJG());
+		}
+		if (imprimir) {
+			if(item.isMuestraPendiente()) {
+				sql.append(" AND D.ESTADO <> 'F' ");
+				sql.append(" AND D.ESTADO <> 'A' ");
+	
+			}
 		}
 		
-		if(item.getAnioEJG()!=null) {
+		if(item.getAnioEJG()!=null && !item.getAnioEJG().isEmpty()) {
 			sql.append(" AND ejg.anio = "+item.getAnioEJG());
 		}
 		
@@ -3044,8 +3052,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("FECHAVALIDACION = SYSDATE");
 			sql.SET("USUVALIDACION = '" + usuario.getIdusuario() + "'");
 			
-			if (UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
+			if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 				sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
+				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
+				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
+			} else {
+				sql.SET("FECHAJUSTIFICACION = SYSDATE");
 				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 			}

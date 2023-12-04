@@ -87,7 +87,6 @@ public class ScsEejgPeticionesSqlExtendsProvider extends ScsEejgPeticionesSqlPro
 		sql.FROM("scs_eejg_peticiones eejg");
 
 		sql.INNER_JOIN("SCS_PERSONAJG sp on (eejg.IDINSTITUCION = sp.IDINSTITUCION and eejg.IDPERSONA = sp.IDPERSONA)");
-		sql.INNER_JOIN("CEN_ESTADOSOLICITUD cestado on (cestado.IDESTADO = eejg.estado)");
 		sql.LEFT_OUTER_JOIN("adm_usuarios u on (eejg.idusuariopeticion=u.idusuario and eejg.idinstitucion=u.idinstitucion)");
 
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")

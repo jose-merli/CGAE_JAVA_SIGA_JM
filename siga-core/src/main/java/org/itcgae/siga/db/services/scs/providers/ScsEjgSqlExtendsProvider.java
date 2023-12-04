@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.ColegiadosSJCSItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 
 public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
@@ -960,7 +961,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
 						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
 					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA " + ejgItem.getIdGuardia());
+						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA =" + ejgItem.getIdGuardia());
 				} else if (ejgItem.getTipoLetrado().equals("D")) {
 
 					// letrado designas
@@ -1052,6 +1053,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			}
 			sql.INNER_JOIN("SCS_EEJG_XML EXML " + "ON PET.IDPETICION = EXML.IDPETICION ");
 			sql.WHERE("EXML.IDXML IS NOT NULL");
+		}
+		
+		if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDTURNO =")) {
+			sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+		}
+		if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDGUARDIA =")) {
+			sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
 		}
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
@@ -1269,7 +1277,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"SCS_GUARDIASTURNO GUARDIA  ON GUARDIA.IDINSTITUCION =EJG.IDINSTITUCION AND GUARDIA.IDTURNO =EJG.GUARDIATURNO_IDTURNO  AND GUARDIA.IDGUARDIA =EJG.GUARDIATURNO_IDGUARDIA");
 		sql.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON F_SIGA_GET_IDULTIMOESTADOEJG(ejg.IDINSTITUCION, ejg.IDTIPOEJG, ejg.ANIO, ejg.NUMERO) = MAESTROESTADO.IDESTADOEJG");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
 				+ idLenguaje + "'");
 		sql.LEFT_OUTER_JOIN(
 				"scs_tipodictamenejg tipodictamen ON tipodictamen.idtipodictamenejg = ejg.idtipodictamenejg AND ejg.idinstitucion = tipodictamen.idinstitucion");
@@ -1418,7 +1426,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "AND ESTADO.IDTIPOEJG = ESTADO3.IDTIPOEJG " + "AND ESTADO.ANIO = ESTADO3.ANIO "
 				+ "AND ESTADO.NUMERO = ESTADO3.NUMERO " + "AND ESTADO3.FECHABAJA IS NULL))))");
 		sql.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON ESTADO.IDESTADOEJG = MAESTROESTADO.IDESTADOEJG");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND REC.IDLENGUAJE = '"
 				+ idLenguaje + "'");
 		sql.LEFT_OUTER_JOIN(
 				"scs_tipodictamenejg tipodictamen ON tipodictamen.idtipodictamenejg = ejg.idtipodictamenejg AND ejg.idinstitucion = tipodictamen.idinstitucion");
@@ -1546,7 +1554,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numejg numero, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
+		sql.SELECT("ejg.idinstitucion, ejg.anio, ejg.numejg numero, ejg.numero numeroasoc, ( 'E' || ejg.anio || '/' || ejg.numejg) asunto,"
 				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,ejg.idtipoejg,"
 				+ "f_siga_getrecurso(nvl(te.descripcion,'')," + idLenguaje + ") tipoejg,"
 				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
@@ -1767,11 +1775,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.INNER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = PER.IDPERSONA)");
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO ESTADO ON (PER.IDPERSONA = ESTADO.IDPERSONA AND ESTADO.IDINSTITUCION = COL.IDINSTITUCION )");
-		if ((item.getIdGuardia() != null && item.getIdGuardia().length > 0)
-				|| (item.getIdTurno() != null && item.getIdTurno().length > 0)) {
-			sql.INNER_JOIN(
-					"SCS_GUARDIASCOLEGIADO GUARDIAS ON (PER.IDPERSONA = GUARDIAS.IDPERSONA AND COL.IDINSTITUCION = GUARDIAS.IDINSTITUCION)");
-		}
 
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL TIPOESTADO ON (TIPOESTADO.IDESTADO=ESTADO.IDESTADO)");
 		sql.INNER_JOIN("CEN_INSTITUCION INS ON (INS.IDINSTITUCION=COL.IDINSTITUCION)");
@@ -1819,10 +1822,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			for (int i = 1; i < item.getIdTurno().length; i++) {
 				inSQL += ", " + item.getIdTurno()[i];
 			}
-			//SIGARNV-3125@DTT.JAMARTIN@15/02/2023@INICIO
-//			sql.WHERE("GUARDIAS.IDTURNO IN  (" + inSQL + ")");
+
 			sql.WHERE("tur.IDTURNO IN  (" + inSQL + ")");
-			//SIGARNV-3125@DTT.JAMARTIN@15/02/2023@FIN 
 		}
 
 		if (item.getIdGuardia() != null && item.getIdGuardia().length > 0) {
@@ -1830,8 +1831,14 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			for (int i = 1; i < item.getIdGuardia().length; i++) {
 				inSQL += ", " + item.getIdGuardia()[i];
 			}
-			sql.WHERE("GUARDIAS.IDGUARDIA IN (" + inSQL + ")");
+			sql.WHERE("guar.IDGUARDIA IN (" + inSQL + ")");
+			
 		}
+		
+		sql.WHERE("guar.fechasolicitudbaja IS NULL");
+		sql.WHERE("guar.fechadenegacion IS NULL");
+		sql.WHERE("tur.fechasolicitudbaja IS NULL");
+		sql.WHERE("tur.fechadenegacion IS NULL");
 
 		if (item.getNif() != null && !item.getNif().isEmpty()) {
 			sql.WHERE("PER.NIFCIF = '" + item.getNif() + "'");
@@ -2702,6 +2709,19 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.WHERE("numeroejg = " + ejgItem.getNumero());
 		sql.WHERE("IDTIPOEJG = " + ejgItem.getTipoEJG());
 		
+		
+		return sql.toString();
+	}
+	
+	public String updatePersonaJG(ScsEjg ejg, Long idPersona) {
+		SQL sql = new SQL();
+		
+		sql.UPDATE("SCS_EJG");
+		sql.SET("IDPERSONAJG = " + idPersona);
+		sql.WHERE("IDINSTITUCION = " + ejg.getIdinstitucion());
+		sql.WHERE("ANIO = " + ejg.getAnio());
+		sql.WHERE("NUMERO = " + ejg.getNumero());
+		sql.WHERE("IDTIPOEJG = " + ejg.getIdtipoejg());
 		
 		return sql.toString();
 	}

@@ -89,6 +89,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         query.SELECT("RETENCIONES.IDINSTITUCION");
         query.SELECT("RETENCIONES.IDPERSONA");
         query.SELECT("RETENCIONES.IDRETENCION");
+        query.SELECT("RETENCIONES.ESDETURNO");
         query.SELECT("(" + subQuery.toString() + ") AS NCOLEGIADO");
         query.SELECT("DECODE(RETENCIONES.TIPORETENCION, 'P', F_SIGA_GETRECURSO_ETIQUETA('FACTSJCS.MANTRETENCIONESJ.LITERAL.PORCENTUAL', " + idLenguaje + "), 'F', F_SIGA_GETRECURSO_ETIQUETA('FACTSJCS.MANTRETENCIONESJ.LITERAL.IMPORTEFIJO', " + idLenguaje + "), 'L', F_SIGA_GETRECURSO_ETIQUETA('FACTSJCS.MANTRETENCIONESJ.LITERAL.TRAMOSLEC', " + idLenguaje + ")) AS TIPORETENCION");
         query.SELECT("(" + subQuery2.toString() + ") AS NOMBRE");
@@ -151,6 +152,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         superQuery.SELECT("IMPORTE");
         superQuery.SELECT("RETENCIONAPLICADA");
         superQuery.SELECT("RESTANTE");
+        superQuery.SELECT("ESDETURNO");
         superQuery.FROM("(" + query.toString() + ")");
 
         if (tamMaximo != null) {
@@ -176,6 +178,7 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         superQuery.GROUP_BY("IMPORTE");
         superQuery.GROUP_BY("RETENCIONAPLICADA");
         superQuery.GROUP_BY("RESTANTE");
+        superQuery.GROUP_BY("ESDETURNO");
 
         superQuery.ORDER_BY("ORDEN");
         superQuery.ORDER_BY("FECHAINICIO");

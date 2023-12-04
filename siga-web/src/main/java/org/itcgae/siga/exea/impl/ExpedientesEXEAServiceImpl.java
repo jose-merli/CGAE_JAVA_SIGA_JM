@@ -709,7 +709,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                 String idSolicitud = request.getParameter("idSolicitud");
                 String json = "";
                 String[] jsons = request.getParameter("documentosJSON").replace("[", "").replace("]", "").replace("},{", "};{").split(";");
-                Collections.reverse(Arrays.asList(jsons)); //El orden del JSON es inverso al de los documentos, lo revertimos
+                //Collections.reverse(Arrays.asList(jsons)); //El orden del JSON es inverso al de los documentos, lo revertimos
                 Iterator<String> itr = request.getFileNames();
                 Short idInstitucionSol = cenSolicitudincorporacionExtendsMapper.selectByPrimaryKey(Long.valueOf(idSolicitud)).getIdinstitucion();
                 int i = 0;

@@ -44,6 +44,12 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 	})
 	List<AsuntosJusticiableItem> searchClaveSoj(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMax, String idLenguaje);
 	
+	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "selectNuevoNumero")
+	String selectNuevoNumero(FichaSojItem datos, Short idInstitucion);
+	
+	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "selectNuevoNumeroSOJ")
+	String selectNuevoNumeroSOJ(FichaSojItem datos, Short idInstitucion);
+	
 	@SelectProvider(type = ScsSojSqlExtendsProvider.class, method = "getAsuntoTipoSoj")
 	@Results({ 
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),

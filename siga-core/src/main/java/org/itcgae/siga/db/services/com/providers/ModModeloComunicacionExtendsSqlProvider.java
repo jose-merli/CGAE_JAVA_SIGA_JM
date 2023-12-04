@@ -142,6 +142,60 @@ public class ModModeloComunicacionExtendsSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String selectModelosComunicacionDialgConConsultaDestinatarios(String idInstitucionLogueada, String idInstitucion, String idClaseComunicacion, String idModulo,
+			String idLenguaje, String idConsulta, List<String> perfiles) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
+		sql.SELECT("MODELO.IDPLANTILLAENVIOS");
+		sql.SELECT("MODELO.IDTIPOENVIOS");
+		sql.SELECT("MODELO.VISIBLE");
+		sql.SELECT("MODELO.PRESELECCIONAR");
+		sql.SELECT("MODELO.INFORMEUNICO");
+		sql.SELECT("MODELO.ORDEN");
+		sql.SELECT("cc.DESCRIPCION AS NOMBRECONSULTADESTINATARIOS");
+		sql.SELECT(
+				"(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = MODELO.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"
+						+ idLenguaje + "') AS TIPOENVIO");
+
+		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
+		sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
+		sql.LEFT_OUTER_JOIN("ENV_CONSULTASENVIO ec ON ec.IDMODELOCOMUNICACION = modelo.IDMODELOCOMUNICACION AND ec.IDOBJETIVO = 1");
+		sql.LEFT_OUTER_JOIN("CON_CONSULTA cc ON cc.IDCONSULTA = ec.IDCONSULTA");
+
+		sql.JOIN( // = MODELO.IDINSTITUCION
+					"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = " + idInstitucionLogueada);
+
+		if(idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
+			
+			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + "  AND MODELO.FECHABAJA IS NULL AND MODELO.IDINSTITUCION = "+idInstitucion);
+			sql.WHERE("MODELO.VISIBLE = '1'");
+
+		}else {
+
+			// CLASE.IDMODULO = " + idModulo + " OR 
+			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND MODELO.FECHABAJA IS NULL ");	
+			sql.WHERE("((MODELO.IDINSTITUCION = " + idInstitucion + " AND MODELO.VISIBLE = '1') or (MODELO.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + " AND MODELO.VISIBLE = '1' and modelo.pordefecto = 'SI'))");
+
+
+		}
+
+		if (idConsulta != null) {
+			sql.WHERE(
+					"MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION_CONSULTA='"
+							+ idInstitucion + "' AND IDCONSULTA='" + idConsulta + "' AND FECHABAJA IS NULL)");
+		}
+
+		if (perfiles != null && perfiles.size() > 0) {
+			sql.WHERE("PERFILES.IDPERFIL IN (" + String.join(",", perfiles) + ")");
+		}
+		
+		sql.ORDER_BY("MODELO.ORDEN ASC");
+
+		return sql.toString();
+	}
 
 	public String selectPlantillaModelo(String idModeloComunicacion, Short idInstitucion) {
 

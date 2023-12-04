@@ -24,6 +24,7 @@ import org.itcgae.siga.DTOs.com.GenerarComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionSearchConNombreConsultaDestinatarios;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
@@ -96,6 +97,16 @@ public class DialogoComunicacionController {
 			return new ResponseEntity<ModelosComunicacionSearch>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ModelosComunicacionSearch>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/modelosSearchConConsultaDestinatarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ModelosComunicacionSearchConNombreConsultaDestinatarios> modelosComunicacionSearchConConsultaDestinatarios(HttpServletRequest request, @RequestBody ModeloDialogoItem modeloDTO) {
+		
+		ModelosComunicacionSearchConNombreConsultaDestinatarios response = _dialogoComunicacionService.obtenerModelosConConsultaDestinatarios(request, modeloDTO);
+		if(response.getError() == null)
+			return new ResponseEntity<ModelosComunicacionSearchConNombreConsultaDestinatarios>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ModelosComunicacionSearchConNombreConsultaDestinatarios>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/tipoEnvios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

@@ -6626,34 +6626,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		if (ejg.getIdentificadords() == null) {
 
-			// longitud maxima para num
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
-			List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-			String longitudEJG = listParam.get(0).getValor();
-
-			// Alteramos el numero para que todos los numeros de las carpetas de una
-			// institucion tengan la misma longitud.
-
-			String numero = ejgItem.getNumero();
-
-			int numCeros = Integer.parseInt(longitudEJG) - ejgItem.getNumero().length();
-
-			String ceros = "";
-			for (int i = 0; i < numCeros; i++) {
-				ceros += "0";
-			}
-
-			ceros += numero;
-
-			// Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya
-			// que no es una clave unica
-			// y mantener el formato de DocuShare.
-			String title = ejgItem.getAnnio() + "/" + ceros;
+			// Año EJG/Num EJG. formato de DocuShare.
+			String title = ejg.getAnio() + "/" + ejg.getNumejg();
 
 			LOGGER.debug("ValorEjgDocu : " + title);
 			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);
@@ -6701,40 +6675,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				// longitud maxima para num
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
-				List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-				String longitudEJG = listParam.get(0).getValor();
-
-				// Alteramos el numero para que todos los numeros de las carpetas de una
-				// institucion tengan la misma longitud.
-
-				String numero = ejgItem.getNumero();
-
-				int numCeros = Integer.parseInt(longitudEJG) - ejgItem.getNumero().length();
-
-				String ceros = "";
-				for (int i = 0; i < numCeros; i++) {
-					ceros += "0";
-				}
-
-				ceros += numero;
-
-				// Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya
-				// que no es una clave unica
-				// y mantener el formato de DocuShare.
-				String title = ejgItem.getAnnio() + "/" + ceros;
-
-				idDS = docushareHelper.createCollectionEjg(idInstitucion, title, "");
-
-				LOGGER.info("insertCollectionEjg() / docushareHelper.createCollectionEjg() -> Valor de idDS obtenido: "
-						+ idDS);
-
 				ScsEjgKey key = new ScsEjgKey();
 
 				key.setIdinstitucion(idInstitucion);
@@ -6743,6 +6683,20 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				key.setNumero(Long.valueOf(ejgItem.getNumero()));
 
 				ScsEjgWithBLOBs ejg = scsEjgMapper.selectByPrimaryKey(key);
+
+				// Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya
+				// que no es una clave unica
+				// y mantener el formato de DocuShare.
+				String title = ejgItem.getAnnio() + "/" + ejg.getNumejg();
+
+				idDS = docushareHelper.createCollectionEjg(idInstitucion, title, "");
+
+				if (idDS == null || idDS.isEmpty()) {
+					throw (new Exception("Error al crear la colección en Regtel para el EJG"));
+				}
+				
+				LOGGER.info("insertCollectionEjg() / docushareHelper.createCollectionEjg() -> Valor de idDS obtenido: "
+						+ idDS);
 
 				ejg.setIdentificadords(idDS);
 				ejg.setFechamodificacion(new Date());
@@ -6783,34 +6737,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		if (ejg.getIdentificadords() == null) {
 
-			// longitud maxima para num
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
-					.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
-			List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-			String longitudEJG = listParam.get(0).getValor();
-
-			// Alteramos el numero para que todos los numeros de las carpetas de una
-			// institucion tengan la misma longitud.
-
-			String numero = docu.getNumero();
-
-			int numCeros = Integer.parseInt(longitudEJG) - numero.length();
-
-			String ceros = "";
-			for (int i = 0; i < numCeros; i++) {
-				ceros += "0";
-			}
-
-			ceros += numero;
-
 			// Año EJG/Num EJG. Se realiza el proceso anterior para no utilizar numEjg ya
 			// que no es una clave unica
 			// y mantener el formato de DocuShare.
-			String title = docu.getAnio() + "/" + ceros;
+			String title = docu.getAnio() + "/" + ejg.getNumejg();
 
 			LOGGER.debug("ValorEjgDocu : " + title);
 			identificadorDS = docushareHelper.buscaCollectionEjg(title, idInstitucion);

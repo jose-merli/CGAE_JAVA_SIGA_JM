@@ -20,7 +20,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
                     sql2.FROM("SCS_ESTADOEJG E");
                     sql2.INNER_JOIN("SCS_MAESTROESTADOSEJG MAESTROESTADO ON MAESTROESTADO.IDESTADOEJG = E.IDESTADOEJG");
-                    sql2.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND IDLENGUAJE = '" + idLenguaje + "'");
+                    sql2.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = MAESTROESTADO.DESCRIPCION AND IDLENGUAJE = '" + idLenguaje + "'");
           
                     sql2.WHERE("E.IDINSTITUCION = '" + asuntoClave.getIdInstitucion() + "'");
                     sql2.WHERE("E.IDTIPOEJG = '" + asuntoClave.getClave() + "'");
@@ -103,7 +103,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
 
         sql.FROM("scs_estadoejg estado");
         sql.INNER_JOIN("scs_maestroestadosejg maestro on (estado.idestadoejg=maestro.idestadoejg)");
-        sql.INNER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
+        sql.LEFT_OUTER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
         sql.LEFT_OUTER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
         sql.LEFT_OUTER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
 
@@ -151,7 +151,7 @@ public class ScsEstadoejgSqlExtendsProvider extends ScsEstadoejgSqlProvider {
     	
     	sql.FROM("scs_estadoejg estado");
         sql.INNER_JOIN("scs_maestroestadosejg maestro on (estado.idestadoejg=maestro.idestadoejg)");
-        sql.INNER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
+        sql.LEFT_OUTER_JOIN("gen_recursos_catalogos recursos on (maestro.descripcion=recursos.idrecurso)");
         sql.LEFT_OUTER_JOIN("cen_persona persona on (estado.usumodificacion=persona.idpersona)");
         sql.LEFT_OUTER_JOIN("adm_usuarios usuario ON (estado.usumodificacion = usuario.idusuario and estado.idinstitucion = usuario.idinstitucion)");
 

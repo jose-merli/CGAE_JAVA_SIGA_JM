@@ -20,6 +20,7 @@ public class RetencionesItem {
     private String importe;
     private String retencionAplicada;
     private String restante;
+    private boolean esDeTurno;
 
 }
 

@@ -8,13 +8,17 @@ public class ScsTiposGuardiasSqlExtendsProvider extends ScsTiposguardiasSqlProvi
 	public String comboTiposGuardia(String idLenguaje) {
 
 		SQL sql = new SQL();
-
-		sql.SELECT("SCS_TIPOSGUARDIAS.IDTIPOGUARDIA, GEN_RECURSOS_CATALOGOS.DESCRIPCION");
+		SQL sqlfinal = new SQL();
+		
+		sql.SELECT("SCS_TIPOSGUARDIAS.IDTIPOGUARDIA");
+		sql.SELECT("f_siga_getrecurso(SCS_TIPOSGUARDIAS.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOSGUARDIAS");
-		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON SCS_TIPOSGUARDIAS.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO");
-		sql.WHERE("SCS_TIPOSGUARDIAS.FECHA_BAJA IS NULL AND GEN_RECURSOS_CATALOGOS.IDLENGUAJE ='"+idLenguaje+"'");
-		sql.ORDER_BY( "GEN_RECURSOS_CATALOGOS.DESCRIPCION");
-		return sql.toString();
+		sql.WHERE("SCS_TIPOSGUARDIAS.FECHA_BAJA IS NULL");
+		
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 
 

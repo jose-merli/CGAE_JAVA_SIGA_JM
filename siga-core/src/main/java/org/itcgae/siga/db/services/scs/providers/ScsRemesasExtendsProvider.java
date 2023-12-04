@@ -38,6 +38,9 @@ public class ScsRemesasExtendsProvider {
 		SQL subquery6 = new SQL();
 		SQL subquery7 = new SQL();
 		SQL subquery8 = new SQL();
+		SQL subquery9 = new SQL();
+		SQL subquery10 = new SQL();
+		SQL subquery11 = new SQL();
 		SQL fechaGeneracion = new SQL();
 		SQL fechaEnvio = new SQL();
 		SQL fechaRecepcion = new SQL();
@@ -85,13 +88,89 @@ public class ScsRemesasExtendsProvider {
 		subquery3.WHERE("est.idestado = a.idestado");
 		subquery3.WHERE("rownum=1");
 
-		subquery5.SELECT("count(distinct ejgr.idejgremesa)");
-		subquery5.FROM("cajg_ejgremesa ejgr");
-		subquery5.FROM("cajg_respuesta_ejgremesa resp");
-		subquery5.WHERE("ejgr.idinstitucion = rem.idinstitucion");
-		subquery5.WHERE("ejgr.idremesa = rem.idremesa");
-		subquery5.WHERE("ejgr.idejgremesa = resp.idejgremesa");
-
+		subquery9.SELECT("count(distinct ejgr.idejgremesa)");
+		subquery9.FROM("cajg_ejgremesa ejgr");
+		subquery9.FROM("cajg_respuesta_ejgremesa resp");
+		subquery9.WHERE("ejgr.idinstitucion = rem.idinstitucion");
+		subquery9.WHERE("ejgr.idremesa = rem.idremesa");
+		subquery9.WHERE("ejgr.idejgremesa = resp.idejgremesa");
+		
+		subquery11.SELECT("COUNT(1)");
+		subquery11.FROM("CAJG_EJGREMESA ER2");
+		subquery11.FROM("CAJG_REMESA REM2");
+		subquery11.WHERE("ER2.IDINSTITUCION = REM2.IDINSTITUCION");
+		subquery11.WHERE("ER2.IDREMESA = REM2.IDREMESA");
+		subquery11.WHERE("REM2.IDTIPOREMESA = remesa1.IDTIPOREMESA");
+		subquery11.WHERE("ER2.IDINSTITUCION = ejgremesa1.IDINSTITUCION");
+		subquery11.WHERE("ER2.ANIO = ejgremesa1.ANIO");
+		subquery11.WHERE("ER2.NUMERO = ejgremesa1.NUMERO");
+		subquery11.WHERE("ER2.IDTIPOEJG = ejgremesa1.IDTIPOEJG");
+		subquery11.WHERE("ER2.IDREMESA > ejgremesa1.IDREMESA ");
+		
+		subquery10.SELECT("COUNT(("+ subquery11.toString() + "))");
+		subquery10.FROM("SCS_EJG ejg1");
+		subquery10.FROM("SCS_GUARDIASTURNO guardia1");
+		subquery10.FROM("SCS_TIPOEJG tipoejg1");
+		subquery10.FROM("CEN_COLEGIADO colegiado1");
+		subquery10.FROM("CAJG_EJGREMESA ejgremesa1");
+		subquery10.FROM("CAJG_REMESA remesa1");
+		subquery10.FROM("SCS_PERSONAJG persona1");
+		subquery10.FROM("SCS_ESTADOEJG estado1");
+		subquery10.FROM("SCS_MAESTROESTADOSEJG maestroestado1");
+		subquery10.WHERE("ejg1.IDTIPOEJG = tipoejg1.IDTIPOEJG");
+		subquery10.WHERE("ejg1.IDINSTITUCION = guardia1.IDINSTITUCION(+)");
+		subquery10.WHERE("ejg1.GUARDIATURNO_IDTURNO = guardia1.IDTURNO(+)");
+		subquery10.WHERE("ejg1.GUARDIATURNO_IDGUARDIA = guardia1.IDGUARDIA(+)");
+		subquery10.WHERE("ejg1.IDINSTITUCION = colegiado1.IDINSTITUCION(+)");
+		subquery10.WHERE("ejg1.IDPERSONA = colegiado1.IDPERSONA(+)");
+		subquery10.WHERE("ejg1.idinstitucion = persona1.IDINSTITUCION (+)");
+		subquery10.WHERE("ejg1.IDPERSONAJG = persona1.IDPERSONA(+)");
+		subquery10.WHERE("estado1.idestadoejg = maestroestado1.idestadoejg (+)");
+		subquery10.WHERE("estado1.idinstitucion = ejg1.idinstitucion");
+		subquery10.WHERE("estado1.idtipoejg = ejg1.idtipoejg");
+		subquery10.WHERE("estado1.anio = ejg1.anio");
+		subquery10.WHERE("estado1.numero = ejg1.numero");
+		subquery10.WHERE("estado1.fechabaja IS NULL");
+		subquery10.WHERE("estado1.idestadoporejg = (\r\n"
+				+ "		SELECT\r\n"
+				+ "			MAX(estado2.idestadoporejg)\r\n"
+				+ "		FROM\r\n"
+				+ "			scs_estadoejg estado2\r\n"
+				+ "		WHERE\r\n"
+				+ "			estado2.idinstitucion = estado1.idinstitucion\r\n"
+				+ "			AND estado2.idtipoejg = estado1.idtipoejg\r\n"
+				+ "			AND estado2.anio = estado1.anio\r\n"
+				+ "			AND estado2.numero = estado1.numero\r\n"
+				+ "                    )");
+		subquery10.WHERE("ejg1.idinstitucion = ejgremesa1.idinstitucion");
+		subquery10.WHERE("ejg1.anio = ejgremesa1.anio");
+		subquery10.WHERE("ejg1.numero = ejgremesa1.numero");
+		subquery10.WHERE("ejg1.idtipoejg = ejgremesa1.idtipoejg");
+		subquery10.WHERE("ejgremesa1.idremesa = remesa1.idremesa");
+		subquery10.WHERE("ejgremesa1.idinstitucion = remesa1.idinstitucion");
+		subquery10.WHERE("ejgremesa1.idremesa = rem.IDREMESA ");
+		subquery10.WHERE("ejgremesa1.idinstitucion = rem.IDINSTITUCION");
+		subquery10.WHERE("(SELECT\r\n"
+				+ "					COUNT(1)\r\n"
+				+ "				FROM\r\n"
+				+ "					CAJG_EJGREMESA ER2,\r\n"
+				+ "					CAJG_REMESA REM2\r\n"
+				+ "				WHERE\r\n"
+				+ "					(ER2.IDINSTITUCION = REM2.IDINSTITUCION\r\n"
+				+ "						AND ER2.IDREMESA = REM2.IDREMESA\r\n"
+				+ "						AND REM2.IDTIPOREMESA = remesa1.IDTIPOREMESA\r\n"
+				+ "						AND ER2.IDINSTITUCION = ejgremesa1.IDINSTITUCION\r\n"
+				+ "						AND ER2.ANIO = ejgremesa1.ANIO\r\n"
+				+ "						AND ER2.NUMERO = ejgremesa1.NUMERO\r\n"
+				+ "						AND ER2.IDTIPOEJG = ejgremesa1.IDTIPOEJG\r\n"
+				+ "						AND ER2.IDREMESA > ejgremesa1.IDREMESA )\r\n"
+				+ "			) >0");
+		subquery10.WHERE("ejgremesa1.IDEJGREMESA IN(\r\n"
+				+ "			SELECT cre.IDEJGREMESA  FROM CAJG_RESPUESTA_EJGREMESA cre \r\n"
+				+ "			JOIN CAJG_EJGREMESA ce ON ce.IDEJGREMESA = cre.IDEJGREMESA\r\n"
+				+ "		)");
+		
+		
 		subquery6.SELECT("count(1)");
 		subquery6.FROM("cajg_ejgremesa ejgr");
 		subquery6.WHERE("ejgr.idinstitucion = rem.idinstitucion");
@@ -176,9 +255,9 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("(" + subquery1.toString() + ") fecha_envio");
 		sql.SELECT("(" + subquery2.toString() + ") fecha_recepcion");
 		sql.SELECT("F_SIGA_GETRECURSO((tipoest.descripcion), " + idLenguaje + ") estado");
-		sql.SELECT("(" + subquery5.toString() + ") incidencias_ejg");
+		sql.SELECT("(" + subquery9.toString() + ") - " + "("+subquery10.toString() +") incidencias_ejg");
 		sql.SELECT("(" + subquery6.toString() + ") total_ejg");
-		sql.SELECT("(" + subquery5.toString() + ") || ' / ' || (" + subquery6.toString() + ") as INCIDENCIAS");
+		sql.SELECT("(" + subquery9.toString() + ") - " + "("+subquery10.toString() +") || ' / ' || (" + subquery6.toString() + ") as INCIDENCIAS");
 		sql.FROM("cajg_remesa rem");
 		sql.FROM("cajg_remesaestados est");
 		sql.FROM("cajg_tipoestadoremesa tipoest");

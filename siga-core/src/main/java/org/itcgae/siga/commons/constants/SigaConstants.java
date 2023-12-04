@@ -1493,7 +1493,6 @@ public class SigaConstants {
 
 	public static String ENVIOS_MASIVOS_LOG_NOMBRE_FICHERO = "informeEnvio.log";
 
-
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
 	public static String EXPRESION_REGULAR_MAIL2 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
 			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
@@ -1543,6 +1542,8 @@ public class SigaConstants {
 	
 
 	public static final String I_INFORMEFACTSJCS = "FACJ2";
+	
+	public static String[] hitosFueraGuardia = new String[] { "25", "31", "7", "22" };
 
 	// hitos generales de facturacion
 	public static final int HITO_GENERAL_TURNO = 10;
@@ -1567,7 +1568,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="EEJG_IDSISTEMA";
 	public static String EEJG_URLWS ="EEJG_URLWS";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.107_3";
+	public static String SIGAWEB_VERSION = "1.0.109_0";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";

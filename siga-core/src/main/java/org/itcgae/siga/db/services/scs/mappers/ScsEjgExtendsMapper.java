@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
@@ -19,7 +20,9 @@ import org.itcgae.siga.DTOs.scs.ExpInsosItem;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
+import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
+import org.itcgae.siga.db.mappers.ScsEjgSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsEjgSqlExtendsProvider;
 
 public interface ScsEjgExtendsMapper extends ScsEjgMapper {
@@ -55,7 +58,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOEJG", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOEJG", property = "tipo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroasoc", property = "numeroAsoc", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AsuntosJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo,
 													   String idLenguaje);
@@ -454,4 +458,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NUMPROCEDIMIENTO", property = "numprocedimiento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ExpInsosItem> getDatosExpInsos(EjgItem item);
+	
+	@UpdateProvider(type = ScsEjgSqlExtendsProvider.class, method = "updatePersonaJG")
+	int updatePersonaJG(ScsEjg ejg, Long idPersona);
 }

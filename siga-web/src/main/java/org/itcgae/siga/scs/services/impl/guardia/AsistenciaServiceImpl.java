@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -678,6 +679,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		Error error = new Error();
 		try {
 			if (idInstitucion != null) {
+				
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni)
 						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -701,6 +703,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							.getValor();
 
 					if (asistencias != null && !asistencias.isEmpty()) {
+						String[] nombres = new String[2];
+						
+						// Cuando se realice una sustitución, sacamos nombre y apellidos de los letrados
+						if ("S".equals(asistencias.get(0).getFiltro().getIsSustituto()) &&
+								!UtilidadesString.esCadenaVacia(asistencias.get(0).getFiltro().getIdLetradoManual())) {
+							
+							// Nombre letrado guardia
+							nombres[0] = obtenerNombreCompletoLetrado(asistencias.get(0).getFiltro().getIdLetradoGuardia(), idInstitucion);
+						}
 
 						asistencias.forEach((TarjetaAsistenciaResponse2Item asistencia) -> {
 
@@ -754,6 +765,11 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											asistencia.getActuaciones().get(i), asistencia, anioAsistencia,
 											numeroAsistencia, tipoAsistenciaGeneral, idInstitucion, true,
 											usuarios.get(0));
+									
+									if ("S".equals(asistencias.get(0).getFiltro().getIsSustituto()) &&
+											!UtilidadesString.esCadenaVacia(asistencias.get(0).getFiltro().getIdLetradoManual())) {
+										actuacionBBDD.setObservaciones("Viene de la guardia original de " + nombres[0]);
+									}
 
 									int responseActuacion = scsActuacionasistenciaExtendsMapper.insertSelective(actuacionBBDD);
 									if (responseActuacion == 0) {
@@ -792,6 +808,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 									// Si es nueva la insertamos, si no updateamos
 									if (isNuevaActuacion) {
+										// Si se va a realizar una sustitución se informa en las observaciones de la actuación
+										if ("S".equals(asistencias.get(0).getFiltro().getIsSustituto()) &&
+												!UtilidadesString.esCadenaVacia(asistencias.get(0).getFiltro().getIdLetradoManual())) {
+											actuacionBBDD.setObservaciones("Viene de la guardia original de " + nombres[0]);
+										}
+										
 										LOGGER.info("guardarAsistenciasExpres() / Nueva actuacion");
 										int responseActuacion = scsActuacionasistenciaExtendsMapper.insertSelective(actuacionBBDD);
 										if (responseActuacion == 0) {
@@ -802,6 +824,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											error.description("Error al insertar la nueva actuacion");
 										}
 									} else {
+										
 										LOGGER.info("guardarAsistenciasExpres() / Actuacion existente, actualizamos");
 										actuacionBBDD.setIdactuacion(Long.valueOf(i + 1));
 										int responseActuacion = scsAsistenciaExtendsMapper.updateAsistenciaExpress(actuacionBBDD);
@@ -835,6 +858,16 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			deleteResponseDTO.setError(error);
 		}
 		return deleteResponseDTO;
+	}
+
+	private String obtenerNombreCompletoLetrado(String idLetrado, Short idInstitucion) {
+		String nombreCompleto = "";
+		FichaPersonaItem fichaPersonaItem;
+		
+		fichaPersonaItem = cenPersonaExtendsMapper.getColegiadoByIdPersona(idLetrado, idInstitucion);
+		
+		nombreCompleto = fichaPersonaItem.getApellido1() + " " + fichaPersonaItem.getApellido2() + ", " +  fichaPersonaItem.getNombre();
+		return nombreCompleto;
 	}
 
 	/**
@@ -1253,8 +1286,18 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			Date fechaActuacion = new SimpleDateFormat("dd/MM/yyyy").parse(actuacion.getFechaActuacion());
 			Date fechaAsistencia = new SimpleDateFormat("dd/MM/yyyy").parse(asistencia.getFechaAsistencia());
 			
-			if (compruebaDiaDespues(fechaAsistencia, fechaActuacion) == true) {
-				actuacionBBDD.setDiadespues("S");
+			if (compruebaFueraGuardia(idInstitucion, asistencia.getIdTurno(), asistencia.getIdGuardia())) {
+				if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, true)) {
+					actuacionBBDD.setDiadespues("S");
+				} else {
+					actuacionBBDD.setDiadespues("N");
+				}
+			} else {
+				if (compruebaDiaDespues(fechaAsistencia, fechaActuacion, true)) {
+					actuacionBBDD.setDiadespues("S");
+				} else {
+					actuacionBBDD.setDiadespues("N");
+				}
 			}
 			
 		} catch (ParseException e) {
@@ -1267,6 +1310,31 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return actuacionBBDD;
 	}
 	
+	// Comprueba si el baremo de guardia tiene
+	private boolean compruebaFueraGuardia(Short idInstitucion, String idTurno, String idGuardia) {
+		
+		try {
+			ScsHitofacturableguardiaExample hfg = new ScsHitofacturableguardiaExample();
+			hfg.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+			.andIdturnoEqualTo(Integer.parseInt(idTurno))
+			.andIdguardiaEqualTo(Integer.parseInt(idGuardia));
+			
+			List<ScsHitofacturableguardia> hitos = scsHitofacturableguardiaExtendsMapper.selectByExample(hfg);
+			
+			for(ScsHitofacturableguardia hito: hitos) {
+				for (String hitoFueraGuardia: SigaConstants.hitosFueraGuardia) {
+					if (hito.getIdhito() == Long.parseLong(hitoFueraGuardia)) {
+						return true;
+					}
+				}
+			}
+		} catch(Exception e) {
+			return false;
+		}
+		
+		return false;
+	}
+
 	private Date reiniciaHoraFecha(Date dia) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(dia);
@@ -1279,14 +1347,19 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		return calendar.getTime();
 	}
 	
-	private boolean compruebaDiaDespues(Date dia, Date posibleDiaDespues) {
+	private boolean compruebaDiaDespues(Date dia, Date posibleDiaDespues, boolean variosDiasdespues) {
 		dia = reiniciaHoraFecha(dia);
 		posibleDiaDespues = reiniciaHoraFecha(posibleDiaDespues);
 		
 		long diferenciaEnMilisegundos = posibleDiaDespues.getTime() - dia.getTime();
 		long DiferenciaEnDias = diferenciaEnMilisegundos / (1000 * 60 * 60 * 24);
 				
-		return DiferenciaEnDias == 1;
+		if (variosDiasdespues) {
+			return DiferenciaEnDias >= 1;
+		} else {
+			return DiferenciaEnDias == 1;
+		}
+		
 	}
 	
 	private String getTipoActuacionPorDefecto (AdmUsuarios usuario, Short idInstitucion, String idTipoAsistencia, String juzgadoComisaria) {
@@ -1373,54 +1446,37 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @throws Exception
 	 */
 	@Transactional
-	private void procesarSustitucionGuardia(FiltroAsistenciaItem filtro, Short idInstitucion,
-			HttpServletRequest request) throws SigaExceptions {
-
+	private void procesarSustitucionGuardia(FiltroAsistenciaItem filtro, Short idInstitucion, HttpServletRequest request) throws SigaExceptions {
 		try {
 			if ("S".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
-				String diaGuardia = String
-						.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
+				String diaGuardia = String.valueOf(new SimpleDateFormat("dd/MM/yyyy").parse(filtro.getDiaGuardia()).getTime());
 				String[] datos = new String[11];
 				datos[0] = filtro.getIdTurno();
 				datos[1] = filtro.getIdGuardia();
-				datos[2] = diaGuardia; // Fecha
-										// desde
-										// la
-										// que
-										// se
-										// sustituye
+				datos[2] = diaGuardia; // Fecha desde la que se sustituye
 				datos[3] = filtro.getIdLetradoGuardia(); // Letrado al que vamos a sustituir
 				datos[4] = filtro.getIdLetradoManual(); // Letrado que sustituye
-				datos[5] = diaGuardia; // Fecha
-										// de
-										// sustitucion
+				datos[5] = diaGuardia; // Fecha de sustitucion
 				datos[6] = ""; // Comentario
 				datos[7] = filtro.getSalto(); // Salto (S) o compensacion (C) y Salto y compensacion (S/C)
 				datos[8] = scsGuardiasturnoExtendsMapper.getIdCalendarioGuardiasFecha(filtro.getIdTurno(),
 						filtro.getIdGuardia(), idInstitucion.toString(), filtro.getDiaGuardia()); // idCalendario
-				datos[9] = diaGuardia; // Fecha
-										// hasta
-										// la
-										// que
-										// se
-										// sustituye
+				datos[9] = diaGuardia; // Fecha hasta la que se sustituye
 				datos[10] = "True";
 
 				// Sustituimos el que está de guardia por el de la asistencia
 				LOGGER.info("procesarSustitucionGuardia() / Se sustituye letrado de guardia");
-				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos,
-						request);
+				UpdateResponseDTO updateResponseDTO = guardiasColegiadoServiceImpl.sustituirGuardiaColeg(datos, request);
 
-			} else if ("N".equals(filtro.getIsSustituto())
-					&& !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
-				LOGGER.info(
-						"procesarSustitucionGuardia() / Se añade el letrado de la asistencia como refuerzo en la guardia");
+			} else if ("N".equals(filtro.getIsSustituto()) && !UtilidadesString.esCadenaVacia(filtro.getIdLetradoManual())) {
+				LOGGER.info("procesarSustitucionGuardia() / Se añade el letrado de la asistencia como refuerzo en la guardia");
 				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
 				tarjetaAsistenciaResponseItem.setIdTurno(filtro.getIdTurno());
 				tarjetaAsistenciaResponseItem.setIdGuardia(filtro.getIdGuardia());
 				tarjetaAsistenciaResponseItem.setFechaAsistencia(filtro.getDiaGuardia() + " 00:00");
 				tarjetaAsistenciaResponseItem.setIdLetradoGuardia(filtro.getIdLetradoManual());
-				procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
+				tarjetaAsistenciaResponseItem.setFiltro(filtro);
+				procesaGuardiasColegiadoSaltoComp(tarjetaAsistenciaResponseItem, idInstitucion, request);
 			} else {
 				LOGGER.info("procesarSustitucionGuardia() / Se añade el letrado de la asistencia");
 				TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem = new TarjetaAsistenciaResponseItem();
@@ -1429,10 +1485,10 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				tarjetaAsistenciaResponseItem.setFechaAsistencia(filtro.getDiaGuardia() + " 00:00");
 				tarjetaAsistenciaResponseItem.setIdLetradoGuardia(filtro.getIdLetradoGuardia());
 				procesaGuardiasColegiado(tarjetaAsistenciaResponseItem, idInstitucion);
-
 			}
 
 		} catch (Exception e) {
+			LOGGER.error("AsistenciaServiceImpl.procesarSustitucionGuardia() - ERROR: " + e.getMessage()); 
 			throw new SigaExceptions(e, "No se han podido procesar las guardias de colegiado, compruebe que no existen facturaciones");
 		}
 	}
@@ -2292,7 +2348,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							if (colegiado != null) {
 								asistenciaResponse.setNombreColegiado(colegiado.getApellido1() + " "
-										+ colegiado.getApellido2() + " " + colegiado.getNombre());
+										+ (colegiado.getApellido2() != null ? colegiado.getApellido2() : "") + " " + colegiado.getNombre());
 								asistenciaResponse.setNumeroColegiado(colegiado.getNumeroColegiado());
 							}
 
@@ -2619,9 +2675,12 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
 					scsCabeceraguardias.setFechamodificacion(new Date());
 					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFacturado(null);
+					scsCabeceraguardias.setIdfacturacion(null);
 					scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
-
+					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
+					
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
 					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
 						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
@@ -2692,6 +2751,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setIdinstitucion(idInstitucion);
 					scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
 					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
+					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
 
 					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
 					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy HH:mm")
@@ -2731,13 +2791,275 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			}
 
 		} catch (Exception e) {
-			LOGGER.error(
-					"procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, "
-							+ e,
-					e);
-			throw new SigaExceptions(e,
-					"procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, "
-							+ e);
+			LOGGER.error( "procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e, e);
+			throw new SigaExceptions(e, "procesarGuardiasColegiado () / Error al procesar las guardias de colegiado durante la asistencia, " + e);
+		}
+
+	}
+	
+	/**
+	 * Método que procesa las guardias de colegiado y las cabeceras de guardia al
+	 * crear una asistencia
+	 *
+	 *
+	 * @param tarjetaAsistenciaResponseItem
+	 * @param request 
+	 */
+	private void procesaGuardiasColegiadoSaltoComp(TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem,
+			Short idInstitucion, HttpServletRequest request) throws SigaExceptions {
+
+		try {
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			String fechaHoy = formatter.format(new Date());
+			
+			String saltoOcompensacion = tarjetaAsistenciaResponseItem.getFiltro().getSalto();
+			
+			if (Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()) < 1000000) {
+				//Recuperamos el IDPERSONA a partir del idLetradoGuardia (su nColegiado)
+				Long idPersona = 0L;
+				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+				cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(tarjetaAsistenciaResponseItem.getIdLetradoGuardia());
+				
+				List<CenColegiado> listCol = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+				
+				if(listCol != null && !listCol.isEmpty()) {
+					tarjetaAsistenciaResponseItem.setIdLetradoGuardia(listCol.get(0).getIdpersona().toString());
+				}
+			}
+
+			int affectedRows = 0;
+			// Buscamos las guardias de colegiado para el letrado seleccionado
+			List<ScsGuardiascolegiado> guardiascolegiados = scsGuardiascolegiadoExtendsMapper
+					.getGuardiasColegiadoNoSustitucion(tarjetaAsistenciaResponseItem, idInstitucion);
+
+			// Si no hay guardias de colegiado creadas
+			if (guardiascolegiados == null || guardiascolegiados.isEmpty()) {
+
+				// Nos devuelve el idpersona de la persona que esta en guardia para esa fecha
+				guardiascolegiados = scsGuardiascolegiadoExtendsMapper
+						.getGuardiasColegiadoEnFecha(tarjetaAsistenciaResponseItem, idInstitucion);
+				// Buscamos sus respectivas guardias de colegiado
+				if (guardiascolegiados != null && !guardiascolegiados.isEmpty()) {
+					guardiascolegiados = scsGuardiascolegiadoExtendsMapper.getGuardiasColegiado(
+							tarjetaAsistenciaResponseItem, idInstitucion,
+							String.valueOf(guardiascolegiados.get(0).getIdpersona()));
+				}
+			}
+
+			// Si hay guardias de colegiado
+			if (guardiascolegiados != null && !guardiascolegiados.isEmpty()) {
+
+				ScsGuardiascolegiado firstGuardiaColegiado = guardiascolegiados.get(0);
+				ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+				scsCabeceraguardias.setIdpersona(firstGuardiaColegiado.getIdpersona());
+				scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+				scsCabeceraguardias.setIdinstitucion(idInstitucion);
+				scsCabeceraguardias.setFechainicio(firstGuardiaColegiado.getFechainicio());
+				scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+				scsCabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByPrimaryKey(scsCabeceraguardias);
+
+				// Si el letrado estaba ya de guardia, validamos las cabeceras
+				if (firstGuardiaColegiado.getIdpersona().longValue() == Long
+						.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia())) {
+
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+					affectedRows += scsCabeceraguardiasExtendsMapper.updateByPrimaryKeySelective(scsCabeceraguardias);
+
+					if (affectedRows <= 0) {
+						LOGGER.error(
+								"procesaGuardiasColegiadoSaltoComp() / El letrado de la asistencia estaba de guardia pero no se actualizo ninguna fila");
+					}
+
+					// Si no, lo aniadimos como refuerzo
+				} else {
+
+					// Recorremos para setear el idPersona del colegiado que tentemos que
+					// insertar(el que hace la asistencia)
+					for (ScsGuardiascolegiado scsGuardiascolegiado : guardiascolegiados) {
+						// Para cada guardia colegiado accedemos a sus cabeceras de guardia, a las que
+						// luego habra que setear del idPersona y ponerlo en la ultima posicion(por eso
+						// se ha obtenido el ultimo de la fila)
+
+						scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+						scsGuardiascolegiado.setFacturado("N");
+						scsGuardiascolegiado.setIdfacturacion(null);
+						scsGuardiascolegiado.setPagado("N");
+						scsGuardiascolegiado
+								.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+						scsGuardiascolegiado.setFechamodificacion(new Date());
+						scsGuardiascolegiado.setUsumodificacion(0);
+
+					}
+
+					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechavalidacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+					scsCabeceraguardias.setFacturado(null);
+					scsCabeceraguardias.setIdfacturacion(null);
+					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
+					
+					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
+						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+						try {
+							this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+						} catch (Exception e) {
+							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+						}
+					});
+					if (affectedRows <= 0) {
+						LOGGER.error(
+								"procesaGuardiasColegiadoSaltoComp() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+					}
+					
+					//--------------------------------------------------------------------------------------------------
+					// Incluimos saltos (al entrante) y compensaciones  (al saliente) en funcion de los checks correspondientes
+					//--------------------------------------------------------------------------------------------------
+
+					if ("S/C".equals(saltoOcompensacion) || "S".equals(saltoOcompensacion)) {
+						SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
+						scgi.setIdPersona(tarjetaAsistenciaResponseItem.getIdLetradoGuardia().toString());
+						scgi.setIdGuardia(tarjetaAsistenciaResponseItem.getIdGuardia());
+						scgi.setIdTurno(tarjetaAsistenciaResponseItem.getIdTurno());
+						scgi.setFecha(fechaHoy);
+						scgi.setSaltoCompensacion("S");
+						scgi.setMotivo("Refuerzo");
+
+						MaxIdDto nuevoId = scsSaltoscompensacionesExtendsMapper.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
+
+						 int respSalto = scsSaltoscompensacionesExtendsMapper.guardarSaltosCompensaciones(
+								scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuarios.get(0));
+					}
+				}
+				// No hay guardias de colegiado creadas para la fecha, se crean
+			} else {
+
+				ScsCalendarioguardiasExample example = new ScsCalendarioguardiasExample();
+
+				example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdturnoEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()))
+						.andIdguardiaEqualTo(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()))
+						.andFechainicioLessThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()))
+						.andFechafinGreaterThanOrEqualTo(new SimpleDateFormat("dd/MM/yyyy")
+								.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+
+				List<ScsCalendarioguardias> scsCalendarioguardias = scsCalendarioguardiasMapper
+						.selectByExample(example);
+
+				if (scsCalendarioguardias != null && !scsCalendarioguardias.isEmpty()) {
+					//Recuperamos el IDPERSONA a partir del idLetradoGuardia (su nColegiado)
+					Long idPersona = 0L;
+					CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+					cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(tarjetaAsistenciaResponseItem.getIdLetradoGuardia());
+					
+					List<CenColegiado> listCol = cenColegiadoMapper.selectByExample(cenColegiadoExample);
+					
+					if(listCol != null && !listCol.isEmpty()) {
+						idPersona = listCol.get(0).getIdpersona();
+					}
+					
+					ScsGuardiascolegiado scsGuardiascolegiado = new ScsGuardiascolegiado();
+					scsGuardiascolegiado.setIdinstitucion(idInstitucion);
+					scsGuardiascolegiado.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+					scsGuardiascolegiado.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+					scsGuardiascolegiado.setFechainicio(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsGuardiascolegiado.setFechafin(new SimpleDateFormat("dd/MM/yyyy")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					if(idPersona == 0L) {
+						scsGuardiascolegiado.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					}else {
+					scsGuardiascolegiado.setIdpersona(idPersona);
+					}
+					scsGuardiascolegiado.setDiasguardia((long) 1);
+					scsGuardiascolegiado.setDiasacobrar((long) 1);
+					scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+
+					scsGuardiascolegiado.setReserva("N");
+					scsGuardiascolegiado.setFacturado("N");
+					scsGuardiascolegiado.setIdfacturacion(null);
+					scsGuardiascolegiado.setPagado("N");
+					scsGuardiascolegiado.setFechamodificacion(new Date());
+					scsGuardiascolegiado.setUsumodificacion(0);
+
+					ScsCabeceraguardias scsCabeceraguardias = new ScsCabeceraguardias();
+					scsCabeceraguardias.setIdinstitucion(idInstitucion);
+					scsCabeceraguardias.setIdturno(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdTurno()));
+					scsCabeceraguardias.setIdcalendarioguardias(scsCalendarioguardias.get(0).getIdcalendarioguardias());
+					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
+
+					scsCabeceraguardias.setIdguardia(Integer.valueOf(tarjetaAsistenciaResponseItem.getIdGuardia()));
+					scsCabeceraguardias.setFechainicio(new SimpleDateFormat("dd/MM/yyyy HH:mm")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy HH:mm")
+							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
+					if(idPersona == 0L) {
+						scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+					} else {
+						scsCabeceraguardias.setIdpersona(idPersona);
+					}
+					scsCabeceraguardias.setPosicion((short) 1);
+					scsCabeceraguardias.setFechamodificacion(new Date());
+					scsCabeceraguardias.setSustituto("0");
+					scsCabeceraguardias.setFechaalta(new Date());
+
+					// Las metemos validadas
+					scsCabeceraguardias.setValidado("1");
+					scsCabeceraguardias.setFechavalidacion(new Date());
+					scsCabeceraguardias.setUsumodificacion(0);
+
+					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					affectedRows += scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+					
+					try {
+						this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+					} catch (Exception e) {
+						LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+					}
+					
+					//--------------------------------------------------------------------------------------------------
+					// Incluimos saltos (al entrante) y compensaciones  (al saliente) en funcion de los checks correspondientes
+					//--------------------------------------------------------------------------------------------------
+
+					if ("S/C".equals(saltoOcompensacion) || "S".equals(saltoOcompensacion)) {
+						SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
+						scgi.setIdPersona(idPersona.toString());
+						scgi.setIdGuardia(tarjetaAsistenciaResponseItem.getIdGuardia());
+						scgi.setIdTurno(tarjetaAsistenciaResponseItem.getIdTurno());
+						scgi.setFecha(fechaHoy);
+						scgi.setSaltoCompensacion("S");
+						scgi.setMotivo("Refuerzo");
+
+						MaxIdDto nuevoId = scsSaltoscompensacionesExtendsMapper.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
+
+						 int respSalto = scsSaltoscompensacionesExtendsMapper.guardarSaltosCompensaciones(
+								scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuarios.get(0));
+					}
+
+					if (affectedRows <= 0) {
+						LOGGER.error(
+								"procesaGuardiasColegiadoSaltoComp() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
+					}
+				}
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error( "procesaGuardiasColegiadoSaltoComp () / Error al procesar las guardias de colegiado durante la asistencia, " + e, e);
+			throw new SigaExceptions(e, "procesaGuardiasColegiadoSaltoComp () / Error al procesar las guardias de colegiado durante la asistencia, " + e);
 		}
 
 	}
@@ -5817,7 +6139,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		scsEjg.setGuardiaturnoIdguardia(scsAsistencia.getIdguardia());
 		// No se incluye el letrado como tramitador
 		// scsEjg.setIdpersona(scsAsistencia.getIdpersonacolegiado());
-		scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
+		if(scsEjg.getIdpersonajg() == null) {
+			scsEjg.setIdpersonajg(scsAsistencia.getIdpersonajg());
+		}
 		scsEjg.setJuzgado(scsAsistencia.getJuzgado());
 		scsEjg.setJuzgadoidinstitucion(scsAsistencia.getJuzgadoidinstitucion());
 		scsEjg.setComisaria(scsAsistencia.getComisaria());
@@ -5852,11 +6176,27 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			record.setIdpersona(scsAsistencia.getIdpersonajg());
 			record.setIdtipoejg(scsEjg.getIdtipoejg());
 			record.setNumero(scsEjg.getNumero());
-			record.setObservaciones(
-					"Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
+			record.setObservaciones("Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
 			record.setSolicitante(new Short("1"));
 			record.setUsumodificacion(usuario);
-			affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+			
+			ScsUnidadfamiliarejgExample exampleUF = new ScsUnidadfamiliarejgExample();
+			exampleUF.createCriteria().andIdinstitucionEqualTo(record.getIdinstitucion())
+					.andIdtipoejgEqualTo(record.getIdtipoejg())
+					.andAnioEqualTo(record.getAnio())
+					.andNumeroEqualTo(record.getNumero())
+					.andIdpersonaEqualTo(record.getIdpersona());
+			
+			//Primero intentamos actualizar por si ya existe un registro previo de esa persona como unidad familiar pero como solicitante a 0
+			int actualizados = 0;
+			actualizados = scsUnidadfamiliarejgMapper.updateByExample(record, exampleUF);
+			
+			if(actualizados > 0) {
+				affectedRows += actualizados;
+			} else {
+				//Si el update no devuelve registros es porque hay que crear la Unidad Familiar nueva
+				affectedRows += scsUnidadfamiliarejgMapper.insert(record);
+			}
 		}
 
 		return affectedRows;

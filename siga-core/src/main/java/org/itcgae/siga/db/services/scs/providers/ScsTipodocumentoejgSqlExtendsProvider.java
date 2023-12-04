@@ -23,7 +23,7 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
                     sql.SELECT("tipodocumento.codigoext");
                     sql.SELECT("CATDOCUMENTO.descripcion"); 
                     sql.FROM("SCS_TIPODOCUMENTOEJG TIPODOCUMENTO");
-                    sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO ON CATTIPODOCUMENTO.IDRECURSO = TIPODOCUMENTO.DESCRIPCION AND CATTIPODOCUMENTO.IDLENGUAJE = '" + idLenguaje + "'");
+                    sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO ON CATTIPODOCUMENTO.IDRECURSO = TIPODOCUMENTO.DESCRIPCION AND CATTIPODOCUMENTO.IDLENGUAJE = '" + idLenguaje + "'");
                     sql.LEFT_OUTER_JOIN("SCS_DOCUMENTOEJG DOCUMENTO ON DOCUMENTO.IDTIPODOCUMENTOEJG = TIPODOCUMENTO.IDTIPODOCUMENTOEJG  AND DOCUMENTO.IDINSTITUCION = TIPODOCUMENTO.IDINSTITUCION AND DOCUMENTO.FECHABAJA IS NULL");
                     sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CATDOCUMENTO ON CATDOCUMENTO.IDRECURSO = DOCUMENTO.DESCRIPCION AND CATDOCUMENTO.IDLENGUAJE = '" + idLenguaje + "'");
                     sql.WHERE("tipodocumento.idinstitucion = '" + documentoEjgItem.getIdInstitucion() + "'");
@@ -41,7 +41,7 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
                               
                               if(UtilidadesString.esCadenaVacia(documentoEjgItem.getdescripcionDoc())){
                                        sql.WHERE("  TIPODOCUMENTO.idtipodocumentoejg IN ( SELECT TIPODOCUMENTO2.idtipodocumentoejg  FROM SCS_TIPODOCUMENTOEJG TIPODOCUMENTO2"
-                                                           + "                INNER JOIN GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO2 ON CATTIPODOCUMENTO2.IDRECURSO = TIPODOCUMENTO2.DESCRIPCION AND CATTIPODOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "' "
+                                                           + "                LEFT OUTER JOIN GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO2 ON CATTIPODOCUMENTO2.IDRECURSO = TIPODOCUMENTO2.DESCRIPCION AND CATTIPODOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "' "
                                                            + "               LEFT OUTER JOIN SCS_DOCUMENTOEJG DOCUMENTO2 ON DOCUMENTO2.IDTIPODOCUMENTOEJG = TIPODOCUMENTO2.IDTIPODOCUMENTOEJG"
                                                            + " AND DOCUMENTO2.IDINSTITUCION = TIPODOCUMENTO2.IDINSTITUCION AND DOCUMENTO2.FECHABAJA IS NULL"
                                                            + " LEFT OUTER JOIN GEN_RECURSOS_CATALOGOS CATDOCUMENTO2 ON CATDOCUMENTO2.IDRECURSO = DOCUMENTO2.DESCRIPCION AND CATDOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "'"
@@ -50,7 +50,7 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
                               
                               }else if(UtilidadesString.esCadenaVacia(documentoEjgItem.getAbreviatura())){
                                        sql.WHERE("  TIPODOCUMENTO.idtipodocumentoejg IN ( SELECT TIPODOCUMENTO2.idtipodocumentoejg  FROM SCS_TIPODOCUMENTOEJG TIPODOCUMENTO2"
-                                                           + "                INNER JOIN GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO2 ON CATTIPODOCUMENTO2.IDRECURSO = TIPODOCUMENTO2.DESCRIPCION AND CATTIPODOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "' "
+                                                           + "                LEFT OUTER JOIN GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO2 ON CATTIPODOCUMENTO2.IDRECURSO = TIPODOCUMENTO2.DESCRIPCION AND CATTIPODOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "' "
                                                            + "               LEFT OUTER JOIN SCS_DOCUMENTOEJG DOCUMENTO2 ON DOCUMENTO2.IDTIPODOCUMENTOEJG = TIPODOCUMENTO2.IDTIPODOCUMENTOEJG"
                                                            + " AND DOCUMENTO2.IDINSTITUCION = TIPODOCUMENTO2.IDINSTITUCION AND DOCUMENTO2.FECHABAJA IS NULL"
                                                            + " LEFT OUTER JOIN GEN_RECURSOS_CATALOGOS CATDOCUMENTO2 ON CATDOCUMENTO2.IDRECURSO = DOCUMENTO2.DESCRIPCION AND CATDOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "'"
@@ -58,7 +58,7 @@ public class ScsTipodocumentoejgSqlExtendsProvider extends ScsTipodocumentoejgSq
                                                            + "   AND  UPPER(CATDOCUMENTO2.DESCRIPCION) like UPPER('%"+ documentoEjgItem.getdescripcionDoc() + "%') AND TIPODOCUMENTO2.fechabaja is null)   ");
                               }else{
                                        sql.WHERE("  TIPODOCUMENTO.idtipodocumentoejg IN ( SELECT TIPODOCUMENTO2.idtipodocumentoejg  FROM SCS_TIPODOCUMENTOEJG TIPODOCUMENTO2"
-                                                           + "                INNER JOIN GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO2 ON CATTIPODOCUMENTO2.IDRECURSO = TIPODOCUMENTO2.DESCRIPCION AND CATTIPODOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "' "
+                                                           + "                LEFT OUTER JOIN GEN_RECURSOS_CATALOGOS CATTIPODOCUMENTO2 ON CATTIPODOCUMENTO2.IDRECURSO = TIPODOCUMENTO2.DESCRIPCION AND CATTIPODOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "' "
                                                            + "               LEFT OUTER JOIN SCS_DOCUMENTOEJG DOCUMENTO2 ON DOCUMENTO2.IDTIPODOCUMENTOEJG = TIPODOCUMENTO2.IDTIPODOCUMENTOEJG"
                                                            + " AND DOCUMENTO2.IDINSTITUCION = TIPODOCUMENTO2.IDINSTITUCION AND DOCUMENTO2.FECHABAJA IS NULL"
                                                            + " LEFT OUTER JOIN GEN_RECURSOS_CATALOGOS CATDOCUMENTO2 ON CATDOCUMENTO2.IDRECURSO = DOCUMENTO2.DESCRIPCION AND CATDOCUMENTO2.IDLENGUAJE = '" + idLenguaje + "'"

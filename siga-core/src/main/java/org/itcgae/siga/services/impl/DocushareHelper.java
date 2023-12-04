@@ -622,7 +622,7 @@ public class DocushareHelper {
 			//"expedientes.docushare.error.crearColeccion"
 			String mensaje = String.format("Se ha producido un error al crear la collection para el colegio %s e ID_DOCUSHARE = '%s'", idinstitucion, ID_DOCUSHARE);
 			log.error(mensaje, e);
-			
+			throw (new Exception("Error al crear la colección en Regtel para el EJG"));
 		} finally {
 			close(idinstitucion);
 		}

@@ -427,17 +427,27 @@ public class MenuServiceImpl implements IMenuService {
 	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request) {
 		PermisoDTO permisoResponse = new PermisoDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
-		String token = request.getHeader("Authorization");
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+        String token = request.getHeader("Authorization");
+        Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		//String idInstitucionCert = validaInstitucionCertificado(request);
-		List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+        List<CenInstitucion> institucionList = getidInstitucionByCodExterno(getInstitucionRequest(request));
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String idLenguaje = "1";
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		if (null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
+			idLenguaje = usuario.getIdlenguaje();
+		}
 
 		if(institucionList == null || institucionList.isEmpty()) {
 			throw new BadCredentialsException("Institucion No válida");
 		}
 		String idInstitucionRequest = institucionList.get(0).getIdinstitucion().toString();
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionRequest);
+		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionRequest, idLenguaje);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();

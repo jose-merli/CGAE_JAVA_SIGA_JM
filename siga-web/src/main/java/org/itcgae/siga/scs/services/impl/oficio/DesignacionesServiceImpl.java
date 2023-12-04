@@ -498,6 +498,35 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					if (item.getDesignacionHasta() != null) {
 						fechaHasta = Converter.dateToString(item.getDesignacionHasta());
 					}
+					
+					if(item.getNumEJG()!=null && !item.getNumEJG().isEmpty()) {
+					// longitud maxima para num
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("LONGITUD_CODEJG")
+							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+					List<GenParametros> listParam = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+					String longitudEJG = listParam.get(0).getValor();
+
+					// Alteramos el numero para que todos los numeros de las carpetas de una
+					// institucion tengan la misma longitud.
+
+					String numero = item.getNumEJG();
+
+					int numCeros = Integer.parseInt(longitudEJG) - item.getNumEJG().length();
+
+					String numEJG = "";
+					for (int i = 0; i < numCeros; i++) {
+						numEJG += "0";
+					}
+
+					numEJG += numero;
+					
+					item.setNumEJG(numEJG);
+					}
+					
 					LOGGER.info(
 							"DesignacionesServiceImpl.busquedaJustificacionExpres -> obteniendo justificaciones...");
 					// busqueda de designaciones segun los filtros (max 200)
@@ -534,11 +563,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								}
 							}
 							
-							if (!existePdte && ("A".equals(record.getEstado())
-									|| "F".equals(record.getEstado())
-									|| porcentajeTotal >= 100)) {
+							if ("A".equals(record.getEstado()) || "F".equals(record.getEstado()) || (!existePdte && porcentajeTotal >= 100)) {
 								it.remove();
 							}
+							
+//							if (!existePdte && ("A".equals(record.getEstado())
+//									|| "F".equals(record.getEstado())
+//									|| porcentajeTotal >= 100)) {
+//								it.remove();
+//							}
 						}
 						
 						
@@ -2393,11 +2426,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								Short idPretension = Short.parseShort(designaItem.getIdProcedimiento());
 								scsDesigna.setIdpretension(idPretension);
 								
-							}
-							if (designaItem.getDelitos() != null) {
-								scsDesigna.setDelitos(designaItem.getDelitos());
-							}else {
-								scsDesigna.setDelitos(null);
 							}
 							scsDesigna.setFechaestado(designaItem.getFechaEstado());
 							scsDesigna.setFechafin(designaItem.getFechaFin());

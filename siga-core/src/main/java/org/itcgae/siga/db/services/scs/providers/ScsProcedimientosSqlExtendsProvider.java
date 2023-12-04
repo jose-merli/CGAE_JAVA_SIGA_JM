@@ -20,7 +20,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 
 		sql.FROM("SCS_PROCEDIMIENTOS proc");
 		sql.INNER_JOIN("SCS_JURISDICCION jurisdiccion on jurisdiccion.IDJURISDICCION =  proc.IDJURISDICCION");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS juris on (juris.idrecurso = jurisdiccion.DESCRIPCION and idlenguaje = '"
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS juris on (juris.idrecurso = jurisdiccion.DESCRIPCION and idlenguaje = '"
 				+ idLenguaje + "')");
 		;
 
@@ -127,7 +127,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql.LEFT_OUTER_JOIN(
 				"SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION AND PRETENSION.FECHABAJA IS NULL)");
 		sql.INNER_JOIN("scs_jurisdiccion jurisdiccion ON jurisdiccion.idjurisdiccion = procedimiento.idjurisdiccion");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"gen_recursos_catalogos juris ON (\r\n" + "            juris.idrecurso = jurisdiccion.descripcion\r\n"
 						+ "        AND\r\n" + "            idlenguaje = '" + idioma + "' \r\n" + "    )");
 
@@ -205,7 +205,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	 * LEFT_OUTER_JOIN("SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION AND PRETENSION.FECHABAJA IS NULL)"
 	 * ); sql.
 	 * INNER_JOIN("scs_jurisdiccion jurisdiccion ON jurisdiccion.idjurisdiccion = procedimiento.idjurisdiccion"
-	 * ); sql.INNER_JOIN("gen_recursos_catalogos juris ON (\r\n" +
+	 * ); sql.LEFT_OUTER_JOIN("gen_recursos_catalogos juris ON (\r\n" +
 	 * "            juris.idrecurso = jurisdiccion.descripcion\r\n" +
 	 * "        AND\r\n" + "            idlenguaje = '"+ idioma +"' \r\n" +
 	 * "    )");

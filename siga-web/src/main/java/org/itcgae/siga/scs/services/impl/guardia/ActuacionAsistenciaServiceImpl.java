@@ -414,6 +414,11 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 						
                         List<ScsTipoactuacion> tipoActList = scsTipoactuacionMapper.selectByExample(scsTipoactuacionExample);
                         
+                        // Se valida la actuación de  la asistencia
+                        newActuacion.setFechavalidacion(new Date());
+                        newActuacion.setValidada("1");
+                        newActuacion.setUsuvalidacion(usuarios.get(0).getIdusuario());
+                        
                         if(tipoActList != null && tipoActList.isEmpty()) {
                         	ScsTipoactuacion scsTipoactuacionRecord = new ScsTipoactuacion();
                         	scsTipoactuacionRecord.setIdinstitucion(newActuacion.getIdinstitucion());
@@ -500,6 +505,11 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             
                             if(datosGenerales.isDiaDespues()) scsActuacionasistencia.setDiadespues("S");
                             else scsActuacionasistencia.setDiadespues("N");
+                            
+                            // Se valida la actuación de  la asistencia
+                            scsActuacionasistencia.setFechavalidacion(new Date());
+                            scsActuacionasistencia.setValidada("1");
+                            scsActuacionasistencia.setUsuvalidacion(usuarios.get(0).getIdusuario());
                             
                             scsActuacionasistencia.setDescripcionbreve(datosGenerales.getDescripcion());
                             scsActuacionasistencia.setObservaciones(datosGenerales.getObservaciones());

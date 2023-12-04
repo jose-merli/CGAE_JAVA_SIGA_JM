@@ -9,41 +9,48 @@ public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlPro
 	public String getComboAsistencia(String idLenguaje, Short idInstitucion) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("tipoasistencia.idtipoasistencia");
-		sql.SELECT("asisdes.descripcion");
+		sql.SELECT("f_siga_getrecurso(tipoasistencia.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOASISTENCIA tipoasistencia");
-		sql.INNER_JOIN("gen_recursos_catalogos asisdes on asisdes.IDRECURSO = tipoasistencia.descripcion and asisdes.idlenguaje = '" + idLenguaje + "'" );
-		sql.ORDER_BY("asisdes.descripcion");
-
-		return sql.toString();
+		
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	public String getTiposGuardia(String idLenguaje,Short idInstitucion) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("IDTIPOGUARDIA as IDTIPOASISTENCIA");
-		sql.SELECT("CATGUARDIA.DESCRIPCION");
+		sql.SELECT("f_siga_getrecurso(guardia.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPOSGUARDIAS  GUARDIA");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catguardia on (catguardia.idrecurso = guardia.descripcion and catguardia.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("FECHA_BAJA IS NULL");
 
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	public String getTiposGuardia2(String idLenguaje,Short idInstitucion) {
 
 		SQL sql = new SQL();
-
-		sql.SELECT("IDTIPOGUARDIA as IDTIPOASISTENCIA");
-		sql.SELECT("'(' || GUARDIA.CODIGO || ') ' || CATGUARDIA.DESCRIPCION AS DESCRIPCION");
-		sql.FROM("SCS_TIPOSGUARDIAS  GUARDIA");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catguardia on (catguardia.idrecurso = guardia.descripcion and catguardia.idlenguaje = '"+idLenguaje+"')");
-		sql.WHERE("FECHA_BAJA IS NULL");
-		sql.ORDER_BY("CATGUARDIA.DESCRIPCION");
+		SQL sqlfinal = new SQL();
 		
-		return sql.toString();
+		sql.SELECT("IDTIPOGUARDIA as IDTIPOASISTENCIA");
+		sql.SELECT("'(' || GUARDIA.CODIGO || ') ' || f_siga_getrecurso(guardia.descripcion,"+idLenguaje+") AS DESCRIPCION");
+		sql.FROM("SCS_TIPOSGUARDIAS  GUARDIA");
+		sql.WHERE("FECHA_BAJA IS NULL");
+
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 	public String updateTiposAsistencia(TiposAsistenciaItem tiposAsistenciasItem,Short idInstitucion) {
@@ -75,7 +82,7 @@ public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlPro
 		sql.SELECT("LISTAGG(GUARDIA.IDTIPOGUARDIA, ', ') WITHIN GROUP (ORDER BY ASIS.IDTIPOASISTENCIACOLEGIO)  AS IDTIPOSGUARDIA");
 	
 		sql.FROM("SCS_TIPOASISTENCIACOLEGIO ASIS");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ASIS.DESCRIPCION AND CAT.IDLENGUAJE = 1)");
 		sql.LEFT_OUTER_JOIN(
 				"SCS_TIPOASISTENCIAGUARDIA ASISGUARDIA ON ASIS.IDTIPOASISTENCIACOLEGIO = ASISGUARDIA.IDTIPOASISTENCIACOLEGIO AND ASIS.IDINSTITUCION = ASISGUARDIA.IDINSTITUCION");
@@ -109,7 +116,7 @@ public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlPro
 		sql.SELECT("LISTAGG(GUARDIA.IDTIPOGUARDIA, ', ') WITHIN GROUP (ORDER BY ASIS.IDTIPOASISTENCIACOLEGIO)  AS IDTIPOSGUARDIA");
 	
 		sql.FROM("SCS_TIPOASISTENCIACOLEGIO ASIS");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ASIS.DESCRIPCION AND CAT.IDLENGUAJE = 1)");
 		sql.LEFT_OUTER_JOIN(
 				"SCS_TIPOASISTENCIAGUARDIA ASISGUARDIA ON ASIS.IDTIPOASISTENCIACOLEGIO = ASISGUARDIA.IDTIPOASISTENCIACOLEGIO AND ASIS.IDINSTITUCION = ASISGUARDIA.IDINSTITUCION");
