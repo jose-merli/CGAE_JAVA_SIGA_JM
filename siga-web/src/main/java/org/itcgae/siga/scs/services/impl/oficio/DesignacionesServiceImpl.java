@@ -4498,7 +4498,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		if (idGuardia != null) {
 			scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
 		}
-		scsSaltoscompensaciones.setMotivos(motivo);
+		scsSaltoscompensaciones.setMotivos(scsSaltoscompensaciones.getMotivos() + motivo);
 
 		scsDesignacionesExtendsMapper.marcarSaltoCompensacion(scsSaltoscompensaciones, usuario);
 	}

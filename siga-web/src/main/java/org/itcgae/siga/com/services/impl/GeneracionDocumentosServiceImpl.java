@@ -152,7 +152,25 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
 			
 		   if (!dato.isEmpty()) {
-			   // Metodo que recorre el documento para sustituir cada campo por su valor o si es null por un blank
+			   
+			   Set<String> claves=dato.keySet();
+			   DocumentBuilder builder=new DocumentBuilder(doc);
+			   for(String clave : claves) {
+				 while(builder.moveToMergeField(clave))
+			     {
+			       Object o = dato.get(clave);
+			       try {
+			         if(o != null) {
+			    	   builder.write(o.toString().trim());
+			         }
+			       } catch (Exception e) {
+			         LOGGER.error("ERROR - MasterWords.sustituyeDocumento() Error al sustituir campo " + clave + ". Continua...: " + e.getMessage());
+			         LOGGER.error("ERROR al sustituir campo " + clave + ". continua...");
+			       }
+			     }
+			   }
+			   
+/*			   // Metodo que recorre el documento para sustituir cada campo por su valor o si es null por un blank
 				FieldCollection fieldColl = doc.getRange().getFields();
 				for (Field field : fieldColl) {
 					String resultField = field.getResult();
@@ -167,7 +185,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 							}
 						}
 					}
-				}
+				}*/
 	        } else {
 	            doc = null;
 	        }
