@@ -136,7 +136,17 @@ public class EJGIntercambiosHelper {
 
         EcomCola colaEnviaPericles = new EcomCola();
         colaEnviaPericles.setIdinstitucion(documentacionejg.getIdinstitucion());
-        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIO_COMUNICACION.getId());
+        
+        switch(documentacionejg.getIdinstitucion().intValue()) {
+	        case 2055:
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.ASIGNA_ENVIO_DOCUMENTO.getId());
+	        	break;
+	        case 2032:
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.GV_ENVIO_DOCUMENTO.getId());
+	        	break;
+	        default:
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIO_COMUNICACION.getId());
+        }
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
         insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación EJG - %s", documentacionejg.getIddocumentacion()));
