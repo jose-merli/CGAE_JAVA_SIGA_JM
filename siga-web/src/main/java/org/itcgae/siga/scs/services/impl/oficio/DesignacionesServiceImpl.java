@@ -2416,8 +2416,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							if (designaItem.getIdJuzgado() != null) {
 								Long juzgado = new Long(designaItem.getIdJuzgado());
 								scsDesigna.setIdjuzgado(juzgado);
+								scsDesigna.setIdinstitucionJuzg(idInstitucion);
 							}else {
 								scsDesigna.setIdjuzgado(null);
+								scsDesigna.setIdinstitucionJuzg(null);
 							}
 							
 							if (designaItem.getIdProcedimiento() == null || designaItem.getIdProcedimiento().isEmpty()) {
