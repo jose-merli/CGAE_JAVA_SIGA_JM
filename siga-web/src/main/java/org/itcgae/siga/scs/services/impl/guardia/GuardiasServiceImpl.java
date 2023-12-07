@@ -3506,7 +3506,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			List<GuardiasCalendarioItem> guardiaIDList = scsGuardiasturnoExtendsMapper.getOneCalGuardia(listaCalendarios.get(j).getIdturno().toString(),
 					listaCalendarios.get(j).getIdguardia().toString(), dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
 					dateFormatFin.format( calendarioInfo.getFechacalfin()).toString(), idInstitucion.toString());
-			if(!guardiaIDList.isEmpty() && guardiaIDList != null) {
+			if(!guardiaIDList.isEmpty() && guardiaIDList != null && calendarioInfo.getEstado() != 4) {
 				idGuardias =guardiaIDList.get(0).getIdcalendarioguardias();
 				if (!esUltimoCalendario(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
 						Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
