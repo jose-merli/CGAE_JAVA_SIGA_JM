@@ -4102,6 +4102,94 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
        sql.WHERE("g.idGuardia = CG.idGuardia");
        return sql.toString();
 	}
+	
+	public String getResumenBaremos(String idGuardia, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("LISTAGG(f_siga_getrecurso(sh2.descripcion, 1)"
+				+ "            || ' ('"
+				+ "            ||"
+				+ "            CASE"
+				+ "                WHEN sh.idhito IN(45, 46, 55, 56) THEN"
+				+ "                    to_char(sh.preciohito)"
+				+ "                ELSE"
+				+ "                    f_siga_formatonumero(sh.preciohito, 2)"
+				+ "                    || '€'"
+				+ "            END"
+				+ "            || ')',"
+				+ "            ', ') WITHIN GROUP("
+				+ "    ORDER BY"
+				+ "        CASE sh.idhito"
+				+ "            WHEN 53 THEN"
+				+ "                1"
+				+ "            WHEN 55 THEN"
+				+ "                2"
+				+ "            WHEN 1  THEN"
+				+ "                3"
+				+ "            WHEN 45 THEN"
+				+ "                4"
+				+ "            WHEN 2  THEN"
+				+ "                5"
+				+ "            WHEN 54 THEN"
+				+ "                6"
+				+ "            WHEN 56 THEN"
+				+ "                7"
+				+ "            WHEN 44 THEN"
+				+ "                8"
+				+ "            WHEN 46 THEN"
+				+ "                9"
+				+ "            WHEN 4  THEN"
+				+ "                10"
+				+ "            WHEN 10 THEN"
+				+ "                11"
+				+ "            WHEN 5  THEN"
+				+ "                12"
+				+ "            WHEN 3  THEN"
+				+ "                13"
+				+ "            WHEN 19 THEN"
+				+ "                14"
+				+ "            WHEN 7  THEN"
+				+ "                15"
+				+ "            WHEN 8  THEN"
+				+ "                16"
+				+ "            WHEN 9  THEN"
+				+ "                17"
+				+ "            WHEN 6  THEN"
+				+ "                18"
+				+ "            WHEN 20 THEN"
+				+ "                19"
+				+ "            WHEN 21 THEN"
+				+ "                20"
+				+ "            WHEN 22 THEN"
+				+ "                21"
+				+ "            WHEN 23 THEN"
+				+ "                22"
+				+ "            WHEN 25 THEN"
+				+ "                23"
+				+ "            WHEN 24 THEN"
+				+ "                24"
+				+ "            ELSE"
+				+ "                30"
+				+ "        END"
+				+ "    ) AS RESUMENBAREMOS");
+		
+		sql.FROM("scs_guardiasturno sg");
+		
+		sql.INNER_JOIN("scs_hitofacturableguardia sh ON sg.idinstitucion = sh.idinstitucion"
+				+ " AND sg.idturno = sh.idturno"
+				+ " AND sg.idguardia = sh.idguardia");
+		sql.INNER_JOIN("scs_hitofacturable sh2 ON sh.idhito = sh2.idhito");
+		
+		sql.WHERE("sg.idinstitucion = " + idInstitucion);
+		sql.WHERE("sg.idguardia = " + idGuardia);
+		sql.WHERE("( sh.idhito NOT IN ( '12', '13' )"
+				+ " OR ( sh.idhito IN ( '12', '13' )"
+				+ " AND sh.preciohito > 0 ) )");
+		
+		sql.GROUP_BY("sg.nombre");
+		
+		return sql.toString();
+	}
 
 	public String getIdGuardiaByName( String name, String idInstitucion) {
 		SQL sql = new SQL();

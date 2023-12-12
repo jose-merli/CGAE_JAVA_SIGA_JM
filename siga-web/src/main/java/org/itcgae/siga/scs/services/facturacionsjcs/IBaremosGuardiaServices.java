@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaDTO;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IBaremosGuardiaServices {
@@ -20,4 +21,5 @@ public interface IBaremosGuardiaServices {
 	public BaremosGuardiaDTO getTurnoGuarConf(String[] configuracion,HttpServletRequest request);
 
 	public BaremosRequestDTO searchBaremosFichaGuardia(String idGuardia, HttpServletRequest request);
+	public StringDTO getResumenBaremos(String idGuardia, HttpServletRequest request);
 }

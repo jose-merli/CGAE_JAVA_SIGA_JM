@@ -592,6 +592,9 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getConjuntoGuardiaFromGuardiaTurno")
 	 @Results({ @Result(column = "IDCONJUNTOGUARDIA", property = "IDCONJUNTOGUARDIA", jdbcType = JdbcType.VARCHAR)})
 	 String getConjuntoGuardiaFromGuardiaTurno(String idGuardia, String idTurno, String idInstitucion) ;
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getResumenBaremos")
+	 List<String> getResumenBaremos(String idGuardia, String idInstitucion) ;
 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getGuardiasToProg")
 	 @Results()
