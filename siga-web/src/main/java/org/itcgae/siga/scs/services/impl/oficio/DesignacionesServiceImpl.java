@@ -6372,9 +6372,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String num = parts[1];
 				String idTurno = comunicaciones.get(1);
 //		 		String isLetrado = comunicaciones.get(2);
+				List<ScsDesigna> des = new ArrayList<ScsDesigna>();
+                ScsDesignaExample desExample = new ScsDesignaExample();
+                desExample.createCriteria().andAnioEqualTo(Short.valueOf(anio)).andCodigoEqualTo(num).andIdinstitucionEqualTo(idInstitucion);   
+                des = scsDesignacionesExtendsMapper.selectByExample(desExample);
+                if(des != null) {
+                    enviosMasivosItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(String.valueOf(des.get(0).getNumero())
+                            , String.valueOf(des.get(0).getAnio()), String.valueOf(des.get(0).getIdturno()),
+                            idInstitucion, usuarios.get(0).getIdlenguaje());
+                    }
+			
 
-				enviosMasivosItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(num, anio, idTurno,
-						idInstitucion, usuarios.get(0).getIdlenguaje());
+				
 //				if (isLetrado != null && isLetrado.equals("false")) {
 //					String idpersona = null;
 //					comunicacionesItem = scsDesignacionesExtendsMapper.busquedaComunicaciones(anio, num, idTurno,
