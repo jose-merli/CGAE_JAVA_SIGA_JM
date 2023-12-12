@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaDTO;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.Impreso190DTO;
 import org.itcgae.siga.scs.services.facturacionsjcs.IBaremosGuardiaServices;
@@ -97,6 +98,17 @@ public class BaremosGuardiaController {
 			return new ResponseEntity<BaremosRequestDTO>(response, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<BaremosRequestDTO>(response, HttpStatus.FORBIDDEN);
+		}
+	}
+	
+	@RequestMapping(value = "/resumenBaremosFichaGuardia",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> searchResumenBaremosFichaGuardia(HttpServletRequest request, @RequestParam String idGuardia) {
+		StringDTO response = new StringDTO();
+		try {
+			response = baremosGuardiaServices.getResumenBaremos(idGuardia, request);
+			return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<StringDTO>(response, HttpStatus.FORBIDDEN);
 		}
 	}
 	

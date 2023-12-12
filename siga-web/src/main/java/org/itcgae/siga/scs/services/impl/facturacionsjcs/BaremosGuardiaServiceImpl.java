@@ -11,6 +11,7 @@ import org.itcgae.siga.DTO.scs.BaremosGuardiaDTO;
 import org.itcgae.siga.DTO.scs.BaremosGuardiaItem;
 import org.itcgae.siga.DTO.scs.BaremosRequestDTO;
 import org.itcgae.siga.DTO.scs.BaremosRequestItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -34,6 +35,7 @@ import org.itcgae.siga.db.entities.ScsHitofacturableguardiaKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsBaremosGuardiaMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsHitofacturableguardiaExtendsMapper;
 import org.itcgae.siga.scs.services.facturacionsjcs.IBaremosGuardiaServices;
@@ -55,6 +57,9 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 
 	@Autowired
 	private ScsHitofacturableExtendsMapper scsHitofacturableExtendsMapper;
+	
+	@Autowired
+	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -485,6 +490,39 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 		LOGGER.info("searchBaremosGuardia() -> Salida del servicio para obtener baremos guardia");
 
 		return baremosRequestDTO;
+	}
+	
+	@Override
+	public StringDTO getResumenBaremos(String idGuardia, HttpServletRequest request) {
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> datos = new ArrayList<String>();
+		StringDTO resumenBaremos = new StringDTO();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getResumenBaremos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getResumenBaremos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info("getResumenBaremos() -> Entrada para obtener el resumen de baremos");
+
+				datos = scsGuardiasturnoExtendsMapper.getResumenBaremos(idGuardia, idInstitucion.toString());
+
+				LOGGER.info("getResumenBaremos() -> Salida del servicio para obtener el resumen de baremos");
+			}
+		}
+		resumenBaremos.setValor(datos.get(0));
+		return resumenBaremos;
 	}
 	
     private Integer getTamanoMaximo(Short idinstitucion) {
