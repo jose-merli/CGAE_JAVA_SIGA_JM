@@ -415,7 +415,7 @@ public class DocushareHelper {
 							dsObj.setTipo("1");
 							dsObj.setId(dsObject.getHandle().toString());
 
-							dsObj.setTitle(dsObject.getTitle());
+							dsObj.setTitle(dsObject.getTitle() + " " + ((DSDocument) dsObject).getOriginalFileName());
 							dsObj.setDescription(dsObject.getDescription());
 							dsObj.setFechaModificacion(dsObject.getModifiedDate());
 							dsObj.setOriginalFilename(((DSDocument) dsObject).getOriginalFileName());
