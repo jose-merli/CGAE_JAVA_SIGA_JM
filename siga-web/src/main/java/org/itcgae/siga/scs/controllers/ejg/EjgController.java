@@ -37,6 +37,7 @@ import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
@@ -400,9 +401,15 @@ public class EjgController {
 	// descargarEEJ
 	@RequestMapping(value = "/gestion-ejg/descargarExpedientesJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InputStreamResource> descargarExpedientesJG(@RequestBody List<EjgItem> datos,
-			HttpServletRequest request) {
-		ResponseEntity<InputStreamResource> response = gestionEJG.descargarExpedientesJG(datos, request);
-
+			HttpServletRequest request) throws BusinessException{
+		ResponseEntity<InputStreamResource> response = null;	
+		try {
+			response = gestionEJG.descargarExpedientesJG(datos, request);	
+		}catch (BusinessException e){
+			LOGGER.error(
+					"No se han encontrado archivos");
+			response = new ResponseEntity<InputStreamResource>(null,null, HttpStatus.NOT_FOUND);
+		}
 		return response;
 	}
 

@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.scs.*;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
@@ -25,6 +26,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.scs.services.ejg.IGestionEJG;
 import org.itcgae.siga.scs.services.impl.ejg.comision.BusquedaEJGComisionServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
@@ -1523,7 +1525,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 	@Override
 	@Transactional
 	public ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> itemEJG,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws BusinessException {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1582,8 +1584,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 													"GestionEJGServiceImpl.descargarExpedientesJG() -> Obteniendo el informe...");
 											DatosDocumentoItem documento = eejgServiceImpl
 													.getInformeEejg(mapInformeEejg, ejg.getidInstitucion());
-
-											ficheros.add(documento);
+											if(documento.getDatos() != null) {
+												ficheros.add(documento);
+											}
 										}
 									}
 								}
@@ -1593,7 +1596,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					}
 
 					if (ficheros.isEmpty()) {
-						throw new Exception("No se puede descargar el archivo.");
+						throw new BusinessException("No se puede descargar el archivo.");
 					} else {
 						fichero = WSCommons.zipBytes(ficheros, new File("downloads.zip"));
 
@@ -1610,7 +1613,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 								"GestionEJGServiceImpl.descargarExpedientesJG() -> Acción realizada correctamente");
 					}
 
-				} catch (Exception e) {
+				}catch(BusinessException e){
+					throw new BusinessException("No se ha encontrado archivos que descargar");
+				}catch (Exception e) {
 					if ("noExiste".equals(e.getMessage())) {
 						LOGGER.debug("GestionEJGServiceImpl.descargarExpedientesJG() ->", e);
 					} else {
