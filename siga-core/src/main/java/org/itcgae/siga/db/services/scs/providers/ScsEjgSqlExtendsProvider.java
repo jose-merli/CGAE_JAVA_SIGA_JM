@@ -908,7 +908,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sqlTurnoGuardia = new SQL();
 
 		SQL letrado = new SQL();
-        letrado.SELECT("cen_persona.apellidos2 || ' ' || cen_persona.apellidos1 || ',' || cen_persona.nombre");
+        letrado.SELECT("cen_persona.apellidos1 || ' ' || cen_persona.apellidos2 || ',' || cen_persona.nombre");
         letrado.FROM("scs_ejgdesigna ejgdesigna");
         letrado.JOIN("cen_persona ON cen_persona.idpersona = F_SIGA_GETIDLETRADO_DESIGNA(ejgdesigna.IDINSTITUCION, ejgdesigna.IDTURNO , ejgdesigna.ANIODESIGNA , ejgdesigna.NUMERODESIGNA)");
         letrado.WHERE("ejgdesigna.idinstitucion = ejg.idinstitucion");
@@ -1853,7 +1853,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sqlExpediente = new SQL();
 
 		// consulta para obtener letrado en consulta de asistencia
-		sqlAsistencia_1.SELECT("cen_persona.apellidos2  || ' '|| cen_persona.apellidos1 || ',' || cen_persona.nombre");
+		sqlAsistencia_1.SELECT("cen_persona.apellidos1  || ' '|| cen_persona.apellidos2 || ',' || cen_persona.nombre");
 		sqlAsistencia_1.FROM(
 				"scs_asistencia " + "JOIN cen_persona ON cen_persona.idpersona = scs_asistencia.idpersonacolegiado");
 		sqlAsistencia_1.WHERE("ejganio =" + item.getAnnio());
@@ -1910,7 +1910,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// consulta para obtener letrado en consulta de SOJ
 		sqlSOJ_1.SELECT(
-				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
+				"cen_persona.apellidos1\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos2\r\n"
 						+ "             || ','\r\n" + "             || cen_persona.nombre ");
 		sqlSOJ_1.FROM("scs_soj " + "JOIN cen_persona ON cen_persona.idpersona = scs_soj.idpersona");
 		sqlSOJ_1.WHERE("ejganio =" + item.getAnnio());
@@ -1968,7 +1968,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// consulta para obtener letrado en consulta de DESIGNA
 		sqlDesigna_1.SELECT(
-				"cen_persona.apellidos2\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos1\r\n"
+				"cen_persona.apellidos1\r\n" + "             || ' '\r\n" + "             || cen_persona.apellidos2\r\n"
 						+ "             || ','\r\n" + "             || cen_persona.nombre ");
 		sqlDesigna_1.FROM("scs_designasletrado des JOIN cen_persona ON cen_persona.idpersona = des.idpersona");
 		sqlDesigna_1.WHERE("des.idinstitucion =" + item.getidInstitucion());
