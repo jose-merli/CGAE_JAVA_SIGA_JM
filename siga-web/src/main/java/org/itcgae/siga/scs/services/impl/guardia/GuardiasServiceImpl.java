@@ -3506,32 +3506,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 			List<GuardiasCalendarioItem> guardiaIDList = scsGuardiasturnoExtendsMapper.getOneCalGuardia(listaCalendarios.get(j).getIdturno().toString(),
 					listaCalendarios.get(j).getIdguardia().toString(), dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
 					dateFormatFin.format( calendarioInfo.getFechacalfin()).toString(), idInstitucion.toString());
-			if(!guardiaIDList.isEmpty() && guardiaIDList != null && calendarioInfo.getEstado() != 4) {
+			if(!guardiaIDList.isEmpty() && guardiaIDList != null && listDeleteCalBody.get(j).getContadorGenerados() != 0) {
 				idGuardias =guardiaIDList.get(0).getIdcalendarioguardias();
 				if (!esUltimoCalendario(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
 						Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
 						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia()))
 					controlEsUltimo++;
 
-				if (!validarBorradoGuardias(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
-						Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
-						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(),dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
-					controlGuardia++;
+				
+					if (!validarBorradoGuardias(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
+							Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
+							listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(),dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
+						controlGuardia++;
 
-				if(!validarColegiadosFacturados(idInstitucion, Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
-						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
-					controlFacturados++;
+					if(!validarColegiadosFacturados(idInstitucion, Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
+							listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
+						controlFacturados++;
 
-				if(!validarTieneAsistencias(idInstitucion,listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
-					controlAsistencias++;
+					if(!validarTieneAsistencias(idInstitucion,listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
+						controlAsistencias++;
+				}
 				
-				
-				
-			}
+			
 			
 			
 		}
@@ -3630,7 +3630,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		} else {
 			//CONSTRUCCION MENSAJE A MOSTRAR EN FRONT
-			String mensajeProgramacionError ="Calendario Desde" + dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString() +" Hasta "  + dateFormatFin.format( calendarioInfo.getFechacalfin()).toString();
+			String mensajeProgramacionError ="Calendario Desde " + dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString() +" Hasta "  + dateFormatFin.format( calendarioInfo.getFechacalfin()).toString();
 			if(controlEsUltimo > 0) {
 				mensajeProgramacionError = mensajeProgramacionError + " No es el ultimo ";
 			}else if(controlGuardia > 0) {
