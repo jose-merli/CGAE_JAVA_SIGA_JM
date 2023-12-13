@@ -675,6 +675,13 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 				String[] parts;
 				String stringListaEJG = "";
 				List<EjgItem> listaEjgs;
+				
+				if(ejgItem.getNumCAJG() != null) {
+                    String NumCAJGSinCerosDelante = ejgItem.getNumCAJG().replaceFirst("^0+", "");
+                    ejgItem.setNumCAJG(NumCAJGSinCerosDelante);
+
+                }
+				
 				//Saca todos los ejg con los filtros
 				listaEjgs = scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
 						usuarios.get(0).getIdlenguaje().toString());

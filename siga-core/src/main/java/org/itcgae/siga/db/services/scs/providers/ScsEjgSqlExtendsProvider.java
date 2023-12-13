@@ -286,7 +286,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					+ "','DD/MM/RRRR')");
 		}
 		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-			sql.WHERE("EJG.NUMERO_CAJG = '"  + ejgItem.getNumCAJG().trim() + "'");
+			sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
 		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 				|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
 			sql.WHERE(condicionAnnioNumActas);
