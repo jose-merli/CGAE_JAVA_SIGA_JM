@@ -365,36 +365,40 @@ public class MenuServiceImpl implements IMenuService {
 	public ComboDTO getInstituciones(HttpServletRequest request) {
 		// Cargamos el combo de Instituciones
 		ComboDTO response = new ComboDTO();
-
-		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
-		exampleInstitucion.setDistinct(true);
-		exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
-
-		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
-		List<ComboItem> combos = new ArrayList<ComboItem>();
-		ComboItem comboBlanco = new ComboItem();
-		comboBlanco.setValue("");
-		comboBlanco.setLabel("");
-		combos.add(comboBlanco);
-		if (null != instituciones && instituciones.size() > 0) {
-			for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
-				CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
-				ComboItem combo = new ComboItem();
-				combo.setValue(cenInstitucion.getIdinstitucion().toString());
-				if (null != cenInstitucion.getFechaenproduccion()) {
-
-					combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
-							+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
-				} else {
-					combo.setLabel(cenInstitucion.getAbreviatura());
+		
+		try {
+			CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
+			exampleInstitucion.setDistinct(true);
+			exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
+	
+			List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
+			List<ComboItem> combos = new ArrayList<ComboItem>();
+			ComboItem comboBlanco = new ComboItem();
+			comboBlanco.setValue("");
+			comboBlanco.setLabel("");
+			combos.add(comboBlanco);
+			if (null != instituciones && instituciones.size() > 0) {
+				for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
+					CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
+					ComboItem combo = new ComboItem();
+					combo.setValue(cenInstitucion.getIdinstitucion().toString());
+					if (null != cenInstitucion.getFechaenproduccion()) {
+	
+						combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
+								+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
+					} else {
+						combo.setLabel(cenInstitucion.getAbreviatura());
+					}
+	
+					combos.add(combo);
 				}
-
-				combos.add(combo);
+	
 			}
-
+	
+			response.setCombooItems(combos);
+		} catch(Exception e) {
+			LOGGER.error("MenuServiceImpl.getInstituciones() - ERROR: " + e.getMessage());
 		}
-
-		response.setCombooItems(combos);
 		return response;
 	}
 
