@@ -4205,7 +4205,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			LetradoInscripcionItem letradoSeleccionado = new LetradoInscripcionItem(
 					this.getPersonaPorId(idPersona.toString()), idInstitucion, idTurno, idGuardia, "S");
-
+			letradoSeleccionado.setIdSaltoCompensacion(htFila.getIdSaltoCompensacion());
 			if (hmPersonasConSaltos.containsKey(idPersona))
 				alLetradosSaltados = hmPersonasConSaltos.get(idPersona);
 			else
@@ -4359,13 +4359,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		// si tiene saltos, ...
 		List<LetradoInscripcionItem> alSaltos;
 		if ((alSaltos = hmPersonasConSaltos.get(letradoGuardia.getIdpersona())) != null) {
+			letradoGuardia.setIdSaltoCompensacion(hmPersonasConSaltos.get(letradoGuardia.getIdpersona()).get(0).getIdSaltoCompensacion());
+			
 			// ... compensar uno
 			cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", " - Salto cumplido", idInstitucion, idTurno,
 					idGuardia, idCalendarioGuardias, usuario);
 			alSaltos.remove(0);
-			if (alSaltos.size() == 0)
+			if (alSaltos.size() == 0) {
 				hmPersonasConSaltos.remove(letradoGuardia.getIdpersona());
-			return false; // y no seleccionar
+				return false; // y no seleccionar
+			}
 		}
 
 		// una vez comprobado todo, se selecciona a este letrado
