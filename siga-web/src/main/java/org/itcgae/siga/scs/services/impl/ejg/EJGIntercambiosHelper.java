@@ -116,7 +116,7 @@ public class EJGIntercambiosHelper {
 
         EcomCola colaEnviaPericles = new EcomCola();
         colaEnviaPericles.setIdinstitucion(ejg.getIdinstitucion());
-        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_CONSULTA_ESTADO.getId());
+        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_CONSULTAR_ESTADO.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
         insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), "Consulta Estado EJG");
@@ -145,7 +145,7 @@ public class EJGIntercambiosHelper {
 	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.GV_ENVIO_DOCUMENTO.getId());
 	        	break;
 	        default:
-	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIO_COMUNICACION.getId());
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_COMUNICACION.getId());
         }
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
@@ -183,7 +183,7 @@ public class EJGIntercambiosHelper {
 
         EcomCola colaEnviaPericles = new EcomCola();
         colaEnviaPericles.setIdinstitucion(ejg.getIdinstitucion());
-        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIO_COMUNICACION.getId());
+        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_COMUNICACION.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
         insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Regtel - %s", identificadords));
@@ -268,7 +268,7 @@ public class EJGIntercambiosHelper {
 
         EcomCola colaEnviaPericles = new EcomCola();
         colaEnviaPericles.setIdinstitucion(estadoEjgItem.getIdinstitucion());
-        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_EXPEDIENTE.getId());
+        colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_ALTA_EXPEDIENTE.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
         LOGGER.info("envioPericlesExpediente() <- Saliendo de Insertar intercabio en ECOM_COLA");
