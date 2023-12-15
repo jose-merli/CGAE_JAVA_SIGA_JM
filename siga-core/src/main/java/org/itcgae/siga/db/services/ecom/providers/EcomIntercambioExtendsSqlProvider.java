@@ -8,14 +8,25 @@ import java.util.Arrays;
 public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvider {
 
     private static String CASE_ESTADO_RESPUESTA = "CASE " +
-            "WHEN IC.IDESTADORESPUESTA = 4 THEN 'Error indeterminado' " +
+            "WHEN IC.IDESTADORESPUESTA = 4 THEN 'Error' " +
             "WHEN IC.IDESTADORESPUESTA = 6 THEN 'Error de validación' " +
             "WHEN IC.IDESTADORESPUESTA = 5 THEN'Enviado' " +
             "ELSE 'Envío en proceso' END";
-
-    private static String ID_OPERACION_ALTA_EJG = "78";
-    private static String ID_OPERACION_DOCUMENTACION_EJG = "79";
-    private static String ID_OPERACION_DOCUMENTACION_ADICIONAL_EJG = "88";
+    
+    private static String ASIGNA_ENVIO_DOCUMENTO = "2";
+    private static String ASIGNA_CONSULTA_NUMERO = "5";
+    private static String XUNTA_ENVIA_PRESENTACION = "23"; 
+    private static String XUNTA_VERIFICA_PRESENTACION = "24"; 
+    private static String GV_ENVIO_DOCUMENTO = "68";
+    private static String ARAGON_ENVIO_DOCUMENTO = "72";
+    private static String ALCALA_ENVIO_DOCUMENTO = "77";
+    private static String PERICLES_ENVIA_ALTA_EXPEDIENTE = "78";
+    private static String PERICLES_ENVIA_DOCUMENTO = "79";
+    private static String PERICLES_CONSULTAR_RESOLUCION = "83";
+    private static String PERICLES_CONSULTAR_ESTADO = "84";
+    private static String PERICLES_ENVIA_COMUNICACION = "88";
+    private static String PERICLES_ENVIA_EXPEDIENTE_PENDIENTE = "89";
+    
 
     public String getNewId() {
         SQL sql = new SQL();
@@ -33,8 +44,11 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
 
         sql.FROM("ECOM_INTERCAMBIO IC");
 
-        String idEcomCola = getEcomColaListadoIntercambios(ID_OPERACION_ALTA_EJG, idInstitucion, anio, idTipoEJG, numero);
+        String idEcomCola = getEcomColaListadoIntercambios(
+        		String.join(", ", Arrays.asList(PERICLES_ENVIA_ALTA_EXPEDIENTE, PERICLES_CONSULTAR_ESTADO, PERICLES_CONSULTAR_RESOLUCION, ASIGNA_CONSULTA_NUMERO, PERICLES_ENVIA_EXPEDIENTE_PENDIENTE,
+        				XUNTA_ENVIA_PRESENTACION, XUNTA_VERIFICA_PRESENTACION)), idInstitucion, anio, idTipoEJG, numero);
         sql.WHERE(String.format("IC.IDECOMCOLA IN (%s)", idEcomCola));
+        sql.ORDER_BY("FECHAENVIO DESC");
         return sql.toString();
     }
 
@@ -46,9 +60,11 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
         sql.FROM("ECOM_INTERCAMBIO IC");
 
         String idEcomCola = getEcomColaListadoIntercambios(
-                String.join(", ", Arrays.asList(ID_OPERACION_DOCUMENTACION_EJG, ID_OPERACION_DOCUMENTACION_ADICIONAL_EJG)),
+                String.join(", ", Arrays.asList(PERICLES_ENVIA_DOCUMENTO, PERICLES_ENVIA_COMUNICACION,  ASIGNA_ENVIO_DOCUMENTO, GV_ENVIO_DOCUMENTO, ARAGON_ENVIO_DOCUMENTO,
+                		ALCALA_ENVIO_DOCUMENTO)),
                 idInstitucion, anio, idTipoEJG, numero);
         sql.WHERE(String.format("IC.IDECOMCOLA IN (%s)", idEcomCola));
+        sql.ORDER_BY("FECHAENVIO DESC");
         return sql.toString();
     }
 
