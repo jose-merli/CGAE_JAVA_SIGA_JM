@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -209,6 +210,12 @@ public class EjgController {
 	ResponseEntity<EjgDTO> busquedaEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 		EjgDTO response = busquedaEJG.busquedaEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/busquedaTotalRegistrosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> busquedaTotalRegistrosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		StringDTO response = busquedaEJG.busquedaTotalRegistrosEJG(ejgItem, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 
 	// Prestaciones Rechazadas

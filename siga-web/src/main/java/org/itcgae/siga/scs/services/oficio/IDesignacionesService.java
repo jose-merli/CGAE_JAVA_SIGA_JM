@@ -248,4 +248,6 @@ public interface IDesignacionesService {
 	public InsertResponseDTO updateInteresado(String[] item, HttpServletRequest request);
 
 	public InsertResponseDTO updateContrario(String[] item, HttpServletRequest request);
+
+	public StringDTO busquedaTotalRegistrosDesignas(DesignaItem designaItem, HttpServletRequest request);
 }

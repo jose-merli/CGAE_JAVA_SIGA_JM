@@ -151,6 +151,9 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaciones2(DesignaItem designaItem, Short idInstitucion, Integer tamMaximo);
 	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaTotalRegistrosDesignaciones")
+	String busquedaTotalRegistrosDesignaciones(DesignaItem designaItem, Short idInstitucion);
+	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaDesignacionesFinal")
 	@Results({ @Result(column = "ANIO", property = "ano", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.NUMERIC),

@@ -1038,6 +1038,59 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		return designasFinal;
 	}
+	
+	@Override
+	public StringDTO busquedaTotalRegistrosDesignas(DesignaItem designaItem, HttpServletRequest request) {
+		Error error = new Error();
+		StringDTO stringDTO = new StringDTO();
+		List<GenParametros> tamMax = null;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaTotalRegistrosDesignas() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"DesignacionesServiceImpl.busquedaTotalRegistrosDesignas -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+			if (usuarios != null && usuarios.size() > 0) {
+				LOGGER.info(
+						"DesignacionesServiceImpl.busquedaTotalRegistrosDesignas -> Entrada a servicio para la busqueda de justifiacion express");
+
+				try {
+					String totalRegistros = scsDesignacionesExtendsMapper.busquedaTotalRegistrosDesignaciones(designaItem, idInstitucion);
+					
+					stringDTO.setValor(String.valueOf(totalRegistros));
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					LOGGER.info("DesignacionesServiceImpl.busquedaTotalRegistrosDesignas -> Salida del servicio");
+				}
+				LOGGER.info("DesignacionesServiceImpl.busquedaTotalRegistrosDesignas -> Salida del servicio");
+			}
+		}
+
+		return stringDTO;
+	}
 
 	@Override
 	public List<DesignaItem> busquedaNuevaDesigna(DesignaItem designaItem, HttpServletRequest request,

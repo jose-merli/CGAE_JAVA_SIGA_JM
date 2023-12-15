@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -720,6 +721,48 @@ public class BusquedaEJGServiceImpl implements IBusquedaEJG {
 
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return ejgDTO;
+	}
+	
+	@Override
+	public StringDTO busquedaTotalRegistrosEJG(EjgItem ejgItem, HttpServletRequest request) {
+		LOGGER.info("busquedaTotalRegistrosEJG() -> Entrada al servicio para obtener el número total de registros de la búsqueda EJG");
+		Error error = new Error();
+		StringDTO stringDTO = new StringDTO();
+		List<GenParametros> tamMax = null;
+		Integer tamMaximo = null;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"busquedaTotalRegistrosEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"busquedaTotalRegistrosEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdinstitucion(idInstitucion);
+				
+				//Saca todos los ejg con los filtros
+				String totalRegistros = scsEjgExtendsMapper.busquedaTotalRegistrosEJG(ejgItem, idInstitucion.toString(),
+						usuarios.get(0).getIdlenguaje().toString());
+				
+				stringDTO.setValor(String.valueOf(totalRegistros));
+			} else {
+				LOGGER.warn(
+						"busquedaTotalRegistrosEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("busquedaTotalRegistrosEJG() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("busquedaTotalRegistrosEJG() -> Salida del servicio para obtener el número total de registros de la búsqueda EJG");
+		return stringDTO;
 	}
 
 	@Override

@@ -80,6 +80,9 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
 	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaTotalRegistrosEJG")
+	String busquedaTotalRegistrosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje);
+	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaEJGFinal")
 	@Results({
 
