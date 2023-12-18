@@ -170,6 +170,7 @@ import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
 import org.itcgae.siga.db.mappers.AdmUsuarioEfectivoExtendsMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
@@ -400,6 +401,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	@Autowired
 	private SaltosCompGuardiasService saltosCompGuardiasService;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 	
 	// Contadores necesarios para las comprobaciones de filtros modo lectura al guardar justificaciones exprés
 	private int numActualizados;
@@ -9943,6 +9947,42 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public Boolean recuperarParamentoGen(String parametroGen, HttpServletRequest request) {
+		LOGGER.info(
+				"DesignacionesServiceImpl.recuperarParamentoGen() -> Recuperar el parametro "+ parametroGen + " de GEN_PARAMETROS");
+		boolean response = false;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+				try {
+					GenParametrosExample genParametrosExample = new GenParametrosExample();
+					genParametrosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andParametroEqualTo(parametroGen).andModuloEqualTo(SigaConstants.MODULO_SCS);
+					List<GenParametros> listaGenPara = genParametrosMapper.selectByExample(genParametrosExample);
+					
+					if(listaGenPara != null && !listaGenPara.isEmpty()) {
+						if(listaGenPara.get(0).getValor().equals("1")) {
+							response = true;
+						}
+					}
+				}catch(Exception e){
+					LOGGER.error(
+							"DesignacionesServiceImpl.recuperarParamentoGen() -> ERROR: " + e.getMessage());
+				}
+			}
+		}
+		LOGGER.info(
+				"DesignacionesServiceImpl.recuperarParamentoGen() -> Salida recuperar el parametro "+ parametroGen);
+		return response;
 	}
 
 }
