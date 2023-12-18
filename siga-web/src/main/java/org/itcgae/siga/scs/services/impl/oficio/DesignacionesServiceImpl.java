@@ -8286,7 +8286,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
 						.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
 						.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
-						.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento());
+						.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento())
+						.andAnulacionEqualTo((short) 0);
 				actuaciondesignaexample.setOrderByClause("NUMEROASUNTO ASC");
 
 				List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper
