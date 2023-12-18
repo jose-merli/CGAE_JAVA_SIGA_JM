@@ -5601,13 +5601,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						String.valueOf(documentacionEjgItem.getIdTipoDocumento()));
 				for (ComboItem item : comboItems) {
 					scsDocumentacionejg.setIddocumento(Short.valueOf(item.getValue()));
-
+					response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
 					if (response == 1) {
 						nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
 						scsDocumentacionejg.setIddocumentacion(Integer.valueOf(nuevoId.getIdMax().toString()));
-						response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
-						if (response == 0)
-							throw (new Exception("Error al introducir la nueva documentación en el EJG"));
+					}
+					if (response == 0) {
+						throw (new Exception("Error al introducir la nueva documentación en el EJG"));
 					}
 				}
 			} else {
