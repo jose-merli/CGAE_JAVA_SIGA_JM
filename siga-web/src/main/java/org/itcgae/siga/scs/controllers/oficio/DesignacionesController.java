@@ -383,6 +383,14 @@ public class DesignacionesController {
 
 	}
 	// 3.3.6.2.4. Tarjeta Datos Adicionales
+	
+	@RequestMapping(value = "/designas/recuperarParamentoGen", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> recuperarParamentoGen(HttpServletRequest request,
+			@RequestBody String parametroGen) {
+		Boolean response = designacionesService.recuperarParamentoGen(parametroGen, request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+
+	}
 
 	@RequestMapping(value = "/designas/getDatosAdicionales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<DesignaItem>> getDatosAdicionales(HttpServletRequest request,

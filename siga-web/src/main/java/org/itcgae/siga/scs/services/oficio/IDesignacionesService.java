@@ -250,4 +250,7 @@ public interface IDesignacionesService {
 	public InsertResponseDTO updateContrario(String[] item, HttpServletRequest request);
 
 	public StringDTO busquedaTotalRegistrosDesignas(DesignaItem designaItem, HttpServletRequest request);
+
+	public Boolean recuperarParamentoGen(String parametroGen, HttpServletRequest request);
+
 }
