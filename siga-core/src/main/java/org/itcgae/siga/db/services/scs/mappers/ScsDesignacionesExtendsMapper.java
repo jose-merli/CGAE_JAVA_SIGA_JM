@@ -955,6 +955,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ART27", property = "art27", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESUMENASUNTO", property = "resumenAsunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaActual(ScsDesignaKey key);
 	

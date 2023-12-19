@@ -4266,7 +4266,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						affectedRows += scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
 
 						if ("S".equals(copiarDatos)) { // Pasamos los datos de la asistencia a la designa
-							affectedRows += updateDesignaConAsistencia(scsAsistencia);
+							affectedRows += updateDesignaConAsistencia(scsAsistencia, designaItem, usuarios, idInstitucion);
 						}
 					}
 
@@ -5916,7 +5916,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	 * @return
 	 */
 	@Transactional
-	private int updateDesignaConAsistencia(ScsAsistencia scsAsistencia) {
+	private int updateDesignaConAsistencia(ScsAsistencia scsAsistencia, DesignaItem designaItem, List<AdmUsuarios> usuarios, Short idInstitucion) {
 		int affectedRows = 0;
 		ScsDesignaKey scsDesignaKey = new ScsDesignaKey();
 		scsDesignaKey.setAnio(scsAsistencia.getDesignaAnio());
@@ -5931,7 +5931,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			scsDesigna.setNumprocedimiento(scsAsistencia.getNumeroprocedimiento().split("/")[0]);
 		}
 		if (scsAsistencia.getNumeroprocedimiento() != null) {
-			scsDesigna.setAnioprocedimiento(Short.valueOf(scsAsistencia.getNumeroprocedimiento().split("/")[1]));
+			//scsDesigna.setAnioprocedimiento(Short.valueOf(scsAsistencia.getNumeroprocedimiento().split("/")[1]));
+			scsDesigna.setNumprocedimiento(scsAsistencia.getNumeroprocedimiento());
 		}
 		scsDesigna.setObservaciones(scsAsistencia.getObservaciones());
 		scsDesigna.setIdpretension(scsAsistencia.getIdpretension());
@@ -6023,19 +6024,28 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				.andAnioEqualTo(scsAsistencia.getAnio()).andNumeroEqualTo(scsAsistencia.getNumero());
 
 		List<ScsDelitosasistencia> delitos = scsDelitosasistenciaMapper.selectByExample(scsDelitosasistenciaExample);
-
+		
 		if (delitos != null && !delitos.isEmpty()) {
-			String delitosString = delitos.stream().map(delito -> delito.getIddelito().toString() + ",").reduce("",
-					String::concat);
-			// El ultimo delito tendra una coma, se la quitamos
-			delitosString = delitosString.substring(0, delitosString.length() - 1);
-			ScsDesigna scsDesigna1 = new ScsDesigna();
-			scsDesigna1.setAnio(scsAsistencia.getDesignaAnio());
-			scsDesigna1.setNumero(scsAsistencia.getDesignaNumero());
-			scsDesigna1.setIdturno(scsAsistencia.getDesignaTurno());
-			scsDesigna1.setIdinstitucion(scsAsistencia.getIdinstitucion());
-			scsDesigna1.setDelitos(delitosString);
-			affectedRows += scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna1);
+			ScsDesignaExample desExam = new ScsDesignaExample();
+			desExam.createCriteria().andAnioEqualTo((short) designaItem.getAno()).andIdinstitucionEqualTo(idInstitucion)
+			.andCodigoEqualTo(designaItem.getCodigo());
+			List<ScsDesigna> designas = scsDesignacionesExtendsMapper.selectByExample(desExam);
+			if(designas != null && !designas.isEmpty()) {
+				ScsDelitosdesigna scsDelitosdesigna = new ScsDelitosdesigna();
+				scsDelitosdesigna.setIdinstitucion(idInstitucion);
+				scsDelitosdesigna.setNumero(Long.valueOf(designas.get(0).getNumero()));
+				scsDelitosdesigna.setIdturno(Integer.valueOf(designas.get(0).getIdturno()));
+				scsDelitosdesigna.setAnio(Integer.valueOf(designaItem.getAno()).shortValue());
+				scsDelitosdesigna.setFechamodificacion(new Date());
+				scsDelitosdesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+				for (ScsDelitosasistencia delito : delitos) {
+					scsDelitosdesigna.setIddelito(Short.valueOf(delito.getIddelito()));
+					scsDelitosdesignaMapper.insertSelective(scsDelitosdesigna);
+				}
+			}
+			
+			
 		}
 
 		return affectedRows;
