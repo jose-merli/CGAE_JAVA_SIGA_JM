@@ -4415,17 +4415,25 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 		// si tiene saltos, ...
 		List<LetradoInscripcionItem> alSaltos;
-		if ((alSaltos = hmPersonasConSaltos.get(letradoGuardia.getIdpersona())) != null) {
-			letradoGuardia.setIdSaltoCompensacion(hmPersonasConSaltos.get(letradoGuardia.getIdpersona()).get(0).getIdSaltoCompensacion());
-			
-			// ... compensar uno
-			cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", " - Salto cumplido", idInstitucion, idTurno,
-					idGuardia, idCalendarioGuardias, usuario);
-			alSaltos.remove(0);
-			if (alSaltos.size() == 0) {
-				hmPersonasConSaltos.remove(letradoGuardia.getIdpersona());
+		alSaltos = hmPersonasConSaltos.get(letradoGuardia.getIdpersona());
+		if (alSaltos != null) {
+			for(LetradoInscripcionItem salto: alSaltos) {
+				if(salto.getIdSaltoCompensacion() != null && !salto.getIdSaltoCompensacion().isEmpty()) {
+					letradoGuardia.setIdSaltoCompensacion(salto.getIdSaltoCompensacion());	
+					break;
+				}else if(salto.getIdSaltoCompensacionGrupo() != null && !salto.getIdSaltoCompensacionGrupo().isEmpty()) {
+					letradoGuardia.setIdSaltoCompensacion(salto.getIdSaltoCompensacionGrupo());
+					break;
+				}
+			}
+			if(letradoGuardia.getIdSaltoCompensacion() != null) {
+				// ... cumplir un salto
+				cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", " - Salto cumplido", idInstitucion, idTurno,
+						idGuardia, idCalendarioGuardias, usuario);
+				alSaltos.remove(0);
 				return false; // y no seleccionar
 			}
+				
 		}
 
 		// una vez comprobado todo, se selecciona a este letrado
@@ -4545,24 +4553,24 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		ScsSaltoscompensaciones scsSaltoscompensaciones = new ScsSaltoscompensaciones();
+		//PK
 		scsSaltoscompensaciones.setIdinstitucion(Short.parseShort(idInstitucion));
 		scsSaltoscompensaciones.setIdturno(Integer.parseInt(idTurno));
-		scsSaltoscompensaciones.setIdguardia(idGuardiaInt);
-		scsSaltoscompensaciones.setIdpersona(letradoGuardia.getIdpersona());
-		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
+		scsSaltoscompensaciones.setIdsaltosturno(Long.valueOf(letradoGuardia.getIdSaltoCompensacion()));
+		//FIN PK
+		
 		Date fechaBBDD = new SimpleDateFormat("yyyy-MM-dd").parse(diasGuardia.get(0).toString());
 		scsSaltoscompensaciones.setFechacumplimiento(fechaBBDD);
-
-		if (!UtilidadesString.esCadenaVacia(letradoGuardia.getIdSaltoCompensacion())) {
-			scsSaltoscompensaciones.setIdsaltosturno(Long.valueOf(letradoGuardia.getIdSaltoCompensacion()));
+		
+		if(scsSaltoscompensaciones.getMotivos() == null || scsSaltoscompensaciones.getMotivos().isEmpty()) {
+			scsSaltoscompensaciones.setMotivos("Automático" + motivo);
+		}else {
+			scsSaltoscompensaciones.setMotivos(scsSaltoscompensaciones.getMotivos() + motivo);
 		}
-
-		if (idGuardia != null) {
-			scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
-		}
-		scsSaltoscompensaciones.setMotivos(scsSaltoscompensaciones.getMotivos() + motivo);
-
-		scsDesignacionesExtendsMapper.marcarSaltoCompensacion(scsSaltoscompensaciones, usuario);
+		scsSaltoscompensaciones.setUsumodificacion(usuario.getIdusuario());
+		scsSaltoscompensaciones.setFechamodificacion(new Date());
+		
+		scsSaltoscompensacionesExtendsMapper.updateByPrimaryKeySelective(scsSaltoscompensaciones);
 	}
 
 	@Override
