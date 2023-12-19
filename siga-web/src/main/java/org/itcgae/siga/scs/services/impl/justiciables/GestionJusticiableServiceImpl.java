@@ -1492,6 +1492,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setFecha(asuntoEjg.getFecha());
 		asunto.setIdInstitucion(asuntoEjg.getIdInstitucion());
 		asunto.setTurnoGuardia(asuntoEjg.getTurnoGuardia());
+		asunto.setNumProcedimiento(asuntoClave.getNumProcedimiento());
 
 		// Obtenemos colegiado
 
@@ -1686,7 +1687,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setDatosInteres(asuntoDesigna.getDatosInteres());
 		asunto.setNumero(asuntoDesigna.getNumero());
 		asunto.setCodigo(asuntoDesigna.getCodigo());
-		
+		asunto.setNumProcedimiento(asuntoClave.getNumProcedimiento());
 
 		// Obtenemos colegiado
 
@@ -1771,7 +1772,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setIdInstitucion(asuntoAsistencia.getIdInstitucion());
 		asunto.setTurnoGuardia(asuntoAsistencia.getTurnoGuardia());
 		asunto.setDatosInteres(asuntoAsistencia.getDatosInteres());
-
+		asunto.setNumProcedimiento(asuntoClave.getNumProcedimiento());
 		// Obtenemos colegiado
 
 		FichaPersonaItem colegiado = null;
