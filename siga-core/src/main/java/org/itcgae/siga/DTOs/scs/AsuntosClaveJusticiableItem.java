@@ -11,6 +11,7 @@ public class AsuntosClaveJusticiableItem {
 	private String anio;
 	private String nombre;
 	private String numero;
+	private String numProcedimiento;
 	private Date fechaModificacion;
 	private String clave;
 	private String rol;
@@ -96,6 +97,15 @@ public class AsuntosClaveJusticiableItem {
 
 	public void setNumero(String numero) {
 		this.numero = numero;
+	}
+	
+	@JsonProperty("numeroProcedimiento")
+	public String getNumProcedimiento() {
+		return numProcedimiento;
+	}
+
+	public void setNumProcedimiento(String numProcedimiento) {
+		this.numProcedimiento = numProcedimiento;
 	}
 
 	/**
