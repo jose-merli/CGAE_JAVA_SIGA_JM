@@ -70,101 +70,41 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	@Autowired
 	private GenPropertiesMapper _genPropertiesMapper;
 	
+	@Autowired
+	private DiccionarioDTO getDiccionario;
+	
 	@Override
 	public DiccionarioDTO getDiccionario(String lenguaje,HttpServletRequest request) {
-		DiccionarioDTO response = new DiccionarioDTO();
-		// Si nos viene un lenguaje predefinido lo cargamos
-		if (null != lenguaje && !lenguaje.equals("")) {
-			
-			String token = request.getHeader("Authorization");
-			String dni = UserTokenUtils.getDniFromJWTToken(token);
-			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-			
-			CenPersonaExample examplePersona = new CenPersonaExample();
-			examplePersona.createCriteria().andNifcifEqualTo(dni);
-			List<CenPersona> personaList = cenPersonaMapper.selectByExample(examplePersona);
-			
-			CenColegiado colegiado = null;
-			if(personaList.size() > 0){
-				CenPersona persona = personaList.get(0);
-				CenColegiadoKey key = new CenColegiadoKey();
-				key.setIdinstitucion(idInstitucion);
-				key.setIdpersona(persona.getIdpersona());
-				colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
-				
-			}
-			CenCliente cliente = null;
-			if(colegiado != null){
-				CenClienteKey cke = new CenClienteKey();
-				cke.setIdinstitucion(idInstitucion);
-				cke.setIdpersona(colegiado.getIdpersona());
-				cliente = cenClienteMapper.selectByPrimaryKey(cke);
-			}
-			
 		
+		DiccionarioDTO diccionario = getDiccionario;
+		
+		
+		if (lenguaje !=null && !"".equals(lenguaje)) {
 			
-			List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
-			AdmLenguajesExample lenguajeExample = new AdmLenguajesExample();
-			lenguajeExample.createCriteria().andCodigoextEqualTo(lenguaje.toUpperCase());
-			List<AdmLenguajes> admLenguajes = lenguajesMapper.selectByExample(lenguajeExample);
+			try {
 			
-			if (null != admLenguajes && !admLenguajes.isEmpty()) {
+				DiccionarioDTO diccionarioDTOFiltrado = new DiccionarioDTO();
+				List<DiccionarioItem> diccionarioLstFilt = new ArrayList<DiccionarioItem>();
+				DiccionarioItem diccItemFilt = new DiccionarioItem();
+				HashMap<String,HashMap<String,String>> diccionarioFil = new HashMap<String, HashMap<String, String>>();
 				
-				AdmLenguajes admLenguaje = admLenguajes.get(0);
-				GenDiccionarioExample example = new GenDiccionarioExample();
+				List<DiccionarioItem> diccionarios = diccionario.getDiccionarioItems();
+					diccionarioFil.put(lenguaje, diccionarios.get(Integer.parseInt(lenguaje)-1).getDiccionario().get(lenguaje));
+					diccItemFilt.setDiccionario(diccionarioFil);
+					diccionarioLstFilt.add(diccItemFilt);
+					diccionarioDTOFiltrado.setDiccionarioItems(diccionarioLstFilt);
+					
 				
-				if(cliente.getIdlenguaje()!= null){
-					example.createCriteria().andIdlenguajeEqualTo(cliente.getIdlenguaje());
-				}else{
-					example.createCriteria().andIdlenguajeEqualTo(admLenguaje.getIdlenguaje());
-				}
-				
-				example.setOrderByClause(" IDRECURSO ASC");
-				List<GenDiccionario> diccionarios = diccionarioMapper.selectByExample(example);
-				
-				if (null != diccionarios && !diccionarios.isEmpty()) {
-					DiccionarioItem diccionarioItemResponse = new DiccionarioItem();
-					HashMap<String,HashMap<String, String>> diccionariosItem = new HashMap<String,HashMap<String, String>>();
-					HashMap<String, String> diccionarioIndividual = new HashMap<String, String>();
-					for(GenDiccionario diccionario: diccionarios){
-						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
-					}
-					diccionariosItem.put(admLenguaje.getCodigoext().toLowerCase(),diccionarioIndividual);
-					diccionarioItemResponse.setDiccionario(diccionariosItem);
-					diccionarioResponse.add(diccionarioItemResponse);
-					response.setDiccionarioItems(diccionarioResponse);
-					return response;
-				}else{
-					return response;
-				}
+				return diccionarioDTOFiltrado;
+			
+			}catch(Exception e) {
+				return getDiccionario;
 			}
-			//En caso de no tener un lenguaje predefinido, los cargamos todos para generar el diccionario en sesión
-		}else{
-      		List<AdmLenguajes> enumLanguages= getLanguages();
-      		List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
-      		for(AdmLenguajes lang:enumLanguages){
-      			String lenguajeExt = lang.getIdlenguaje();
-      			GenDiccionarioExample example = new GenDiccionarioExample();
-    			example.createCriteria().andIdlenguajeEqualTo(lenguajeExt);
-    			example.setOrderByClause(" IDRECURSO ASC");
-    			List<GenDiccionario> diccionarios = diccionarioMapper.selectByExample(example);
-    			if (null != diccionarios && !diccionarios.isEmpty()) {
-    				DiccionarioItem diccionarioItemResponse = new DiccionarioItem();
-    				HashMap<String,HashMap<String, String>> diccionarioItem = new HashMap<String,HashMap<String, String>>();
-					HashMap<String, String> diccionarioIndividual = new HashMap<String, String>();
-					for(GenDiccionario diccionario: diccionarios){
-						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
-					}
-					diccionarioItem.put(lang.getIdlenguaje(),diccionarioIndividual);
-					diccionarioItemResponse.setDiccionario(diccionarioItem);
-    				diccionarioResponse.add(diccionarioItemResponse);
-    			}
-      		}
-			response.setDiccionarioItems(diccionarioResponse);
-			return response;
-			
+		}else {
+			return getDiccionario;
 		}
-		return response;
+		
+		
 	
 	}
 
