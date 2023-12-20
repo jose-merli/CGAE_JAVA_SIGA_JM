@@ -99,12 +99,11 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 					if(hitoActual.equals(lBaremos.get(i-1).getIdHito())) {
 						//MISMO HITO
 						GuardiasItem guardia = new GuardiasItem();
-						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 						String[] parts = lBaremos.get(i).getGuardias().split(",");
 						lBaremos.get(i).setGuardias(parts[0]);
-						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + parts[0]);
+						guardia.setNombre(lBaremos.get(i).getNomTurno() + " - \n" + parts[0]);
 						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
-						guardia.setDiasGuardia(dias[0] + dias[1]);
+						guardia.setDiasGuardia(lBaremos.get(i).getDias().toString());
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
@@ -126,12 +125,11 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 						indiceNuevo = i;
 						guar = new ArrayList<GuardiasItem>();
 						GuardiasItem guardia = new GuardiasItem();
-						String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 						String[] parts = lBaremos.get(i).getGuardias().split(",");
 						lBaremos.get(i).setGuardias(parts[0]);
-						guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + parts[0]);
+						guardia.setNombre(lBaremos.get(i).getNomTurno() + " - \n" + parts[0]);
 						guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
-						guardia.setDiasGuardia(dias[0] + dias[1]);
+						guardia.setDiasGuardia(lBaremos.get(i).getDias().toString());
 						guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 						guardia.setBaremo(lBaremos.get(i).getBaremo());
 						guardia.setnDias(lBaremos.get(i).getNDias());
@@ -152,12 +150,12 @@ public class BaremosGuardiaServiceImpl implements IBaremosGuardiaServices {
 				}else {
 					indiceNuevo = i;
 					GuardiasItem guardia = new GuardiasItem();
-					String[] dias = lBaremos.get(i).getDias().toString().split("\n");
+					//String[] dias = lBaremos.get(i).getDias().toString().split("\n");
 					String[] parts = lBaremos.get(i).getGuardias().split(",");
 					lBaremos.get(i).setGuardias(parts[0]);
-					guardia.setNombre(lBaremos.get(i).getNomTurno() + "-" + parts[0]);
+					guardia.setNombre(lBaremos.get(i).getNomTurno() + " - \n" + parts[0]);
 					guardia.setIdGuardia(lBaremos.get(i).getIdGuardia());
-					guardia.setDiasGuardia(dias[0] + dias[1]);
+					guardia.setDiasGuardia(lBaremos.get(i).getDias().toString());
 					guardia.setFechabaja(lBaremos.get(i).getFechabaja());
 					guardia.setBaremo(lBaremos.get(i).getBaremo());
 					guardia.setnDias(lBaremos.get(i).getNDias());

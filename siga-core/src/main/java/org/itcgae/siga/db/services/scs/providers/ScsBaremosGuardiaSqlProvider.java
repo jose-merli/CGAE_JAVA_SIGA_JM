@@ -125,7 +125,8 @@ public class ScsBaremosGuardiaSqlProvider {
 		if (!facturaciones.equals("0")) {
 			sqlSimpleImptIndividual.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
-		sqlNapartir.WHERE(" hit2.idhito = CASE hit.idhito " + " WHEN 44 THEN 46 " + " WHEN 1  THEN 45" + " END ");
+		sqlNapartir.WHERE(" hit2.idhito IN (CASE hit.idhito " + " WHEN 44 THEN 46 " + " WHEN 1  THEN 45" + " END, CASE hit.IDHITO WHEN 44"
+				+ " THEN 45 WHEN 1 THEN 46 END)");
 		sqlNapartir.WHERE(" rownum < 2");
 
 		// Subconsulta para obtener el Maximo.
@@ -143,9 +144,9 @@ public class ScsBaremosGuardiaSqlProvider {
 		if (!facturaciones.equals("0")) {
 			sqlMaximo.WHERE("hit2.idfacturacion = hit.idfacturacion");
 		}
-		sqlMaximo.WHERE(" hit2.idhito = CASE hit.idhito " + " WHEN 7    THEN 8 " + " WHEN 22   THEN 8 "
-				+ " WHEN 5    THEN 3 " + "	WHEN 20   THEN 3 " + "	WHEN 9    THEN 6 " + "	WHEN 24   THEN 6 "
-				+ "	WHEN 44   THEN 4 " + "	WHEN 1    THEN 2 " + " END ");
+		sqlMaximo.WHERE(" hit2.idhito IN (CASE hit.idhito when 7 then 8 when 22 then 8 when 5 then 3 when 20 then 3 when 9 then 6 when 24 then 6 \r\n"
+				+ "when 44 then 4 when 1 then 2 end\r\n"
+				+ ", case hit.idhito when 1 then 4 when 44 then 2 end) ");
 		sqlMaximo.WHERE("rownum < 2");
 
 		// Filtro para obtener los días.
@@ -159,7 +160,7 @@ public class ScsBaremosGuardiaSqlProvider {
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'S') = 2 THEN 'S' " + " END "
 				+ " || CASE WHEN regexp_count(gua.seleccionlaborables|| hit.diasaplicables,'D') = 2 THEN 'D' "
 				+ " END");
-		filtroDia.append(",null),null) ||  ' ' || CHR(10) || ' '  || ");
+		filtroDia.append(",null),null) ||  ' ' || '\n' || ' '  || ");
 		filtroDia.append("NVL2(gua.seleccionfestivos,NVL2(hit.diasaplicables,'F: ' ");
 		filtroDia.append("|| CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'L') = 2 THEN 'L' "
 				+ " END " + " || CASE WHEN regexp_count(gua.seleccionfestivos|| hit.diasaplicables,'M') = 2 THEN 'M' "

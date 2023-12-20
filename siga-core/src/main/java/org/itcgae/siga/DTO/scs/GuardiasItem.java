@@ -48,7 +48,7 @@ public class GuardiasItem {
 	private String nDias;
 	private Short disponibilidad;
 	private Short numMinimoSimple;
-	private Short simpleOImporteIndividual;
+	private Double simpleOImporteIndividual;
 	private Short naPartir;
 	private Short maximo;
 	private String porDia;
@@ -287,11 +287,11 @@ public class GuardiasItem {
 		this.numMinimoSimple = numMinimoSimple;
 	}
 
-	public Short getSimpleOImporteIndividual() {
+	public Double getSimpleOImporteIndividual() {
 		return simpleOImporteIndividual;
 	}
 
-	public void setSimpleOImporteIndividual(Short simpleOImporteIndividual) {
+	public void setSimpleOImporteIndividual(Double simpleOImporteIndividual) {
 		this.simpleOImporteIndividual = simpleOImporteIndividual;
 	}
 
