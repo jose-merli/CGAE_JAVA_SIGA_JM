@@ -251,6 +251,5 @@ public interface IDesignacionesService {
 
 	public StringDTO busquedaTotalRegistrosDesignas(DesignaItem designaItem, HttpServletRequest request);
 
-	public Boolean recuperarParamentoGen(String parametroGen, HttpServletRequest request);
 
 }
