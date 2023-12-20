@@ -185,8 +185,8 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         }
 
         sql.FROM("(" + sql2.toString() + ") busqueda");
-        sql.ORDER_BY("busqueda.FECHADESDE");
-        sql.ORDER_BY("busqueda.FECHAHASTA");
+        sql.ORDER_BY("busqueda.FECHADESDE DESC");
+        sql.ORDER_BY("busqueda.FECHAHASTA DESC");
         sql.ORDER_BY("busqueda.FECHAESTADO DESC");
 
         SQL query = new SQL();
