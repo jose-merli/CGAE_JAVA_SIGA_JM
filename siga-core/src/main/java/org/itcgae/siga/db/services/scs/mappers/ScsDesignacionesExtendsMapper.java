@@ -726,9 +726,6 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "cambiarUltimoCola")
 	int cambiarUltimoCola(String idInstitucion, String idTurno, String idPersonaUltimo, Date fechaSolicitudUltimo,AdmUsuarios usuario);
 	
-	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "marcarSaltoCompensacion")
-	int marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario);
-	
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getColaTurnoBBDD")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
