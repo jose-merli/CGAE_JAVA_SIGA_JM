@@ -46,7 +46,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "apellidos", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idtipoidentificacion", property = "idtipoidentificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nifcif", property = "nif", jdbcType = JdbcType.VARCHAR), 
-
+			@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR), 
 			// TARJETA SOLICITUD
 			@Result(column = "idpeticion", property = "nSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "usuModificacion", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
@@ -70,6 +70,7 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 			@Result(column = "apellidos", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idtipoidentificacion", property = "idtipoidentificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nifcif", property = "nif", jdbcType = JdbcType.VARCHAR), 
+			@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR), 
 			//TARJETA SOLICITUD
 			@Result(column = "idpeticion", property = "nSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "usuModificacion", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
