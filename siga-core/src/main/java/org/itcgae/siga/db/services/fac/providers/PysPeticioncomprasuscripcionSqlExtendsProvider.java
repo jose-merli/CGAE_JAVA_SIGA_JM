@@ -33,6 +33,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT("per.idpersona");
 		// TARJETA CLIENTE
 		sql.SELECT("per.nombre");
+		sql.SELECT("cc.NCOLEGIADO");
 		sql.SELECT("concat(per.apellidos1,concat(' ',per.apellidos2)) as apellidos");
 		sql.SELECT("per.nifcif");
 		sql.SELECT("per.IDTIPOIDENTIFICACION");
@@ -70,6 +71,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.FROM("pys_peticioncomprasuscripcion pet");
 
 		sql.INNER_JOIN("cen_persona per on per.idpersona = pet.idpersona");
+		sql.INNER_JOIN("CEN_COLEGIADO cc ON per.idpersona = cc.IDPERSONA");
+		 
 		sql.LEFT_OUTER_JOIN(
 				"adm_usuarios usuario ON (pet.usumodificacion = usuario.idusuario and pet.idinstitucion = usuario.idinstitucion)");
 
@@ -208,8 +211,10 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.SELECT("concat(per.apellidos1,concat(' ',per.apellidos2)) as apellidos");
 			sql.SELECT("per.nifcif");
 			sql.SELECT("per.IDTIPOIDENTIFICACION");
+			sql.SELECT("cc.NCOLEGIADO");
 
 			sql.INNER_JOIN("cen_persona per on per.idpersona = " + peticion.getIdPersona());
+			sql.INNER_JOIN("CEN_COLEGIADO cc ON per.idpersona = cc.IDPERSONA");
 		}
 		else {
 			sql.SELECT("null as idpersona");
