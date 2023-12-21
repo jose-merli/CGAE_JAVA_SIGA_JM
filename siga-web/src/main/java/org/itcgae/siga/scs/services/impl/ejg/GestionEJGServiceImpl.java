@@ -6161,6 +6161,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				eejgPeticion.setApellido2(datos.getPjg_ape2());
 				eejgPeticion.setIdusuariopeticion(BigDecimal.valueOf(usuarios.get(0).getIdusuario()));
 				eejgPeticion.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
+				eejgPeticion.setFechasolicitud(new Date());
 				eejgPeticion.setFechapeticion(new Date());
 				eejgPeticion.setFechamodificacion(new Date());
 				eejgPeticion.setUsumodificacion(0);
