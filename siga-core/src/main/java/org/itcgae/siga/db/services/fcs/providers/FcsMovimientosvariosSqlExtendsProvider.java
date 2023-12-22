@@ -35,7 +35,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         subquery3.FROM("fcs_aplica_movimientosvarios aplica");
         subquery3.WHERE("fcs_aplica_movimientosvarios.idinstitucion = aplica.idinstitucion");
         subquery3.WHERE("fcs_aplica_movimientosvarios.idmovimiento = aplica.idmovimiento");
-        subquery3.WHERE("aplica.idaplicacion <= fcs_aplica_movimientosvarios.idaplicacion"); 
+        subquery3.WHERE("aplica.idaplicacion = fcs_aplica_movimientosvarios.idaplicacion"); 
         
         SQL subquery6 = new SQL();
         
@@ -56,7 +56,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         subquery6.SELECT("fcs_movimientosvarios.idpersona idpersona");
         subquery6.SELECT("fcs_movimientosvarios.cantidad cantidad");
         subquery6.SELECT("fcs_aplica_movimientosvarios.importeaplicado cantidadaplicada");
-        subquery6.SELECT("(fcs_movimientosvarios.cantidad - (" + subquery3 + ") ) cantidadrestante");
+        subquery6.SELECT("(fcs_movimientosvarios.cantidad + (" + subquery3 + ") ) cantidadrestante");
         subquery6.SELECT("fcs_movimientosvarios.fechaalta fechaalta");
         subquery6.SELECT("fcs_movimientosvarios.descripcion movimiento");
         subquery6.SELECT("fcs_movimientosvarios.idmovimiento idmovimiento");
@@ -171,7 +171,7 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
         subquery2.SELECT("fcs_movimientosvarios.idpersona idpersona");
         subquery2.SELECT("fcs_movimientosvarios.cantidad cantidad");
         subquery2.SELECT("fcs_aplica_movimientosvarios.importeaplicado cantidadaplicada");
-        subquery2.SELECT("(fcs_movimientosvarios.cantidad - (" + subquery3 + ") ) cantidadrestante");
+        subquery2.SELECT("(fcs_movimientosvarios.cantidad + (" + subquery3 + ") ) cantidadrestante");
         subquery2.SELECT("fcs_movimientosvarios.fechaalta fechaalta");
         subquery2.SELECT("fcs_movimientosvarios.descripcion movimiento");
         subquery2.SELECT("fcs_movimientosvarios.idmovimiento idmovimiento");
