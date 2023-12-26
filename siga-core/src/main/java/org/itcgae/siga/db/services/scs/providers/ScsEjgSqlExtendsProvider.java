@@ -34,526 +34,971 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		String fechaPonenteHast;
 		String fechaResolucionDesd;
 		String fechaResolucionHast;
+		int contadorRoles = 0;
 
 		SQL sql = new SQL();
 		SQL sqlUF = new SQL();
 		SQL sqlContrarios = new SQL();
 		SQL sqlUFRep = new SQL();
+		SQL sqlSolicitantePrincipal = new SQL();
+		String sqlFinal = "";
+		String sqlJusticiables = "";
 		
-		String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
-		if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") {
-			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
-		}
-		if (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "") {
-			condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
-		}
-
-		String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
-				+ " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion and ejgremesa.idremesa = remesa.idremesa"
-				+ " AND ejgremesa.idinstitucion = ejg.idinstitucion" + " AND   ejgremesa.anio = ejg.anio"
-				+ " AND   ejgremesa.idtipoejg = ejg.idtipoejg" + " AND   ejgremesa.numero = ejg.numero"
-				+ " AND   remesa.idinstitucion = " + idInstitucion;
-
-		if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
-			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.prefijo = '" + ejgItem.getNumRegRemesa1() + "'";
-		if (ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != "")
-			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.numero = '" + ejgItem.getNumRegRemesa2() + "'";
-		if (ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
-			condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.sufijo = '" + ejgItem.getNumRegRemesa3() + "'";
-		condicionNumRegRemesa = condicionNumRegRemesa + "))";
-		
-		// select
-		sql.SELECT("DISTINCT ejg.anio anio");
-		sql.SELECT("ejg.idinstitucion");
-		sql.SELECT("ejg.numero numero");
-		sql.SELECT("ejg.idtipoejg idtipoejg");
-		
-		// from
-		sql.FROM("scs_ejg ejg"); 
-
-		// joins
-//		if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "") {
-//		sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
-//		}
-		
-		if((ejgItem.getNif() != null && ejgItem.getNif() != "") || (ejgItem.getRol() != null && ejgItem.getRol() != "") 
-				|| (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") || (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") 
-				|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
-			sql.LEFT_OUTER_JOIN("scs_personajg perjg on perjg.idpersona = ejg.idpersonajg AND perjg.IDINSTITUCION = EJG.IDINSTITUCION");
-		}
-		
-//		if(ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "") {
-//        sql.LEFT_OUTER_JOIN("SCS_TURNO  TURNO ON TURNO.IDINSTITUCION = ejg.IDINSTITUCION AND TURNO.IDTURNO = EJG.GUARDIATURNO_IDTURNO");
-//		}
-//		if(ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "") {
-//        sql.LEFT_OUTER_JOIN("SCS_GUARDIASTURNO GUARDIA  ON GUARDIA.IDINSTITUCION =EJG.IDINSTITUCION AND GUARDIA.IDTURNO =EJG.GUARDIATURNO_IDTURNO  AND GUARDIA.IDGUARDIA =EJG.GUARDIATURNO_IDGUARDIA");
-//		}
-
-		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") || (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
-			sql.JOIN("scs_ejg_acta ejgacta ON ejgacta.idinstitucionejg = ejg.idinstitucion AND ejgacta.anioejg = ejg.anio AND ejgacta.idtipoejg = ejg.idtipoejg AND ejgacta.numeroejg = ejg.numero");
-			sql.JOIN("scs_actacomision ac ON ejgacta.idinstitucionacta = ac.idinstitucion AND ejgacta.idacta = ac.idacta AND ejgacta.anioacta = ac.anioacta");
-		}
-
-		//WHERE 
-		sql.WHERE("ejg.idinstitucion = " + idInstitucion );
-		
-		if ((ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") 
-				|| (ejgItem.getFechaEstadoDesd() != null)
-				|| (ejgItem.getFechaEstadoHast() != null)) {
-			String joinEstado = "SCS_ESTADOEJG ESTADO ON ESTADO.IDINSTITUCION = EJG.IDINSTITUCION AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.ANIO = EJG.ANIO AND ESTADO.NUMERO = EJG.NUMERO ";
-			sql.JOIN(joinEstado);
-	        sql.WHERE("ESTADO.IDESTADOEJG = F_SIGA_GET_IDULTIMOESTADOEJG (ESTADO.IDINSTITUCION, ESTADO.IDTIPOEJG, ESTADO.ANIO,ESTADO.NUMERO )");
-		}
-		if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") {
-			sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
-		}
-		
-		if (ejgItem.getFechaEstadoDesd() != null) {
-			fechaEstadoDesd = dateFormat.format(ejgItem.getFechaEstadoDesd());
-			sql.WHERE("TO_DATE(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( '" + fechaEstadoDesd + "','DD/MM/RRRR')");
-		}
-		
-		if (ejgItem.getFechaEstadoHast() != null) {
-			fechaEstadoHast = dateFormat.format(ejgItem.getFechaEstadoHast());
-			sql.WHERE("TO_DATE(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( '" + fechaEstadoHast + "','DD/MM/RRRR')");
-		}
-		
-		if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
-			sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
-
-		if (ejgItem.getNumero() != null && !ejgItem.getNumero().isEmpty()) {
-
-			String[] parts;
-
-			if (ejgItem.getNumero().trim().contains(",")) {
-				parts = ejgItem.getNumero().trim().split(",");
-				String numeros = "(";
-				for (String str : parts) {
-					if(numeros.equals("(")) {
-						numeros += str;
-					}else {
-						numeros += "," + str;
-					}
-				}
-				numeros += ")";
-				
-				sql.WHERE("EJG.NUMEJG IN " + numeros);
-
-			} else if (ejgItem.getNumero().trim().contains("-")) {
-				parts = ejgItem.getNumero().trim().split("-");
-
-				sql.WHERE("EJG.NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
-
-			} else {
-				sql.WHERE(" EJG.NUMEJG = " + ejgItem.getNumero().trim());
+		if(ejgItem.isModoBusqueda()) {
+			String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
+			if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") {
+				condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
 			}
-		}
-
-		if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
-			sql.WHERE("ejg.IDTIPOEJG IN (" + ejgItem.getTipoEJG() + ")");
-		if (ejgItem.getTipoEJGColegio() != null && ejgItem.getTipoEJGColegio() != "")
-			sql.WHERE("ejg.idtipoejgcolegio IN (" + ejgItem.getTipoEJGColegio() + ")");
-		if (ejgItem.getCreadoDesde() != null && ejgItem.getCreadoDesde() != "")
-			sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
-		if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "") {
-			SQL sqlProc = new SQL();
-			sqlProc.SELECT("idprocedimiento");
-			sqlProc.FROM("scs_designa des");
-			sqlProc.JOIN(
-					"scs_ejgdesigna   ejgdes ON des.anio = ejgdes.aniodesigna AND des.numero = ejgdes.numerodesigna\r\n"
-							+ "                                                  AND des.idinstitucion = ejgdes.idinstitucion\r\n"
-							+ "                                                  AND des.idturno = ejgdes.idturno ");
-			sqlProc.WHERE("ejgdes.idinstitucion = ejg.idinstitucion");
-			sqlProc.WHERE("ejgdes.anioejg = ejg.anio");
-			sqlProc.WHERE("ejgdes.numeroejg = ejg.numero");
-			sqlProc.WHERE("ejgdes.idtipoejg = ejg.idtipoejg");
-			sqlProc.WHERE("des.idpretension =" + ejgItem.getProcedimiento());
-			sql.WHERE("EXISTS (" + sqlProc.toString() + ")");
-		}
-
-		if (ejgItem.getFechaAperturaDesd() != null) {
-			fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd());
-			sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaAperturaHast() != null) {
-			fechaAperturaHast = dateFormat.format(ejgItem.getFechaAperturaHast());
-			sql.WHERE("EJG.FECHAAPERTURA <= TO_DATE( '" + fechaAperturaHast + "','DD/MM/RRRR')");
-		}
-		
-		if (ejgItem.getFechaLimiteDesd() != null) {
-			fechaLimiteDesd = dateFormat.format(ejgItem.getFechaLimiteDesd());
-			sql.WHERE("TO_DATE(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( '" + fechaLimiteDesd
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaLimiteHast() != null) {
-			fechaLimiteHast = dateFormat.format(ejgItem.getFechaLimiteHast());
-			sql.WHERE("TO_DATE(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + fechaLimiteHast
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getDictamen() != null && !ejgItem.getDictamen().isEmpty()) {
-			String[] selectedDict = ejgItem.getDictamen().split(",");
-			for (String dictamen : selectedDict) {
-				if (!dictamen.equals("-1") && !dictamen.equals("0")) {
-					dictamenCad += dictamen + ",";
-				} else if (dictamen.equals("0")) {
-					sinDictamen = true;
-				} else {
-					indiferente = true;
-				}
+			if (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "") {
+				condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
 			}
 
-			if (!indiferente) {
-				if (dictamenCad.length() > 0) {
-					dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
-					if (sinDictamen) {
-						sql.WHERE("(EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ") OR EJG.IDTIPODICTAMENEJG IS NULL)");
-					} else {
-						sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
-					}
-				} else if (sinDictamen) {
-					sql.WHERE("EJG.IDTIPODICTAMENEJG IS NULL");
-				}
+			String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
+					+ " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion and ejgremesa.idremesa = remesa.idremesa"
+					+ " AND ejgremesa.idinstitucion = ejg.idinstitucion" + " AND   ejgremesa.anio = ejg.anio"
+					+ " AND   ejgremesa.idtipoejg = ejg.idtipoejg" + " AND   ejgremesa.numero = ejg.numero"
+					+ " AND   remesa.idinstitucion = " + idInstitucion;
+
+			if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
+				condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.prefijo = '" + ejgItem.getNumRegRemesa1() + "'";
+			if (ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != "")
+				condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.numero = '" + ejgItem.getNumRegRemesa2() + "'";
+			if (ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
+				condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.sufijo = '" + ejgItem.getNumRegRemesa3() + "'";
+			condicionNumRegRemesa = condicionNumRegRemesa + "))";
+			
+			// select
+			sql.SELECT("DISTINCT ejg.anio anio");
+			sql.SELECT("ejg.idinstitucion");
+			sql.SELECT("ejg.numero numero");
+			sql.SELECT("ejg.idtipoejg idtipoejg");
+			
+			// from
+			sql.FROM("scs_ejg ejg"); 
+
+			// joins
+
+			if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") || (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
+				sql.JOIN("scs_ejg_acta ejgacta ON ejgacta.idinstitucionejg = ejg.idinstitucion AND ejgacta.anioejg = ejg.anio AND ejgacta.idtipoejg = ejg.idtipoejg AND ejgacta.numeroejg = ejg.numero");
+				sql.JOIN("scs_actacomision ac ON ejgacta.idinstitucionacta = ac.idinstitucion AND ejgacta.idacta = ac.idacta AND ejgacta.anioacta = ac.anioacta");
 			}
 
-		}
-		if (ejgItem.getFundamentoCalif() != null)
-			sql.WHERE("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
-		if (ejgItem.getFechaDictamenDesd() != null) {
-			fechaDictamenDesd = dateFormat.format(ejgItem.getFechaDictamenDesd());
-			sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( '" + fechaDictamenDesd + "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaDictamenHast() != null) {
-			fechaDictamenHast = dateFormat.format(ejgItem.getFechaDictamenHast());
-			sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '" + fechaDictamenHast + "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getResolucion() != null) {
-			if(ejgItem.getResolucion().equals("12")) {
-				sql.WHERE("EJG.IDTIPORATIFICACIONEJG IS NULL");
-			}else {
-				sql.WHERE("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
+			//WHERE 
+			sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+			
+			if((ejgItem.getNif() != null && ejgItem.getNif() != "") || (ejgItem.getRol() != null && ejgItem.getRol() != "") 
+					|| (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") || (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") 
+					|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+				sql.WHERE("ejg.idinstitucion = perjg.idinstitucion");
 			}
-		}
-		if (ejgItem.getFundamentoJuridico() != null && ejgItem.getFundamentoJuridico() != "")
-			sql.WHERE("EJG.IDFUNDAMENTOJURIDICO = " + ejgItem.getFundamentoJuridico());
-		if (ejgItem.getFechaResolucionDesd() != null) {
-			fechaResolucionDesd = dateFormat.format(ejgItem.getFechaResolucionDesd());
-			sql.WHERE("TO_DATE(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( '" + fechaResolucionDesd
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaResolucionHast() != null) {
-			fechaResolucionHast = dateFormat.format(ejgItem.getFechaResolucionHast());
-			sql.WHERE("TO_DATE(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '" + fechaResolucionHast
-					+ "','DD/MM/RRRR')");
+			
+			if ((ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") 
+					|| (ejgItem.getFechaEstadoDesd() != null)
+					|| (ejgItem.getFechaEstadoHast() != null)) {
+				String joinEstado = "SCS_ESTADOEJG ESTADO ON ESTADO.IDINSTITUCION = EJG.IDINSTITUCION AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.ANIO = EJG.ANIO AND ESTADO.NUMERO = EJG.NUMERO ";
+				sql.JOIN(joinEstado);
+		        sql.WHERE("ESTADO.IDESTADOEJG = F_SIGA_GET_IDULTIMOESTADOEJG (ESTADO.IDINSTITUCION, ESTADO.IDTIPOEJG, ESTADO.ANIO,ESTADO.NUMERO )");
+			}
+			if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") {
+				sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
+			}
+			
+			if (ejgItem.getFechaEstadoDesd() != null) {
+				fechaEstadoDesd = dateFormat.format(ejgItem.getFechaEstadoDesd());
+				sql.WHERE("TO_DATE(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( '" + fechaEstadoDesd + "','DD/MM/RRRR')");
+			}
+			
+			if (ejgItem.getFechaEstadoHast() != null) {
+				fechaEstadoHast = dateFormat.format(ejgItem.getFechaEstadoHast());
+				sql.WHERE("TO_DATE(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( '" + fechaEstadoHast + "','DD/MM/RRRR')");
+			}
+			
+			if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+				sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
 
-		}
-		if (ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
-			sql.WHERE("EJG.IDTIPORESOLAUTO = " + ejgItem.getImpugnacion());
-		if (ejgItem.getFundamentoImpuganacion() != null && ejgItem.getFundamentoImpuganacion() != "")
-			sql.WHERE("EJG.IDTIPOSENTIDOAUTO = " + ejgItem.getFundamentoImpuganacion());
-		if (ejgItem.getFechaImpugnacionDesd() != null) {
-			fechaImpugnacionDesd = dateFormat.format(ejgItem.getFechaImpugnacionDesd());
-			sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '" + fechaImpugnacionDesd + "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaImpugnacionHast() != null) {
-			fechaImpugnacionHast = dateFormat.format(ejgItem.getFechaImpugnacionHast());
-			sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '" + fechaImpugnacionHast + "','DD/MM/RRRR')");
+			if (ejgItem.getNumero() != null && !ejgItem.getNumero().isEmpty()) {
 
-		}
-		if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
-			sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
-		if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "") {
-			sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%" + ejgItem.getNumAnnioProcedimiento() + "%'");
-		}
-		if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
-			sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
-		if (ejgItem.getNig() != null && ejgItem.getNig() != "")
-			sql.WHERE("EJG.NIG like '%" + ejgItem.getNig() + "%'");
-		if (ejgItem.getPerceptivo() != null && ejgItem.getPerceptivo() != "")
-			sql.WHERE("EJG.IDPRECEPTIVO = " + ejgItem.getPerceptivo());
-		if (ejgItem.getCalidad() != null && ejgItem.getCalidad() != "")
-			sql.WHERE("EJG.CALIDAD = '" + ejgItem.getCalidad() + "'");
-		if (ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
-			sql.WHERE("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
-		if (ejgItem.getPonente() != null && ejgItem.getPonente() != "")
-			sql.WHERE("EJG.IDPONENTE = " + ejgItem.getPonente());
-		if (ejgItem.getFechaPonenteDesd() != null) {
-			fechaPonenteDesd = dateFormat.format(ejgItem.getFechaPonenteDesd());
-			sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '" + fechaPonenteDesd
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaPonenteHast() != null) {
-			fechaPonenteHast = dateFormat.format(ejgItem.getFechaPonenteHast());
-			sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '" + fechaPonenteHast
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-			sql.WHERE("EJG.NUMERO_CAJG = '"  + ejgItem.getNumCAJG().trim() + "'");
-		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
-				|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
-			sql.WHERE(condicionAnnioNumActas);
-		}
-		if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != ""
-				|| ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != ""
-				|| ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
-			sql.WHERE(condicionNumRegRemesa);
+				String[] parts;
 
-		if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
-			sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
-		// LOGICA DE ROL
-		if (ejgItem.getRol() != null && ejgItem.getRol() != ""
-			&& ((ejgItem.getNif()!= null && !ejgItem.getNif().isEmpty())
-				|| (ejgItem.getApellido1()!= null && !ejgItem.getApellido1().isEmpty())
-				|| (ejgItem.getApellido2()!= null && !ejgItem.getApellido2().isEmpty())
-				|| (ejgItem.getNombre()!= null && !ejgItem.getNombre().isEmpty())
-					)) {
-			// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
-			boolean banderaRolprimero = false;
-			// Controlar si ya esta activo el 1 Rol.
-			boolean checkRolone = false;
-			// Obtener el último Rol.
-			int rolUltimo = Integer.parseInt(ejgItem.getRol().substring(ejgItem.getRol().length() - 1));
-			// Contador del Rol Actual
-			int contadorRolActual = 0;
-			// Verificar que contengan Solicitantes.
-			if (ejgItem.getRol().contains("1")) {
-				/*
-				 * Comprobar que el Rol 1 si viene True = Entonces marcarmos TRUE la
-				 * banderaRolprimero Compronar que el Rol 1 si viene False = Entonces marcamos
-				 * False la banderaRolprimero
-				 */
-				checkRolone = (checkRolone == true) ? true : false;
-				/*
-				 * Comprobar que el Rol 1 si viene False = Entonces marcarmos TRUE porque será
-				 * el 1 Rol. Compronar que el Rol 1 si viene True = Entonces ya tenemos el 1 Rol
-				 * marcado.
-				 */
-				banderaRolprimero = (checkRolone == true) ? false : true;
-
-				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-					// Comprobar que solo existe este Rol activado.
-					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
-					} else {
-						// Verificar si el 1 Rol que tiene sino no añadir parentesis.
-						if (banderaRolprimero == true) {
-							sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
-							checkRolone = true;
-							banderaRolprimero = false;
-						} else {
-							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
-						}
-					}
-				}
-				if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-					String columna = "REPLACE(perjg.apellido1), ' ', '')";
-					String cadena = ejgItem.getApellido1();
-					if (ejgItem.getRol().equals("1")) {
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
+				if (ejgItem.getNumero().trim().contains(",")) {
+					parts = ejgItem.getNumero().trim().split(",");
+					String numeros = "(";
+					for (String str : parts) {
+						if(numeros.equals("(")) {
+							numeros += str;
 						}else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+							numeros += "," + str;
 						}
+					}
+					numeros += ")";
+					
+					sql.WHERE("EJG.NUMEJG IN " + numeros);
+
+				} else if (ejgItem.getNumero().trim().contains("-")) {
+					parts = ejgItem.getNumero().trim().split("-");
+
+					sql.WHERE("EJG.NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
+
+				} else {
+					sql.WHERE(" EJG.NUMEJG = " + ejgItem.getNumero().trim());
+				}
+			}
+
+			if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+				sql.WHERE("ejg.IDTIPOEJG IN (" + ejgItem.getTipoEJG() + ")");
+			if (ejgItem.getTipoEJGColegio() != null && ejgItem.getTipoEJGColegio() != "")
+				sql.WHERE("ejg.idtipoejgcolegio IN (" + ejgItem.getTipoEJGColegio() + ")");
+			if (ejgItem.getCreadoDesde() != null && ejgItem.getCreadoDesde() != "")
+				sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
+			if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "") {
+				SQL sqlProc = new SQL();
+				sqlProc.SELECT("idprocedimiento");
+				sqlProc.FROM("scs_designa des");
+				sqlProc.JOIN(
+						"scs_ejgdesigna   ejgdes ON des.anio = ejgdes.aniodesigna AND des.numero = ejgdes.numerodesigna\r\n"
+								+ "                                                  AND des.idinstitucion = ejgdes.idinstitucion\r\n"
+								+ "                                                  AND des.idturno = ejgdes.idturno ");
+				sqlProc.WHERE("ejgdes.idinstitucion = ejg.idinstitucion");
+				sqlProc.WHERE("ejgdes.anioejg = ejg.anio");
+				sqlProc.WHERE("ejgdes.numeroejg = ejg.numero");
+				sqlProc.WHERE("ejgdes.idtipoejg = ejg.idtipoejg");
+				sqlProc.WHERE("des.idpretension =" + ejgItem.getProcedimiento());
+				sql.WHERE("EXISTS (" + sqlProc.toString() + ")");
+			}
+
+			if (ejgItem.getFechaAperturaDesd() != null) {
+				fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd());
+				sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaAperturaHast() != null) {
+				fechaAperturaHast = dateFormat.format(ejgItem.getFechaAperturaHast());
+				sql.WHERE("EJG.FECHAAPERTURA <= TO_DATE( '" + fechaAperturaHast + "','DD/MM/RRRR')");
+			}
+			
+			if (ejgItem.getFechaLimiteDesd() != null) {
+				fechaLimiteDesd = dateFormat.format(ejgItem.getFechaLimiteDesd());
+				sql.WHERE("TO_DATE(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( '" + fechaLimiteDesd
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaLimiteHast() != null) {
+				fechaLimiteHast = dateFormat.format(ejgItem.getFechaLimiteHast());
+				sql.WHERE("TO_DATE(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + fechaLimiteHast
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getDictamen() != null && !ejgItem.getDictamen().isEmpty()) {
+				String[] selectedDict = ejgItem.getDictamen().split(",");
+				for (String dictamen : selectedDict) {
+					if (!dictamen.equals("-1") && !dictamen.equals("0")) {
+						dictamenCad += dictamen + ",";
+					} else if (dictamen.equals("0")) {
+						sinDictamen = true;
 					} else {
-						if (banderaRolprimero) {
-							if(ejgItem.isModoBusqueda()) {
-								sql.WHERE(" " + columna + " = '" + cadena + "'");
-							}else {
-								sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-							}
-							checkRolone = true;
-							banderaRolprimero = false;
+						indiferente = true;
+					}
+				}
+
+				if (!indiferente) {
+					if (dictamenCad.length() > 0) {
+						dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
+						if (sinDictamen) {
+							sql.WHERE("(EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ") OR EJG.IDTIPODICTAMENEJG IS NULL)");
 						} else {
-							if(ejgItem.isModoBusqueda()) {
-								sql.WHERE(" " + columna + " = '" + cadena + "'");
-							}else {
-								sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-							}
+							sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
 						}
+					} else if (sinDictamen) {
+						sql.WHERE("EJG.IDTIPODICTAMENEJG IS NULL");
+					}
+				}
+
+			}
+			if (ejgItem.getFundamentoCalif() != null)
+				sql.WHERE("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
+			if (ejgItem.getFechaDictamenDesd() != null) {
+				fechaDictamenDesd = dateFormat.format(ejgItem.getFechaDictamenDesd());
+				sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( '" + fechaDictamenDesd + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaDictamenHast() != null) {
+				fechaDictamenHast = dateFormat.format(ejgItem.getFechaDictamenHast());
+				sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '" + fechaDictamenHast + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getResolucion() != null) {
+				if(ejgItem.getResolucion().equals("12")) {
+					sql.WHERE("EJG.IDTIPORATIFICACIONEJG IS NULL");
+				}else {
+					sql.WHERE("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
+				}
+			}
+			if (ejgItem.getFundamentoJuridico() != null && ejgItem.getFundamentoJuridico() != "")
+				sql.WHERE("EJG.IDFUNDAMENTOJURIDICO = " + ejgItem.getFundamentoJuridico());
+			if (ejgItem.getFechaResolucionDesd() != null) {
+				fechaResolucionDesd = dateFormat.format(ejgItem.getFechaResolucionDesd());
+				sql.WHERE("TO_DATE(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( '" + fechaResolucionDesd
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaResolucionHast() != null) {
+				fechaResolucionHast = dateFormat.format(ejgItem.getFechaResolucionHast());
+				sql.WHERE("TO_DATE(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '" + fechaResolucionHast
+						+ "','DD/MM/RRRR')");
+
+			}
+			if (ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
+				sql.WHERE("EJG.IDTIPORESOLAUTO = " + ejgItem.getImpugnacion());
+			if (ejgItem.getFundamentoImpuganacion() != null && ejgItem.getFundamentoImpuganacion() != "")
+				sql.WHERE("EJG.IDTIPOSENTIDOAUTO = " + ejgItem.getFundamentoImpuganacion());
+			if (ejgItem.getFechaImpugnacionDesd() != null) {
+				fechaImpugnacionDesd = dateFormat.format(ejgItem.getFechaImpugnacionDesd());
+				sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '" + fechaImpugnacionDesd + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaImpugnacionHast() != null) {
+				fechaImpugnacionHast = dateFormat.format(ejgItem.getFechaImpugnacionHast());
+				sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '" + fechaImpugnacionHast + "','DD/MM/RRRR')");
+
+			}
+			if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
+				sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
+			if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "") {
+				sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%" + ejgItem.getNumAnnioProcedimiento() + "%'");
+			}
+			if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
+				sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
+			if (ejgItem.getNig() != null && ejgItem.getNig() != "")
+				sql.WHERE("EJG.NIG like '%" + ejgItem.getNig() + "%'");
+			if (ejgItem.getPerceptivo() != null && ejgItem.getPerceptivo() != "")
+				sql.WHERE("EJG.IDPRECEPTIVO = " + ejgItem.getPerceptivo());
+			if (ejgItem.getCalidad() != null && ejgItem.getCalidad() != "")
+				sql.WHERE("EJG.CALIDAD = '" + ejgItem.getCalidad() + "'");
+			if (ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
+				sql.WHERE("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
+			if (ejgItem.getPonente() != null && ejgItem.getPonente() != "")
+				sql.WHERE("EJG.IDPONENTE = " + ejgItem.getPonente());
+			if (ejgItem.getFechaPonenteDesd() != null) {
+				fechaPonenteDesd = dateFormat.format(ejgItem.getFechaPonenteDesd());
+				sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '" + fechaPonenteDesd
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaPonenteHast() != null) {
+				fechaPonenteHast = dateFormat.format(ejgItem.getFechaPonenteHast());
+				sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '" + fechaPonenteHast
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
+				sql.WHERE("EJG.NUMERO_CAJG = '"  + ejgItem.getNumCAJG().trim() + "'");
+			if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
+					|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
+				sql.WHERE(condicionAnnioNumActas);
+			}
+			if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != ""
+					|| ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != ""
+					|| ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
+				sql.WHERE(condicionNumRegRemesa);
+
+			if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
+				sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
+			// LOGICA DE ROL
+			if (ejgItem.getRol() != null && ejgItem.getRol() != ""
+				&& ((ejgItem.getNif()!= null && !ejgItem.getNif().isEmpty())
+					|| (ejgItem.getApellido1()!= null && !ejgItem.getApellido1().isEmpty())
+					|| (ejgItem.getApellido2()!= null && !ejgItem.getApellido2().isEmpty())
+					|| (ejgItem.getNombre()!= null && !ejgItem.getNombre().isEmpty())
+						)) {
+				//Condiciones para encontrar una persona independientemente del rol pero si tiene un rol seleccionado
+				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
+							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				}
+				
+				if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
+					String columna = "REPLACE(perjg.apellido1, ' ', '')";
+					String cadena = ejgItem.getApellido1();
+					sql.WHERE(" " + columna + " = '" + cadena + "'");
+					
+				}
+				
+				if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
+					String columna = "REPLACE(perjg.apellido2, ' ', '')";
+					String cadena = ejgItem.getApellido2();
+					sql.WHERE(" " + columna + " = '" + cadena + "'");
+				}
+				
+				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+					String columna = "perjg.NOMBRE";
+					String cadena = ejgItem.getNombre();
+					sql.WHERE(" " + columna + " = '" + cadena + "'");
+				}
+				
+				
+				// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
+				boolean banderaRolprimero = false;
+				// Controlar si ya esta activo el 1 Rol.
+				boolean checkRolone = false;
+				// Obtener el último Rol.
+				int rolUltimo = Integer.parseInt(ejgItem.getRol().substring(ejgItem.getRol().length() - 1));
+				// Contador del Rol Actual
+				int contadorRolActual = 0;
+				// Verificar que contengan Solicitantes.
+				if (ejgItem.getRol().contains("1")) {
+					
+					checkRolone = (checkRolone == true) ? true : false;
+					
+					banderaRolprimero = (checkRolone == true) ? false : true;
+					
+					sqlSolicitantePrincipal.SELECT("1");
+					sqlSolicitantePrincipal.FROM("scs_ejg ejg2");
+					sqlSolicitantePrincipal.WHERE("ejg2.idinstitucion = ejg.idinstitucion and ejg2.idinstitucion = perjg.idinstitucion "
+							+ "and ejg2.idpersonajg = ejg.idpersonajg and ejg2.idpersonajg = perjg.idpersona and "
+							+ "ejg2.numero = ejg.numero and ejg2.anio = ejg.anio and ejg2.idtipoejg = ejg.idtipoejg");
+					
+					if(contadorRoles == 0) {
+						sqlJusticiables += "EXISTS(";
+						contadorRoles ++;
+						sqlJusticiables += sqlSolicitantePrincipal.toString();
+					}else{
+						sqlJusticiables += " UNION ALL " + sqlSolicitantePrincipal.toString();
+					}
+				
+				}
+				// Verificar que contengan Contrarios.
+				if (ejgItem.getRol().contains("2")) {
+					contadorRolActual = 2;
+					// Existe un Rol 1 ya seleccionado.
+					checkRolone = (checkRolone == true) ? true : false;
+					banderaRolprimero = (checkRolone == true) ? false : true;
+										sqlContrarios.WHERE(
+								"contrario.anio = ejg.anio and contrario.numero = ejg.numero"
+								+ " and perjg.idpersona = contrario.idpersona and contrario.idinstitucion = perjg.idinstitucion"
+								+ " and contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg");
+									if(contadorRoles == 0) {
+										sqlJusticiables += "EXISTS(";
+										contadorRoles ++;
+										sqlJusticiables += sqlContrarios.toString();
+									}else{
+										sqlJusticiables += " UNION ALL " + sqlContrarios.toString();
+									}
+									
+				}
+				// Verificar que contengan Representantes.
+				if (ejgItem.getRol().contains("3")) {
+					contadorRolActual = 3;
+					checkRolone = (checkRolone == true) ? true : false;
+					banderaRolprimero = (checkRolone == true) ? false : true;
+						sqlUFRep.SELECT("1");
+						sqlUFRep.FROM("scs_unidadfamiliarejg solicitante");
+						sqlUFRep.WHERE(
+								"solicitante.anio = ejg.anio and solicitante.idinstitucion = perjg.idinstitucion "
+								+ "and solicitante.idpersona = perjg.idpersona and solicitante.numero = ejg.numero AND solicitante.solicitante = 1 "
+										+ "and solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg");
+									if(contadorRoles == 0) {
+										sqlJusticiables += "EXISTS(";
+										contadorRoles ++;
+										sqlJusticiables += sqlUFRep.toString();
+									}else {
+										sqlJusticiables += " UNION ALL " + sqlUFRep.toString();
+									}
+									
+				}
+				// Verificar que contengan Unidad Familiar.
+				if (ejgItem.getRol().contains("4")) {
+					contadorRolActual = 4;
+					checkRolone = (checkRolone == true) ? true : false;
+					banderaRolprimero = (checkRolone == true) ? false : true;
+					
+						sqlUF.SELECT("1");
+						sqlUF.FROM("scs_unidadfamiliarejg unidadFamiliar");					sqlUF.WHERE(
+								"unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg and "
+								+ "unidadFamiliar.idpersona = perjg.idpersona and unidadFamiliar.idinstitucion = perjg.idinstitucion"
+										+ "	and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero ");
+
+									if(contadorRoles == 0) {
+										sqlJusticiables += "EXISTS(";
+										contadorRoles ++;
+										sqlJusticiables += sqlUF.toString();
+									}else{
+										sqlJusticiables += " UNION ALL " + sqlUF.toString();
+									}
+				}
+				// Verificar que no contiene Roles.
+			} else {
+				if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+					sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
+					String columna = "REPLACE(perjg.apellido1, ' ', '')";
+					String cadena = ejgItem.getApellido1();
+					if(ejgItem.isModoBusqueda()) {
+						sql.WHERE(" " + columna + " = '" + cadena + "'");
+					} else {
+						sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
 					}
 				}
 				if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-					String columna = "REPLACE(perjg.apellido2), ' ', '')";
+					String columna = "REPLACE(perjg.apellido2, ' ', '')";
 					String cadena = ejgItem.getApellido2();
-					if (ejgItem.getRol().equals("1")) {
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						}else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
+					if(ejgItem.isModoBusqueda()) {
+						sql.WHERE(" " + columna + " = '" + cadena + "'");
 					} else {
-						if (banderaRolprimero) {
-							if(ejgItem.isModoBusqueda()) {
-								sql.WHERE(" " + columna + " = '" + cadena + "'");
-							}else {
-								sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-							}
-							checkRolone = true;
-							banderaRolprimero = false;
-						} else {
-							if(ejgItem.isModoBusqueda()) {
-								sql.WHERE(" " + columna + " = '" + cadena + "'");
-							}else {
-								sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-							}
-						}
+						sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
 					}
 				}
 				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
 					String columna = "perjg.NOMBRE";
 					String cadena = ejgItem.getNombre();
-					if (ejgItem.getRol().equals("1")) {
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						}else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
+					if(ejgItem.isModoBusqueda()) {
+						sql.WHERE(" " + columna + " = '" + cadena + "'");
 					} else {
-						if (banderaRolprimero) {
-							if(ejgItem.isModoBusqueda()) {
-								sql.WHERE(" " + columna + " = '" + cadena + "'");
-							}else {
-								sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-							}
-							checkRolone = true;
-							banderaRolprimero = false;
+						sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+					}
+				}
+
+			}
+			if(!sqlJusticiables.equals(""))
+			sql.WHERE(sqlJusticiables + ")");
+
+			if (ejgItem.getTipoLetrado() != null && ejgItem.getTipoLetrado() != "") {
+				if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
+
+					sql.WHERE("col.ncolegiado = " + ejgItem.getNumColegiado());
+					if (ejgItem.getTipoLetrado().equals("E")) {
+						sql.JOIN(
+								"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
+						// letrado tramitador
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA =" + ejgItem.getIdGuardia());
+					} else if (ejgItem.getTipoLetrado().equals("D")) {
+
+						// letrado designas
+						sql.JOIN(
+								"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
+						sql.JOIN(
+								"SCS_DESIGNA DESIGNA ON EJGDESIGNA.IDINSTITUCION = DESIGNA.idinstitucion and EJGDESIGNA.IDTURNO = DESIGNA.IDTURNO and EJGDESIGNA.ANIODESIGNA = DESIGNA.ANIO and EJGDESIGNA.numerodesigna = DESIGNA.NUMERO");
+						sql.JOIN(
+								"SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
+						sql.JOIN(
+								"cen_colegiado col on DESIGNALETRADO.idpersona = col.idpersona and DESIGNALETRADO.idinstitucion = col.idinstitucion");
+						SQL sql2 = new SQL();
+
+						sql2.SELECT("MAX(LET2.Fechadesigna)");
+						sql2.FROM("SCS_DESIGNASLETRADO LET2");
+						sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
+						sql2.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
+						sql2.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+						sql2.WHERE("TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)");
+						sql.WHERE("DESIGNALETRADO.Fechadesigna = (" + sql2 + ")");
+
+						if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+							sql.WHERE("DESIGNALETRADO.IDPERSONA = " + ejgItem.getIdPersona());
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("DESIGNA.IDTURNO = " + ejgItem.getIdTurno());
+					} else if (ejgItem.getTipoLetrado().equals("A")) {
+						// letrado asistencias
+						sql.JOIN(
+								"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
+						sql.JOIN(
+								"cen_colegiado col on ASISTENCIA.IDPERSONACOLEGIADO = col.idpersona and ASISTENCIA.idinstitucion = col.idinstitucion");
+						if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+							sql.WHERE("ASISTENCIA.IDPERSONACOLEGIADO = " + ejgItem.getIdPersona());
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
+					}
+				} else if(ejgItem.getIdPersona() != null){
+					sql.LEFT_OUTER_JOIN(
+							"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
+					if (ejgItem.getTipoLetrado().equals("E")) {
+						// letrado tramitador
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
+					} else if (ejgItem.getTipoLetrado().equals("D")) {
+						// letrado designas
+						sql.JOIN(
+								"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getIdTurno());
+					} else if (ejgItem.getTipoLetrado().equals("A")) {
+						// letrado asistencias
+						sql.JOIN(
+								"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
+					}
+				}
+			} else if(ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "" && ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "" &&
+					ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != ""){
+				sql.LEFT_OUTER_JOIN(
+						"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
+				if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
+					sql.WHERE("col.ncolegiado = " + ejgItem.getNumColegiado());
+				}
+				if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+					sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+				if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+					sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
+			}
+
+			if (ejgItem.getEstadosSolicitudExpEco() != null && ejgItem.getEstadosSolicitudExpEco().length > 0) {
+				sql.JOIN("SCS_EEJG_PETICIONES PET " + "ON PET.ANIO = ejg.ANIO " + "AND PET.NUMERO = ejg.NUMERO "
+						+ "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " + "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
+				sql.WHERE("PET.ESTADO IN (" + String.join(",", ejgItem.getEstadosSolicitudExpEco()) + ")");
+			}
+
+			if (ejgItem.isInformacionEconomica()) {
+				if (ejgItem.getEstadosSolicitudExpEco() == null || ejgItem.getEstadosSolicitudExpEco().length == 0) {
+					sql.INNER_JOIN("SCS_EEJG_PETICIONES PET " + "ON PET.ANIO = ejg.ANIO " + "AND PET.NUMERO = ejg.NUMERO "
+							+ "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " + "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
+				}
+				sql.INNER_JOIN("SCS_EEJG_XML EXML " + "ON PET.IDPETICION = EXML.IDPETICION ");
+				sql.WHERE("EXML.IDXML IS NOT NULL");
+			}
+			
+			if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDTURNO =")) {
+				sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+			}
+			if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDGUARDIA =")) {
+				sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
+			}
+			
+
+			sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
+			
+			if (tamMaximo != null) { 
+				Integer tamMaxNumber = tamMaximo;
+				sql.FETCH_FIRST_ROWS_ONLY(tamMaxNumber);
+			}
+			
+			
+			//Pongo este from aquí para que se coloque después de todos los posibles joins
+					if((ejgItem.getNif() != null && ejgItem.getNif() != "") || (ejgItem.getRol() != null && ejgItem.getRol() != "") 
+							|| (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") || (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") 
+							|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+						
+						String sqlSelectFrom = sql.toString().substring(0, sql.toString().indexOf("WHERE"));
+						String sqlWhere = sql.toString().substring(sql.toString().indexOf("WHERE"));
+						sqlSelectFrom += ", scs_personajg perjg";
+						sqlFinal = sqlSelectFrom + " " + sqlWhere;
+					}else {
+						sqlFinal = sql.toString();
+					}
+		}else {
+			
+			ejgItem.setApellidos(ejgItem.getApellido1() + " " + ejgItem.getApellido2());
+			
+			String condicionAnnioNumActas = " ac.idinstitucion = " + idInstitucion;
+			if (ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") {
+				condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.anioacta = " + ejgItem.getAnnioActa();
+			}
+			if (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "") {
+				condicionAnnioNumActas = condicionAnnioNumActas + " AND   ac.numeroacta = " + ejgItem.getNumActa();
+			}
+
+			String condicionNumRegRemesa = " (EXISTS (SELECT 1 FROM cajg_ejgremesa ejgremesa, cajg_remesa remesa"
+					+ " WHERE ejgremesa.idinstitucionremesa = remesa.idinstitucion and ejgremesa.idremesa = remesa.idremesa"
+					+ " AND ejgremesa.idinstitucion = ejg.idinstitucion" + " AND   ejgremesa.anio = ejg.anio"
+					+ " AND   ejgremesa.idtipoejg = ejg.idtipoejg" + " AND   ejgremesa.numero = ejg.numero"
+					+ " AND   remesa.idinstitucion = " + idInstitucion;
+
+			if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != "")
+				condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.prefijo = '" + ejgItem.getNumRegRemesa1() + "'";
+			if (ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != "")
+				condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.numero = '" + ejgItem.getNumRegRemesa2() + "'";
+			if (ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
+				condicionNumRegRemesa = condicionNumRegRemesa + " AND   remesa.sufijo = '" + ejgItem.getNumRegRemesa3() + "'";
+			condicionNumRegRemesa = condicionNumRegRemesa + "))";
+			
+			// select
+			sql.SELECT("DISTINCT ejg.anio anio");
+			sql.SELECT("ejg.idinstitucion");
+			sql.SELECT("ejg.numero numero");
+			sql.SELECT("ejg.idtipoejg idtipoejg");
+			
+			// from
+			sql.FROM("scs_ejg ejg"); 
+
+			// joins
+//			if(ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "") {
+//			sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
+//			}
+			
+			if((ejgItem.getNif() != null && ejgItem.getNif() != "") || (ejgItem.getRol() != null && ejgItem.getRol() != "") 
+					|| (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") || (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+				sql.LEFT_OUTER_JOIN("scs_personajg perjg on perjg.idpersona = ejg.idpersonajg AND perjg.IDINSTITUCION = EJG.IDINSTITUCION");
+			}
+			
+//			if(ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "") {
+//	        sql.LEFT_OUTER_JOIN("SCS_TURNO  TURNO ON TURNO.IDINSTITUCION = ejg.IDINSTITUCION AND TURNO.IDTURNO = EJG.GUARDIATURNO_IDTURNO");
+//			}
+//			if(ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "") {
+//	        sql.LEFT_OUTER_JOIN("SCS_GUARDIASTURNO GUARDIA  ON GUARDIA.IDINSTITUCION =EJG.IDINSTITUCION AND GUARDIA.IDTURNO =EJG.GUARDIATURNO_IDTURNO  AND GUARDIA.IDGUARDIA =EJG.GUARDIATURNO_IDGUARDIA");
+//			}
+
+			if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "") || (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
+				sql.JOIN("scs_ejg_acta ejgacta ON ejgacta.idinstitucionejg = ejg.idinstitucion AND ejgacta.anioejg = ejg.anio AND ejgacta.idtipoejg = ejg.idtipoejg AND ejgacta.numeroejg = ejg.numero");
+				sql.JOIN("scs_actacomision ac ON ejgacta.idinstitucionacta = ac.idinstitucion AND ejgacta.idacta = ac.idacta AND ejgacta.anioacta = ac.anioacta");
+			}
+
+			//WHERE 
+			sql.WHERE("ejg.idinstitucion = " + idInstitucion );
+			
+			if ((ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") 
+					|| (ejgItem.getFechaEstadoDesd() != null)
+					|| (ejgItem.getFechaEstadoHast() != null)) {
+				String joinEstado = "SCS_ESTADOEJG ESTADO ON ESTADO.IDINSTITUCION = EJG.IDINSTITUCION AND ESTADO.IDTIPOEJG = EJG.IDTIPOEJG AND ESTADO.ANIO = EJG.ANIO AND ESTADO.NUMERO = EJG.NUMERO ";
+				sql.JOIN(joinEstado);
+		        sql.WHERE("ESTADO.IDESTADOEJG = F_SIGA_GET_IDULTIMOESTADOEJG (ESTADO.IDINSTITUCION, ESTADO.IDTIPOEJG, ESTADO.ANIO,ESTADO.NUMERO )");
+			}
+			if (ejgItem.getEstadoEJG() != null && ejgItem.getEstadoEJG() != "") {
+				sql.WHERE("estado.idestadoejg IN (" + ejgItem.getEstadoEJG() + ")");
+			}
+			
+			if (ejgItem.getFechaEstadoDesd() != null) {
+				fechaEstadoDesd = dateFormat.format(ejgItem.getFechaEstadoDesd());
+				sql.WHERE("TO_DATE(ESTADO.FECHAINICIO,'DD/MM/RRRR') >= TO_DATE( '" + fechaEstadoDesd + "','DD/MM/RRRR')");
+			}
+			
+			if (ejgItem.getFechaEstadoHast() != null) {
+				fechaEstadoHast = dateFormat.format(ejgItem.getFechaEstadoHast());
+				sql.WHERE("TO_DATE(ESTADO.FECHAINICIO,'DD/MM/RRRR') <= TO_DATE( '" + fechaEstadoHast + "','DD/MM/RRRR')");
+			}
+			
+			if (ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")
+				sql.WHERE("ejg.anio =" + ejgItem.getAnnio());
+
+			if (ejgItem.getNumero() != null && !ejgItem.getNumero().isEmpty()) {
+
+				String[] parts;
+
+				if (ejgItem.getNumero().trim().contains(",")) {
+					parts = ejgItem.getNumero().trim().split(",");
+					String numeros = "(";
+					for (String str : parts) {
+						if(numeros.equals("(")) {
+							numeros += str;
+						}else {
+							numeros += "," + str;
+						}
+					}
+					numeros += ")";
+					
+					sql.WHERE("EJG.NUMEJG IN " + numeros);
+
+				} else if (ejgItem.getNumero().trim().contains("-")) {
+					parts = ejgItem.getNumero().trim().split("-");
+
+					sql.WHERE("EJG.NUMEJG BETWEEN " + parts[0].trim() + " AND " + parts[1].trim());
+
+				} else {
+					sql.WHERE(" EJG.NUMEJG = " + ejgItem.getNumero().trim());
+				}
+			}
+
+			if (ejgItem.getTipoEJG() != null && ejgItem.getTipoEJG() != "")
+				sql.WHERE("ejg.IDTIPOEJG IN (" + ejgItem.getTipoEJG() + ")");
+			if (ejgItem.getTipoEJGColegio() != null && ejgItem.getTipoEJGColegio() != "")
+				sql.WHERE("ejg.idtipoejgcolegio IN (" + ejgItem.getTipoEJGColegio() + ")");
+			if (ejgItem.getCreadoDesde() != null && ejgItem.getCreadoDesde() != "")
+				sql.WHERE("ejg.origenapertura IN (" + ejgItem.getCreadoDesde() + ")");
+			if (ejgItem.getProcedimiento() != null && ejgItem.getProcedimiento() != "") {
+				SQL sqlProc = new SQL();
+				sqlProc.SELECT("idprocedimiento");
+				sqlProc.FROM("scs_designa des");
+				sqlProc.JOIN(
+						"scs_ejgdesigna   ejgdes ON des.anio = ejgdes.aniodesigna AND des.numero = ejgdes.numerodesigna\r\n"
+								+ "                                                  AND des.idinstitucion = ejgdes.idinstitucion\r\n"
+								+ "                                                  AND des.idturno = ejgdes.idturno ");
+				sqlProc.WHERE("ejgdes.idinstitucion = ejg.idinstitucion");
+				sqlProc.WHERE("ejgdes.anioejg = ejg.anio");
+				sqlProc.WHERE("ejgdes.numeroejg = ejg.numero");
+				sqlProc.WHERE("ejgdes.idtipoejg = ejg.idtipoejg");
+				sqlProc.WHERE("des.idpretension =" + ejgItem.getProcedimiento());
+				sql.WHERE("EXISTS (" + sqlProc.toString() + ")");
+			}
+
+			if (ejgItem.getFechaAperturaDesd() != null) {
+				fechaAperturaDesd = dateFormat.format(ejgItem.getFechaAperturaDesd());
+				sql.WHERE("EJG.FECHAAPERTURA >= TO_DATE( '" + fechaAperturaDesd + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaAperturaHast() != null) {
+				fechaAperturaHast = dateFormat.format(ejgItem.getFechaAperturaHast());
+				sql.WHERE("EJG.FECHAAPERTURA <= TO_DATE( '" + fechaAperturaHast + "','DD/MM/RRRR')");
+			}
+			
+			if (ejgItem.getFechaLimiteDesd() != null) {
+				fechaLimiteDesd = dateFormat.format(ejgItem.getFechaLimiteDesd());
+				sql.WHERE("TO_DATE(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') >= TO_DATE( '" + fechaLimiteDesd
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaLimiteHast() != null) {
+				fechaLimiteHast = dateFormat.format(ejgItem.getFechaLimiteHast());
+				sql.WHERE("TO_DATE(EJG.FECHALIMITEPRESENTACION,'DD/MM/RRRR') <= TO_DATE( '" + fechaLimiteHast
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getDictamen() != null && !ejgItem.getDictamen().isEmpty()) {
+				String[] selectedDict = ejgItem.getDictamen().split(",");
+				for (String dictamen : selectedDict) {
+					if (!dictamen.equals("-1") && !dictamen.equals("0")) {
+						dictamenCad += dictamen + ",";
+					} else if (dictamen.equals("0")) {
+						sinDictamen = true;
+					} else {
+						indiferente = true;
+					}
+				}
+
+				if (!indiferente) {
+					if (dictamenCad.length() > 0) {
+						dictamenCad = dictamenCad.substring(0, (dictamenCad.length() - 1));
+						if (sinDictamen) {
+							sql.WHERE("(EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ") OR EJG.IDTIPODICTAMENEJG IS NULL)");
 						} else {
-							if(ejgItem.isModoBusqueda()) {
-								sql.WHERE(" " + columna + " = '" + cadena + "'");
-							}else {
-								sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+							sql.WHERE("EJG.IDTIPODICTAMENEJG IN (" + dictamenCad + ")");
+						}
+					} else if (sinDictamen) {
+						sql.WHERE("EJG.IDTIPODICTAMENEJG IS NULL");
+					}
+				}
+
+			}
+			if (ejgItem.getFundamentoCalif() != null)
+				sql.WHERE("EJG.IDFUNDAMENTOCALIF = " + ejgItem.getFundamentoCalif());
+			if (ejgItem.getFechaDictamenDesd() != null) {
+				fechaDictamenDesd = dateFormat.format(ejgItem.getFechaDictamenDesd());
+				sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') >= TO_DATE( '" + fechaDictamenDesd + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaDictamenHast() != null) {
+				fechaDictamenHast = dateFormat.format(ejgItem.getFechaDictamenHast());
+				sql.WHERE("TO_DATE(EJG.FECHADICTAMEN,'DD/MM/RRRR') <= TO_DATE( '" + fechaDictamenHast + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getResolucion() != null) {
+				if(ejgItem.getResolucion().equals("12")) {
+					sql.WHERE("EJG.IDTIPORATIFICACIONEJG IS NULL");
+				}else {
+					sql.WHERE("EJG.IDTIPORATIFICACIONEJG = " + ejgItem.getResolucion());
+				}
+			}
+			if (ejgItem.getFundamentoJuridico() != null && ejgItem.getFundamentoJuridico() != "")
+				sql.WHERE("EJG.IDFUNDAMENTOJURIDICO = " + ejgItem.getFundamentoJuridico());
+			if (ejgItem.getFechaResolucionDesd() != null) {
+				fechaResolucionDesd = dateFormat.format(ejgItem.getFechaResolucionDesd());
+				sql.WHERE("TO_DATE(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') >= TO_DATE( '" + fechaResolucionDesd
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaResolucionHast() != null) {
+				fechaResolucionHast = dateFormat.format(ejgItem.getFechaResolucionHast());
+				sql.WHERE("TO_DATE(EJG.FECHARESOLUCIONCAJG,'DD/MM/RRRR') <= TO_DATE( '" + fechaResolucionHast
+						+ "','DD/MM/RRRR')");
+
+			}
+			if (ejgItem.getImpugnacion() != null && ejgItem.getImpugnacion() != "")
+				sql.WHERE("EJG.IDTIPORESOLAUTO = " + ejgItem.getImpugnacion());
+			if (ejgItem.getFundamentoImpuganacion() != null && ejgItem.getFundamentoImpuganacion() != "")
+				sql.WHERE("EJG.IDTIPOSENTIDOAUTO = " + ejgItem.getFundamentoImpuganacion());
+			if (ejgItem.getFechaImpugnacionDesd() != null) {
+				fechaImpugnacionDesd = dateFormat.format(ejgItem.getFechaImpugnacionDesd());
+				sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') >= TO_DATE( '" + fechaImpugnacionDesd + "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaImpugnacionHast() != null) {
+				fechaImpugnacionHast = dateFormat.format(ejgItem.getFechaImpugnacionHast());
+				sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '" + fechaImpugnacionHast + "','DD/MM/RRRR')");
+
+			}
+			if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
+				sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
+			if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "") {
+				sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%" + ejgItem.getNumAnnioProcedimiento() + "%'");
+			}
+			if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
+				sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
+			if (ejgItem.getNig() != null && ejgItem.getNig() != "")
+				sql.WHERE("EJG.NIG like '%" + ejgItem.getNig() + "%'");
+			if (ejgItem.getPerceptivo() != null && ejgItem.getPerceptivo() != "")
+				sql.WHERE("EJG.IDPRECEPTIVO = " + ejgItem.getPerceptivo());
+			if (ejgItem.getCalidad() != null && ejgItem.getCalidad() != "")
+				sql.WHERE("EJG.CALIDAD = '" + ejgItem.getCalidad() + "'");
+			if (ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
+				sql.WHERE("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
+			if (ejgItem.getPonente() != null && ejgItem.getPonente() != "")
+				sql.WHERE("EJG.IDPONENTE = " + ejgItem.getPonente());
+			if (ejgItem.getFechaPonenteDesd() != null) {
+				fechaPonenteDesd = dateFormat.format(ejgItem.getFechaPonenteDesd());
+				sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '" + fechaPonenteDesd
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getFechaPonenteHast() != null) {
+				fechaPonenteHast = dateFormat.format(ejgItem.getFechaPonenteHast());
+				sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '" + fechaPonenteHast
+						+ "','DD/MM/RRRR')");
+			}
+			if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
+				sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
+			if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
+					|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
+				sql.WHERE(condicionAnnioNumActas);
+			}
+			if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != ""
+					|| ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != ""
+					|| ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
+				sql.WHERE(condicionNumRegRemesa);
+
+			if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
+				sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
+			// LOGICA DE ROL
+			if (ejgItem.getRol() != null && ejgItem.getRol() != ""
+				&& ((ejgItem.getNif()!= null && !ejgItem.getNif().isEmpty())
+					|| (ejgItem.getApellidos()!= null && !ejgItem.getApellidos().isEmpty())
+					|| (ejgItem.getNombre()!= null && !ejgItem.getNombre().isEmpty())
+						)) {
+				// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
+				boolean banderaRolprimero = false;
+				// Controlar si ya esta activo el 1 Rol.
+				boolean checkRolone = false;
+				// Obtener el último Rol.
+				int rolUltimo = Integer.parseInt(ejgItem.getRol().substring(ejgItem.getRol().length() - 1));
+				// Contador del Rol Actual
+				int contadorRolActual = 0;
+				// Verificar que contengan Solicitantes.
+				if (ejgItem.getRol().contains("1")) {
+					/*
+					 * Comprobar que el Rol 1 si viene True = Entonces marcarmos TRUE la
+					 * banderaRolprimero Compronar que el Rol 1 si viene False = Entonces marcamos
+					 * False la banderaRolprimero
+					 */
+					checkRolone = (checkRolone == true) ? true : false;
+					/*
+					 * Comprobar que el Rol 1 si viene False = Entonces marcarmos TRUE porque será
+					 * el 1 Rol. Compronar que el Rol 1 si viene True = Entonces ya tenemos el 1 Rol
+					 * marcado.
+					 */
+					banderaRolprimero = (checkRolone == true) ? false : true;
+
+					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
+						// Comprobar que solo existe este Rol activado.
+						if (ejgItem.getRol().equals("1")) {
+							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+						} else {
+							// Verificar si el 1 Rol que tiene sino no añadir parentesis.
+							if (banderaRolprimero == true) {
+								sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
+								checkRolone = true;
+								banderaRolprimero = false;
+							} else {
+								sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+							}
+						}
+					}
+					if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+						String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
+						String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+						if (ejgItem.getRol().equals("1")) {
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+						} else {
+							if (banderaRolprimero == true) {
+								sql.WHERE(" ( " + UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
+										UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
+								checkRolone = true;
+								banderaRolprimero = false;
+							} else {
+								sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
+										UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
+							}
+						}
+					}
+					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+						String columna = "perjg.NOMBRE";
+						String cadena = ejgItem.getNombre();
+						if (ejgItem.getRol().equals("1")) {
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+						} else {
+							if (banderaRolprimero == true) {
+								sql.WHERE(" ( " + UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
+										UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
+								checkRolone = true;
+								banderaRolprimero = false;
+							} else {
+								sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena).substring(0,
+										UtilidadesString.filtroTextoBusquedas(columna, cadena).length() - 2));
 							}
 						}
 					}
 				}
-			}
-			// Verificar que contengan Contrarios.
-			if (ejgItem.getRol().contains("2")) {
-				contadorRolActual = 2;
-				// Existe un Rol 1 ya seleccionado.
-				checkRolone = (checkRolone == true) ? true : false;
-				banderaRolprimero = (checkRolone == true) ? false : true;
-				if (ejgItem.getRol().equals("2")) {
-					sql.JOIN(
-							"scs_contrariosejg contrario ON contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg "
-									+ "and contrario.anio = ejg.anio  and contrario.numero = ejg.numero");
-					sql.JOIN(
-							"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-						sql.WHERE("perjgcontrario.NIF = '" + ejgItem.getNif() + "'");
-					if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-						String columna = "REPLACE(perjgcontrario.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido1();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+				// Verificar que contengan Contrarios.
+				if (ejgItem.getRol().contains("2")) {
+					contadorRolActual = 2;
+					// Existe un Rol 1 ya seleccionado.
+					checkRolone = (checkRolone == true) ? true : false;
+					banderaRolprimero = (checkRolone == true) ? false : true;
+					if (ejgItem.getRol().equals("2")) {
+						sql.JOIN(
+								"scs_contrariosejg contrario ON contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg "
+										+ "and contrario.anio = ejg.anio  and contrario.numero = ejg.numero");
+						sql.JOIN(
+								"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
+						if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+							sql.WHERE("perjgcontrario.NIF = '" + ejgItem.getNif() + "'");
+						if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+							String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
+							String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 						}
-					}
-					if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-						String columna = "REPLACE(perjgcontrario.apellido2, ' ', '')";
-						String cadena = ejgItem.getApellido2();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+						if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+							String columna = "perjgcontrario.NOMBRE";
+							String cadena = ejgItem.getNombre();
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 						}
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgcontrario.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-				} else {
-					sqlContrarios.SELECT("1");
-					sqlContrarios.FROM("scs_contrariosejg contrario  ");
-					sqlContrarios.JOIN(
-							"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
-					sqlContrarios.WHERE(
-							"contrario.anio = ejg.anio and contrario.numero = ejg.numero and contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-						sqlContrarios.WHERE("perjgcontrario.NIF = '" + ejgItem.getNif() + "'");
-					}
-					if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-						String columna = "REPLACE(perjgcontrario.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido1();
-						if(ejgItem.isModoBusqueda()) {
-							sqlContrarios.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-						String columna = "REPLACE(perjgcontrario.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido2();
-						if(ejgItem.isModoBusqueda()) {
-							sqlContrarios.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgcontrario.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						if(ejgItem.isModoBusqueda()) {
-							sqlContrarios.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-
-					/*
-					 * Comprobar si el contrario es el 1 Rol, en caso de que no continuamos con el
-					 * procedimiento
-					 */
-					if (banderaRolprimero == true) {
-						sql.WHERE(" " + "((EXISTS(" + sqlContrarios.toString() + ")");
-						banderaRolprimero = false;
-						checkRolone = true;
 					} else {
-						// Informados Nombre, Apellido y Dni.
-						if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellido1() != null
-								&& ejgItem.getApellido1() != "" && ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") 
-								&& ejgItem.getNif() != null && ejgItem.getNif() != "") {
-							if (contadorRolActual == rolUltimo) {
-								// Contiene el 1 Rol entonces insertar los parentesís.
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))))");
-									// 2 parentesís menos.
+						sqlContrarios.SELECT("1");
+						sqlContrarios.FROM("scs_contrariosejg contrario  ");
+						sqlContrarios.JOIN(
+								"scs_personajg perjgcontrario on perjgcontrario.idpersona = contrario.idpersona AND perjgcontrario.IDINSTITUCION = contrario.IDINSTITUCION");
+						sqlContrarios.WHERE(
+								"contrario.anio = ejg.anio and contrario.numero = ejg.numero and contrario.idinstitucion = ejg.idinstitucion and contrario.idtipoejg = ejg.idtipoejg");
+						if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
+							sqlContrarios.WHERE("perjgcontrario.NIF = '" + ejgItem.getNif() + "'");
+						}
+						if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+							String columna = "REPLACE(CONCAT(perjgcontrario.apellido1,perjgcontrario.apellido2), ' ', '')";
+							String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+							sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+						}
+						if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+							String columna = "perjgcontrario.NOMBRE";
+							String cadena = ejgItem.getNombre();
+							sqlContrarios.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+
+						}
+
+						/*
+						 * Comprobar si el contrario es el 1 Rol, en caso de que no continuamos con el
+						 * procedimiento
+						 */
+						if (banderaRolprimero == true) {
+							sql.WHERE(" " + "((EXISTS(" + sqlContrarios.toString() + ")");
+							banderaRolprimero = false;
+							checkRolone = true;
+						} else {
+							// Informados Nombre, Apellido y Dni.
+							if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellidos() != null
+									&& ejgItem.getApellidos() != "") && ejgItem.getNif() != null
+									&& ejgItem.getNif() != "") {
+								if (contadorRolActual == rolUltimo) {
+									// Contiene el 1 Rol entonces insertar los parentesís.
+									if (ejgItem.getRol().contains("1")) {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))))");
+										// 2 parentesís menos.
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
+									}
 								} else {
 									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
+									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
 								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-							}
-							// Informados el Nombre y Apellidos
-						} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
-								&& ejgItem.getApellido1() != null && ejgItem.getApellido1() != "" 
-								&& ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")) {
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + "))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-							}
-							// Informados NIF
-						} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
-							// Informado Nombre o Apellido
-							if ((ejgItem.getApellido1() != null && ejgItem.getApellido1() != "")
-									|| (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")
-									|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+								// Informados el Nombre y Apellidos
+							} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
+									&& ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")) {
 								if (contadorRolActual == rolUltimo) {
 									if (ejgItem.getRol().contains("1")) {
 										sql.OR();
@@ -566,152 +1011,115 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
 								}
+								// Informados NIF
+							} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
+								// Informado Nombre o Apellido
+								if ((ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
+										|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+									if (contadorRolActual == rolUltimo) {
+										if (ejgItem.getRol().contains("1")) {
+											sql.OR();
+											sql.WHERE("EXISTS(" + sqlContrarios.toString() + "))))");
+										} else {
+											sql.OR();
+											sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
+										}
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
+									}
+								} else {
+									if (contadorRolActual == rolUltimo) {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
+									}
+								}
+								// Otros casos
 							} else {
 								if (contadorRolActual == rolUltimo) {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
+
 								} else {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
 								}
 							}
-							// Otros casos
-						} else {
-							if (contadorRolActual == rolUltimo) {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")))");
-
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlContrarios.toString() + ")");
-							}
 						}
 					}
 				}
-			}
-			// Verificar que contengan Representantes.
-			if (ejgItem.getRol().contains("3")) {
-				contadorRolActual = 3;
-				checkRolone = (checkRolone == true) ? true : false;
-				banderaRolprimero = (checkRolone == true) ? false : true;
-				if (ejgItem.getRol().equals("3")) {
-					sql.JOIN(
-							"scs_unidadfamiliarejg solicitante on solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg "
-									+ "and solicitante.anio = ejg.anio  and solicitante.numero = ejg.numero and  solicitante.solicitante = 1");
-					sql.JOIN(
-							"scs_personajg perjgsolicitante ON perjgsolicitante.idpersona = solicitante.idpersona and perjgsolicitante.idinstitucion = solicitante.idinstitucion ");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-						sql.WHERE("perjgsolicitante.NIF = '" + ejgItem.getNif() + "'");
-					if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-						String columna = "REPLACE(perjgsolicitante.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido1();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+				// Verificar que contengan Representantes.
+				if (ejgItem.getRol().contains("3")) {
+					contadorRolActual = 3;
+					checkRolone = (checkRolone == true) ? true : false;
+					banderaRolprimero = (checkRolone == true) ? false : true;
+					if (ejgItem.getRol().equals("3")) {
+						sql.JOIN(
+								"scs_unidadfamiliarejg solicitante on solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg "
+										+ "and solicitante.anio = ejg.anio  and solicitante.numero = ejg.numero and  solicitante.solicitante = 1");
+						sql.JOIN(
+								"scs_personajg perjgsolicitante ON perjgsolicitante.idpersona = solicitante.idpersona and perjgsolicitante.idinstitucion = solicitante.idinstitucion ");
+						if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+							sql.WHERE("perjgsolicitante.NIF = '" + ejgItem.getNif() + "'");
+						if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+							String columna = "REPLACE(CONCAT(perjgsolicitante.apellido1,perjgsolicitante.apellido2), ' ', '')";
+							String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 						}
-					}
-					if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-						String columna = "REPLACE(perjgsolicitante.apellido2, ' ', '')";
-						String cadena = ejgItem.getApellido2();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+						if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+							String columna = "perjgsolicitante.NOMBRE";
+							String cadena = ejgItem.getNombre();
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 						}
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgsolicitante.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-				} else {
-					sqlUFRep.SELECT("1");
-					sqlUFRep.FROM("scs_unidadfamiliarejg solicitante");
-					sqlUFRep.JOIN(
-							"scs_personajg perjgsolicitante on perjgsolicitante.idrepresentantejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = solicitante.IDINSTITUCION");
-					sqlUFRep.WHERE(
-							"solicitante.anio = ejg.anio and solicitante.numero = ejg.numero AND solicitante.solicitante = 1 "
-									+ "and solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg");
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-						sqlUFRep.WHERE("perjgsolicitante.NIF = '" + ejgItem.getNif() + "'");
-					}
-					if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-						String columna = "REPLACE(perjgsolicitante.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido1();
-						if(ejgItem.isModoBusqueda()) {
-							sqlUFRep.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-						String columna = "REPLACE(perjgsolicitante.apellido2, ' ', '')";
-						String cadena = ejgItem.getApellido2();
-						if(ejgItem.isModoBusqueda()) {
-							sqlUFRep.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgsolicitante.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						if(ejgItem.isModoBusqueda()) {
-							sqlUFRep.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (banderaRolprimero == true) {
-						sql.WHERE(" " + "((EXISTS(" + sqlUFRep.toString() + ")");
-						banderaRolprimero = false;
-						checkRolone = true;
 					} else {
-						// Informados Nombre, Apellido y Dni.
-						if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellido1() != null
-								&& ejgItem.getApellido1() != "" && ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") 
-								&& ejgItem.getNif() != null && ejgItem.getNif() != "") {
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))))");
+						sqlUFRep.SELECT("1");
+						sqlUFRep.FROM("scs_unidadfamiliarejg solicitante");
+						sqlUFRep.JOIN(
+								"scs_personajg perjgsolicitante on perjgsolicitante.idrepresentantejg = solicitante.idpersona AND perjgsolicitante.IDINSTITUCION = solicitante.IDINSTITUCION");
+						sqlUFRep.WHERE(
+								"solicitante.anio = ejg.anio and solicitante.numero = ejg.numero AND solicitante.solicitante = 1 "
+										+ "and solicitante.idinstitucion = ejg.idinstitucion and solicitante.idtipoejg = ejg.idtipoejg");
+						if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
+							sqlUFRep.WHERE("perjgsolicitante.NIF = '" + ejgItem.getNif() + "'");
+						}
+						if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+							String columna = "REPLACE(CONCAT(perjgsolicitante.apellido1,perjgsolicitante.apellido2), ' ', '')";
+							String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+							sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+						}
+						if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+							String columna = "perjgsolicitante.NOMBRE";
+							String cadena = ejgItem.getNombre();
+							sqlUFRep.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+						}
+						if (banderaRolprimero == true) {
+							sql.WHERE(" " + "((EXISTS(" + sqlUFRep.toString() + ")");
+							banderaRolprimero = false;
+							checkRolone = true;
+						} else {
+							// Informados Nombre, Apellido y Dni.
+							if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellidos() != null
+									&& ejgItem.getApellidos() != "") && ejgItem.getNif() != null
+									&& ejgItem.getNif() != "") {
+								if (contadorRolActual == rolUltimo) {
+									if (ejgItem.getRol().contains("1")) {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))))");
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
+									}
 								} else {
 									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
+									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
 								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-							}
-							// Informados el Nombre y Apellidos
-						} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
-								&& ejgItem.getApellido1() != null && ejgItem.getApellido1() != ""
-								&& ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")) {
+								// Informados el Nombre y Apellidos
+							} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
+									&& ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")) {
 
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + "))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-							}
-							// Informados NIF
-						} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
-
-							// Informado Nombre o Apellido
-							if ((ejgItem.getApellido1() != null && ejgItem.getApellido1() != "")
-									|| (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")
-									|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
 								if (contadorRolActual == rolUltimo) {
 									if (ejgItem.getRol().contains("1")) {
 										sql.OR();
@@ -724,160 +1132,126 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
 								}
+								// Informados NIF
+							} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
+
+								// Informado Nombre o Apellido
+								if ((ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
+										|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+									if (contadorRolActual == rolUltimo) {
+										if (ejgItem.getRol().contains("1")) {
+											sql.OR();
+											sql.WHERE("EXISTS(" + sqlUFRep.toString() + "))))");
+										} else {
+											sql.OR();
+											sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
+										}
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
+									}
+								} else {
+									if (contadorRolActual == rolUltimo) {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
+									}
+								}
+								// Otros casos
 							} else {
 								if (contadorRolActual == rolUltimo) {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
+
 								} else {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
 								}
 							}
-							// Otros casos
-						} else {
-							if (contadorRolActual == rolUltimo) {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")))");
-
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUFRep.toString() + ")");
-							}
 						}
-					}
 
+					}
 				}
-			}
-			// Verificar que contengan Unidad Familiar.
-			if (ejgItem.getRol().contains("4")) {
-				contadorRolActual = 4;
-				checkRolone = (checkRolone == true) ? true : false;
-				banderaRolprimero = (checkRolone == true) ? false : true;
-				// Verificar si solo existe el Rol Unidad Familiar seleccionado.
-				if (ejgItem.getRol().equals("4")) {
-					sql.JOIN(
-							"scs_unidadfamiliarejg unidadFamiliar on unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg "
-									+ "and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero");
-					sql.JOIN(
-							"scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
+				// Verificar que contengan Unidad Familiar.
+				if (ejgItem.getRol().contains("4")) {
+					contadorRolActual = 4;
+					checkRolone = (checkRolone == true) ? true : false;
+					banderaRolprimero = (checkRolone == true) ? false : true;
+					// Verificar si solo existe el Rol Unidad Familiar seleccionado.
+					if (ejgItem.getRol().equals("4")) {
+						sql.JOIN(
+								"scs_unidadfamiliarejg unidadFamiliar on unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg "
+										+ "and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero");
+						sql.JOIN(
+								"scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
 
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-						sql.WHERE("perjgunidadfamiliar.NIF = '" + ejgItem.getNif() + "'");
-					if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-						String columna = "REPLACE(perjgunidadfamiliar.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido1();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+						if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+							sql.WHERE("perjgunidadfamiliar.NIF = '" + ejgItem.getNif() + "'");
+						if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+							String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
+							String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 						}
-					}
-					if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-						String columna = "REPLACE(perjgunidadfamiliar.apellido2, ' ', '')";
-						String cadena = ejgItem.getApellido2();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+						if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+							String columna = "perjgunidadfamiliar.NOMBRE";
+							String cadena = ejgItem.getNombre();
+							sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 						}
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgunidadfamiliar.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						if(ejgItem.isModoBusqueda()) {
-							sql.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					// Verificar que puede venir mas de un ROl.
-				} else {
-					sqlUF.SELECT("1");
-					sqlUF.FROM("scs_unidadfamiliarejg unidadFamiliar");
-					sqlUF.JOIN(
-							"scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
-					sqlUF.WHERE(
-							"unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg"
-									+ "	and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero ");
-
-					if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
-
-						sqlUF.WHERE("perjgunidadfamiliar.NIF = '" + ejgItem.getNif() + "'");
-
-					}
-					if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-						String columna = "REPLACE(perjgunidadfamiliar.apellido1, ' ', '')";
-						String cadena = ejgItem.getApellido1();
-						if(ejgItem.isModoBusqueda()) {
-							sqlUF.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlUF.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-						String columna = "REPLACE(perjgunidadfamiliar.apellido2, ' ', '')";
-						String cadena = ejgItem.getApellido2();
-						if(ejgItem.isModoBusqueda()) {
-							sqlUF.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlUF.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-						String columna = "perjgunidadfamiliar.NOMBRE";
-						String cadena = ejgItem.getNombre();
-						if(ejgItem.isModoBusqueda()) {
-							sqlUF.WHERE(" " + columna + " = '" + cadena + "'");
-						} else {
-							sqlUF.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-						}
-					}
-					if (banderaRolprimero == true) {
-						sql.WHERE(" " + "((EXISTS(" + sqlUF.toString() + ")");
-						banderaRolprimero = false;
-						checkRolone = true;
+						// Verificar que puede venir mas de un ROl.
 					} else {
-						// Informados Nombre, Apellido y Dni.
-						if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellido1() != null
-								&& ejgItem.getApellido1() != "" && ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")
-								&& ejgItem.getNif() != null&& ejgItem.getNif() != "") {
+						sqlUF.SELECT("1");
+						sqlUF.FROM("scs_unidadfamiliarejg unidadFamiliar");
+						sqlUF.JOIN(
+								"scs_personajg perjgunidadfamiliar on perjgunidadfamiliar.idpersona = unidadFamiliar.idpersona AND perjgunidadfamiliar.IDINSTITUCION = unidadFamiliar.IDINSTITUCION");
+						sqlUF.WHERE(
+								"unidadFamiliar.idinstitucion = ejg.idinstitucion and unidadFamiliar.idtipoejg = ejg.idtipoejg"
+										+ "	and unidadFamiliar.anio = ejg.anio  and unidadFamiliar.numero = ejg.numero ");
 
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))))");
+						if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
+
+							sqlUF.WHERE("perjgunidadfamiliar.NIF = '" + ejgItem.getNif() + "'");
+
+						}
+						if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+							String columna = "REPLACE(CONCAT(perjgunidadfamiliar.apellido1,perjgunidadfamiliar.apellido2), ' ', '')";
+							String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+
+							sqlUF.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+
+						}
+						if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+							String columna = "perjgunidadfamiliar.NOMBRE";
+							String cadena = ejgItem.getNombre();
+							sqlUF.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+						}
+						if (banderaRolprimero == true) {
+							sql.WHERE(" " + "((EXISTS(" + sqlUF.toString() + ")");
+							banderaRolprimero = false;
+							checkRolone = true;
+						} else {
+							// Informados Nombre, Apellido y Dni.
+							if ((ejgItem.getNombre() != null && ejgItem.getNombre() != "" && ejgItem.getApellidos() != null
+									&& ejgItem.getApellidos() != "") && ejgItem.getNif() != null
+									&& ejgItem.getNif() != "") {
+
+								if (contadorRolActual == rolUltimo) {
+									if (ejgItem.getRol().contains("1")) {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUF.toString() + ")))))");
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
+									}
 								} else {
 									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
+									sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
 								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-							}
-							// Informados el Nombre y Apellidos
-						} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
-								&& ejgItem.getApellido1() != null && ejgItem.getApellido1() != ""
-								&& ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")) {
+								// Informados el Nombre y Apellidos
+							} else if ((ejgItem.getNombre() != null && ejgItem.getNombre() != ""
+									&& ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")) {
 
-							if (contadorRolActual == rolUltimo) {
-								if (ejgItem.getRol().contains("1")) {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + "))))");
-								} else {
-									sql.OR();
-									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
-								}
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-							}
-							// Informados NIF
-						} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
-
-							// Informado Nombre o Apellido
-							if ((ejgItem.getApellido1() != null && ejgItem.getApellido1() != "")
-									|| (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "")
-									|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
 								if (contadorRolActual == rolUltimo) {
 									if (ejgItem.getRol().contains("1")) {
 										sql.OR();
@@ -886,190 +1260,196 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 										sql.OR();
 										sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
 									}
-
 								} else {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
 								}
+								// Informados NIF
+							} else if ((ejgItem.getNif() != null && ejgItem.getNif() != "")) {
+
+								// Informado Nombre o Apellido
+								if ((ejgItem.getApellidos() != null && ejgItem.getApellidos() != "")
+										|| (ejgItem.getNombre() != null && ejgItem.getNombre() != "")) {
+									if (contadorRolActual == rolUltimo) {
+										if (ejgItem.getRol().contains("1")) {
+											sql.OR();
+											sql.WHERE("EXISTS(" + sqlUF.toString() + "))))");
+										} else {
+											sql.OR();
+											sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
+										}
+
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
+									}
+								} else {
+									if (contadorRolActual == rolUltimo) {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
+									} else {
+										sql.OR();
+										sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
+									}
+								}
+								// Otros casos
 							} else {
 								if (contadorRolActual == rolUltimo) {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlUF.toString() + ")))");
+
 								} else {
 									sql.OR();
 									sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
 								}
 							}
-							// Otros casos
-						} else {
-							if (contadorRolActual == rolUltimo) {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-
-							} else {
-								sql.OR();
-								sql.WHERE("EXISTS(" + sqlUF.toString() + ")");
-							}
 						}
 					}
 				}
-			}
-			// Verificar que no contiene Roles.
-		} else {
-			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
-			if (ejgItem.getApellido1() != null && ejgItem.getApellido1() != "") {
-				String columna = "REPLACE(perjg.apellido1, ' ', '')";
-				String cadena = ejgItem.getApellido1();
-				if(ejgItem.isModoBusqueda()) {
-					sql.WHERE(" " + columna + " = '" + cadena + "'");
-				} else {
-					sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+				// Verificar que no contiene Roles.
+			} else {
+				if (ejgItem.getNif() != null && ejgItem.getNif() != "")
+					sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
+					String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
+					String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-			}
-			if (ejgItem.getApellido2() != null && ejgItem.getApellido2() != "") {
-				String columna = "REPLACE(perjg.apellido2, ' ', '')";
-				String cadena = ejgItem.getApellido2();
-				if(ejgItem.isModoBusqueda()) {
-					sql.WHERE(" " + columna + " = '" + cadena + "'");
-				} else {
-					sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+				if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
+					String columna = "perjg.NOMBRE";
+					String cadena = ejgItem.getNombre();
+					sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 				}
-			}
-			if (ejgItem.getNombre() != null && ejgItem.getNombre() != "") {
-				String columna = "perjg.NOMBRE";
-				String cadena = ejgItem.getNombre();
-				if(ejgItem.isModoBusqueda()) {
-					sql.WHERE(" " + columna + " = '" + cadena + "'");
-				} else {
-					sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-				}
+
 			}
 
-		}
+			if (ejgItem.getTipoLetrado() != null && ejgItem.getTipoLetrado() != "") {
+				if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
 
-		if (ejgItem.getTipoLetrado() != null && ejgItem.getTipoLetrado() != "") {
-			if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
+					sql.WHERE("col.ncolegiado = " + ejgItem.getNumColegiado());
+					if (ejgItem.getTipoLetrado().equals("E")) {
+						sql.JOIN(
+								"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
+						// letrado tramitador
+//						if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+//							sql.WHERE("PER.IDPERSONA = " + ejgItem.getIdPersona());
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA =" + ejgItem.getIdGuardia());
+					} else if (ejgItem.getTipoLetrado().equals("D")) {
 
-				sql.WHERE("col.ncolegiado = " + ejgItem.getNumColegiado());
-				if (ejgItem.getTipoLetrado().equals("E")) {
-					sql.JOIN(
+						// letrado designas
+						sql.JOIN(
+								"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
+						sql.JOIN(
+								"SCS_DESIGNA DESIGNA ON EJGDESIGNA.IDINSTITUCION = DESIGNA.idinstitucion and EJGDESIGNA.IDTURNO = DESIGNA.IDTURNO and EJGDESIGNA.ANIODESIGNA = DESIGNA.ANIO and EJGDESIGNA.numerodesigna = DESIGNA.NUMERO");
+						sql.JOIN(
+								"SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
+						sql.JOIN(
+								"cen_colegiado col on DESIGNALETRADO.idpersona = col.idpersona and DESIGNALETRADO.idinstitucion = col.idinstitucion");
+						SQL sql2 = new SQL();
+
+						sql2.SELECT("MAX(LET2.Fechadesigna)");
+						sql2.FROM("SCS_DESIGNASLETRADO LET2");
+						sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
+						sql2.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
+						sql2.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
+						sql2.WHERE("TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)");
+						sql.WHERE("DESIGNALETRADO.Fechadesigna = (" + sql2 + ")");
+
+						if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+							sql.WHERE("DESIGNALETRADO.IDPERSONA = " + ejgItem.getIdPersona());
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("DESIGNA.IDTURNO = " + ejgItem.getIdTurno());
+					} else if (ejgItem.getTipoLetrado().equals("A")) {
+						// letrado asistencias
+						sql.JOIN(
+								"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
+						sql.JOIN(
+								"cen_colegiado col on ASISTENCIA.IDPERSONACOLEGIADO = col.idpersona and ASISTENCIA.idinstitucion = col.idinstitucion");
+						if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+							sql.WHERE("ASISTENCIA.IDPERSONACOLEGIADO = " + ejgItem.getIdPersona());
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
+					}
+				} else if(ejgItem.getIdPersona() != null){
+					sql.LEFT_OUTER_JOIN(
 							"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
-					// letrado tramitador
-//					if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
-//						sql.WHERE("PER.IDPERSONA = " + ejgItem.getIdPersona());
-					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
-					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA =" + ejgItem.getIdGuardia());
-				} else if (ejgItem.getTipoLetrado().equals("D")) {
-
-					// letrado designas
-					sql.JOIN(
-							"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
-					sql.JOIN(
-							"SCS_DESIGNA DESIGNA ON EJGDESIGNA.IDINSTITUCION = DESIGNA.idinstitucion and EJGDESIGNA.IDTURNO = DESIGNA.IDTURNO and EJGDESIGNA.ANIODESIGNA = DESIGNA.ANIO and EJGDESIGNA.numerodesigna = DESIGNA.NUMERO");
-					sql.JOIN(
-							"SCS_DESIGNASLETRADO DESIGNALETRADO ON DESIGNALETRADO.idinstitucion = DESIGNA.idinstitucion  and DESIGNALETRADO.idturno = DESIGNA.idturno and DESIGNALETRADO.anio = DESIGNA.anio and DESIGNALETRADO.numero = DESIGNA.numero");
-					sql.JOIN(
-							"cen_colegiado col on DESIGNALETRADO.idpersona = col.idpersona and DESIGNALETRADO.idinstitucion = col.idinstitucion");
-					SQL sql2 = new SQL();
-
-					sql2.SELECT("MAX(LET2.Fechadesigna)");
-					sql2.FROM("SCS_DESIGNASLETRADO LET2");
-					sql2.WHERE("DESIGNALETRADO.IDINSTITUCION = LET2.IDINSTITUCION");
-					sql2.WHERE("DESIGNALETRADO.ANIO = LET2.ANIO");
-					sql2.WHERE("DESIGNALETRADO.NUMERO = LET2.NUMERO");
-					sql2.WHERE("TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)");
-					sql.WHERE("DESIGNALETRADO.Fechadesigna = (" + sql2 + ")");
-
-					if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
-						sql.WHERE("DESIGNALETRADO.IDPERSONA = " + ejgItem.getIdPersona());
-					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-						sql.WHERE("DESIGNA.IDTURNO = " + ejgItem.getIdTurno());
-				} else if (ejgItem.getTipoLetrado().equals("A")) {
-					// letrado asistencias
-					sql.JOIN(
-							"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
-					sql.JOIN(
-							"cen_colegiado col on ASISTENCIA.IDPERSONACOLEGIADO = col.idpersona and ASISTENCIA.idinstitucion = col.idinstitucion");
-					if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
-						sql.WHERE("ASISTENCIA.IDPERSONACOLEGIADO = " + ejgItem.getIdPersona());
-					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
-					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-						sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
+					if (ejgItem.getTipoLetrado().equals("E")) {
+						// letrado tramitador
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
+					} else if (ejgItem.getTipoLetrado().equals("D")) {
+						// letrado designas
+						sql.JOIN(
+								"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getIdTurno());
+					} else if (ejgItem.getTipoLetrado().equals("A")) {
+						// letrado asistencias
+						sql.JOIN(
+								"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+							sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+							sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
+					}
 				}
-			} else if(ejgItem.getIdPersona() != null){
+			} else if(ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "" && ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "" &&
+					ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != ""){
 				sql.LEFT_OUTER_JOIN(
 						"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
-				if (ejgItem.getTipoLetrado().equals("E")) {
-					// letrado tramitador
-					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
-					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-						sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
-				} else if (ejgItem.getTipoLetrado().equals("D")) {
-					// letrado designas
-					sql.JOIN(
-							"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
-					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-						sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getIdTurno());
-				} else if (ejgItem.getTipoLetrado().equals("A")) {
-					// letrado asistencias
-					sql.JOIN(
-							"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
-					if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-						sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
-					if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-						sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
+				if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
+					sql.WHERE("col.ncolegiado = " + ejgItem.getNumColegiado());
 				}
+//				if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
+//					sql.WHERE("PER.IDPERSONA = " + ejgItem.getIdPersona());
+				if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+					sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+				if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
+					sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
 			}
-		} else if(ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "" && ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "" &&
-				ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != ""){
-			sql.LEFT_OUTER_JOIN(
-					"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
-			if (ejgItem.getNumColegiado() != null && ejgItem.getNumColegiado() != "") {
-				sql.WHERE("col.ncolegiado = " + ejgItem.getNumColegiado());
-			}
-//			if (ejgItem.getIdPersona() != null && ejgItem.getIdPersona() != "")
-//				sql.WHERE("PER.IDPERSONA = " + ejgItem.getIdPersona());
-			if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
-				sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
-			if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
-				sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
-		}
 
-		if (ejgItem.getEstadosSolicitudExpEco() != null && ejgItem.getEstadosSolicitudExpEco().length > 0) {
-			sql.JOIN("SCS_EEJG_PETICIONES PET " + "ON PET.ANIO = ejg.ANIO " + "AND PET.NUMERO = ejg.NUMERO "
-					+ "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " + "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
-			sql.WHERE("PET.ESTADO IN (" + String.join(",", ejgItem.getEstadosSolicitudExpEco()) + ")");
-		}
-
-		if (ejgItem.isInformacionEconomica()) {
-			if (ejgItem.getEstadosSolicitudExpEco() == null || ejgItem.getEstadosSolicitudExpEco().length == 0) {
-				sql.INNER_JOIN("SCS_EEJG_PETICIONES PET " + "ON PET.ANIO = ejg.ANIO " + "AND PET.NUMERO = ejg.NUMERO "
+			if (ejgItem.getEstadosSolicitudExpEco() != null && ejgItem.getEstadosSolicitudExpEco().length > 0) {
+				sql.JOIN("SCS_EEJG_PETICIONES PET " + "ON PET.ANIO = ejg.ANIO " + "AND PET.NUMERO = ejg.NUMERO "
 						+ "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " + "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
+				sql.WHERE("PET.ESTADO IN (" + String.join(",", ejgItem.getEstadosSolicitudExpEco()) + ")");
 			}
-			sql.INNER_JOIN("SCS_EEJG_XML EXML " + "ON PET.IDPETICION = EXML.IDPETICION ");
-			sql.WHERE("EXML.IDXML IS NOT NULL");
-		}
+
+			if (ejgItem.isInformacionEconomica()) {
+				if (ejgItem.getEstadosSolicitudExpEco() == null || ejgItem.getEstadosSolicitudExpEco().length == 0) {
+					sql.INNER_JOIN("SCS_EEJG_PETICIONES PET " + "ON PET.ANIO = ejg.ANIO " + "AND PET.NUMERO = ejg.NUMERO "
+							+ "AND PET.IDINSTITUCION = ejg.IDINSTITUCION " + "AND PET.IDTIPOEJG = ejg.IDTIPOEJG");
+				}
+				sql.INNER_JOIN("SCS_EEJG_XML EXML " + "ON PET.IDPETICION = EXML.IDPETICION ");
+				sql.WHERE("EXML.IDXML IS NOT NULL");
+			}
+			
+			if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDTURNO =")) {
+				sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
+			}
+			if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDGUARDIA =")) {
+				sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
+			}
+
+			sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
+			
+			if (tamMaximo != null) { 
+				Integer tamMaxNumber = tamMaximo;
+				sql.FETCH_FIRST_ROWS_ONLY(tamMaxNumber);
+			}
+
+			sqlFinal = sql.toString();
 		
-		if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDTURNO =")) {
-			sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
-		}
-		if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "" && !sql.toString().contains("EJG.GUARDIATURNO_IDGUARDIA =")) {
-			sql.WHERE("EJG.GUARDIATURNO_IDGUARDIA = " + ejgItem.getIdGuardia());
 		}
 
-		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
 		
-		if (tamMaximo != null) { 
-			Integer tamMaxNumber = tamMaximo;
-			sql.FETCH_FIRST_ROWS_ONLY(tamMaxNumber);
-		}
-
-		return sql.toString();
+		return sqlFinal;
 	}
 	
 	public String busquedaEJGFinal(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje, String stringListaEjgs) {
