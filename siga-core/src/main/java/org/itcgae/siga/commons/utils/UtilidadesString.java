@@ -165,7 +165,14 @@ public class UtilidadesString {
 		cadenaWhere.append(" LIKE");
 		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
 		return cadenaWhere.toString();
-
+	}
+	
+	public static String filtroTextoBusquedasPorDerecha(String columna, String cadena) {
+		StringBuilder cadenaWhere = new StringBuilder();
+		cadenaWhere.append(" " + columna + " ");
+		cadenaWhere.append(" LIKE");
+		cadenaWhere.append(" '" + cadena + "%' ");
+		return cadenaWhere.toString();
 	}
 
 	public static boolean esCadenaVacia(final String cadena) {

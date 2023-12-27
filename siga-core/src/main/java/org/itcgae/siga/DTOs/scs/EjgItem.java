@@ -76,6 +76,8 @@ public class EjgItem {
 
     private String nif;
     private String apellidos;
+    private String apellido1;
+    private String apellido2;
     private String nombre;
     private String rol;
 
@@ -147,6 +149,8 @@ public class EjgItem {
     private int editableComision;
 
     private Long idExpedienteExt;
+    
+    private boolean modoBusqueda;
 
     /**
      *
@@ -1767,4 +1771,29 @@ public class EjgItem {
 	public void setDelitosSeleccionados(String delitosSeleccionados) {
 		this.delitosSeleccionados = delitosSeleccionados;
 	}
+
+	public String getApellido1() {
+		return apellido1;
+	}
+
+	public void setApellido1(String apellido1) {
+		this.apellido1 = apellido1;
+	}
+
+	public String getApellido2() {
+		return apellido2;
+	}
+
+	public void setApellido2(String apellido2) {
+		this.apellido2 = apellido2;
+	}
+
+	public boolean isModoBusqueda() {
+		return modoBusqueda;
+	}
+
+	public void setModoBusqueda(boolean modoBusqueda) {
+		this.modoBusqueda = modoBusqueda;
+	}
+	
 }
