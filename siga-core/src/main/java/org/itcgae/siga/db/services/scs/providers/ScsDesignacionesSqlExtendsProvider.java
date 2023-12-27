@@ -187,7 +187,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		try {
 			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension,"
 						+ " F_SIGA_GETRECURSO(SP.DESCRIPCION, 1) AS procedimiento, SP2.nombre as modulo, SP2.IDPROCEDIMIENTO as IDMODULO, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
-						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
+						+ " des.nig, des.resumenasunto, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 						+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
 			sql +=  " colegiado.ncolegiado, persona.idpersona, persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona";
@@ -3860,7 +3860,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}else{
 			sql.WHERE("IDJUZGADO = ''");
 		}
-		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");								
+		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		
 		return sql.toString();
 	}

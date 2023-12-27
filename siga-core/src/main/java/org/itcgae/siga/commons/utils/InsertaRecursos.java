@@ -142,8 +142,18 @@ public class InsertaRecursos {
 
 	private static void conecta() throws Exception {		
 		String cadenaConexion = "jdbc:oracle:thin:@192.168.18.18:1546/SIGADES";
-		String usuario = "uscgae_int";
-		String clave = "oradesaINT19";
+	
+		//Solicitamos el usuario de bbdd
+		InputStreamReader isr=new InputStreamReader(System.in);
+		BufferedReader br=new BufferedReader(isr);
+		System.out.println("Introduzca usuario de conexión a la BBDD de desarrollo: ");
+		String usuario = br.readLine();
+		
+		//Solicitamos el password de bbdd
+		isr=new InputStreamReader(System.in);
+        br=new BufferedReader(isr);
+        System.out.println("Introduzca la contraseña de conexión a la BBDD de desarrollo:");
+        String clave = br.readLine();
 
 		con = null;
 		Class.forName(oracle.jdbc.driver.OracleDriver.class.getName());

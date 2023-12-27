@@ -2235,17 +2235,15 @@ public class WSCommons {
 					}
 					//LOGGER.warn("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
 					
-					if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
-						 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
-					 }
-	
-					if (inParameters[i] instanceof String){
-						cs.setString(i+1, inParameters[i].toString());
-					 }
-				
 					if(inParameters[i] == null) {
 						cs.setNull(i+1, Types.NULL);		
+					} else if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
+						 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
+					} else if (inParameters[i] instanceof String){
+						cs.setString(i+1, inParameters[i].toString());
 					}
+				
+					
 				
 			}
 			LOGGER.warn("AGUERRA - FIN PARAMETROS DE ENTRADA");

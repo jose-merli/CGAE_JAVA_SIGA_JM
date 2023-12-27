@@ -13,6 +13,7 @@ public class FichaCompraSuscripcionItem {
 	private String apellidos;
 	private String idtipoidentificacion;
 	private String nif;
+	private String numeroColegiado;
 
 	// TARJETA SOLICITUD
 	private String nSolicitud;
@@ -216,5 +217,12 @@ public class FichaCompraSuscripcionItem {
 	public void setNuevo(boolean nuevo) {
 		this.nuevo = nuevo;
 	}
+	public String getNumeroColegiado() {
+		return numeroColegiado;
+	}
+	public void setNumeroColegiado(String numeroColegiado) {
+		this.numeroColegiado = numeroColegiado;
+	}
+	
 
 }

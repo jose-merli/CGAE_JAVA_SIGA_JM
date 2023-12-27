@@ -2454,7 +2454,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						if (designaItem.getResumenAsunto() != null && !designaItem.getResumenAsunto().isEmpty()) {
 							scsDesigna.setResumenasunto(designaItem.getResumenAsunto());
-						}
+						}		
+						
+						scsDesigna.setFechamodificacion(new Date());
+						scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 						if (designaItem.getFechaAnulacion() == null) {
 							scsDesigna.setEstado(designaItem.getEstado());
@@ -2626,6 +2629,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					Long b = new Long(designaItem.getNumero());
 					scsDesigna.setNumero(b.longValue());
 
+					scsDesigna.setFechamodificacion(new Date());
+					scsDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+					
 					scsDesigna.setFechaoficiojuzgado(designaItem.getFechaOficioJuzgado());
 					scsDesigna.setDelitos(designaItem.getDelitos());
 					// TODO faltan dos campos observaciones
@@ -8296,7 +8302,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						.andIdturnoEqualTo(Integer.valueOf(actuacionDesignaItem.getIdTurno()))
 						.andAnioEqualTo(Short.valueOf(actuacionDesignaItem.getAnio()))
 						.andNumeroEqualTo(Long.valueOf(actuacionDesignaItem.getNumero()))
-						.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento());
+						.andIdprocedimientoEqualTo(actuacionDesignaItem.getIdProcedimiento())
+						.andAnulacionEqualTo((short) 0);
 				actuaciondesignaexample.setOrderByClause("NUMEROASUNTO ASC");
 
 				List<ScsActuaciondesigna> listaActuaciones = scsActuaciondesignaMapper
@@ -9953,5 +9960,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 		return result;
 	}
+
 
 }

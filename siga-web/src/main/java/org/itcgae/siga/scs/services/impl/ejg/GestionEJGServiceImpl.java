@@ -5601,13 +5601,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						String.valueOf(documentacionEjgItem.getIdTipoDocumento()));
 				for (ComboItem item : comboItems) {
 					scsDocumentacionejg.setIddocumento(Short.valueOf(item.getValue()));
-
+					response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
 					if (response == 1) {
 						nuevoId = scsEjgExtendsMapper.getNewIdDocumentacionEjg(idInstitucion);
 						scsDocumentacionejg.setIddocumentacion(Integer.valueOf(nuevoId.getIdMax().toString()));
-						response = scsDocumentacionejgMapper.insert(scsDocumentacionejg);
-						if (response == 0)
-							throw (new Exception("Error al introducir la nueva documentación en el EJG"));
+					}
+					if (response == 0) {
+						throw (new Exception("Error al introducir la nueva documentación en el EJG"));
 					}
 				}
 			} else {
@@ -6161,6 +6161,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				eejgPeticion.setApellido2(datos.getPjg_ape2());
 				eejgPeticion.setIdusuariopeticion(BigDecimal.valueOf(usuarios.get(0).getIdusuario()));
 				eejgPeticion.setIdpersona(Long.parseLong(datos.getUf_idPersona()));
+				eejgPeticion.setFechasolicitud(new Date());
 				eejgPeticion.setFechapeticion(new Date());
 				eejgPeticion.setFechamodificacion(new Date());
 				eejgPeticion.setUsumodificacion(0);

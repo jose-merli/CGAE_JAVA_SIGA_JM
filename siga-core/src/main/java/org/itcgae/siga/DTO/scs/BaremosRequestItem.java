@@ -13,7 +13,7 @@ public class BaremosRequestItem {
 	String dias;
 	Short disponibilidad;
 	Short numMinimoSimple;
-	Short simpleOImporteIndividual;
+	Double simpleOImporteIndividual;
 	Short naPartir;
 	Short maximo;
 	String porDia;

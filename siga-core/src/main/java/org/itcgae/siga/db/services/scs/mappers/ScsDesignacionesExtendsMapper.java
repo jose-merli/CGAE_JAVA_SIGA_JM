@@ -724,8 +724,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	
 
 	@UpdateProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "cambiarUltimoCola")
-	int cambiarUltimoCola(String idInstitucion, String idTurno, String idPersonaUltimo, Date fechaSolicitudUltimo,AdmUsuarios usuario);
-	
+	int cambiarUltimoCola(String idInstitucion, String idTurno, String idPersonaUltimo, Date fechaSolicitudUltimo,AdmUsuarios usuario);	
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getColaTurnoBBDD")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.NUMERIC),
@@ -952,6 +951,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "ART27", property = "art27", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "VALIDADA", property = "validada", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESUMENASUNTO", property = "resumenAsunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)})
 	List<DesignaItem> busquedaDesignaActual(ScsDesignaKey key);
 	

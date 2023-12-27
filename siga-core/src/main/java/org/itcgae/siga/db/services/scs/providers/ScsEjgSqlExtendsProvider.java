@@ -2762,8 +2762,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ "                    JOIN scs_personajg ON scs_personajg.idpersona = scs_asistencia.idpersonajg"
 				+ "                    AND scs_personajg.idinstitucion = scs_asistencia.idinstitucion");
 		sqlAsistencia_4.WHERE("scs_asistencia.idinstitucion = " + item.getidInstitucion());
-		sqlAsistencia_4.WHERE("scs_asistencia.anio = " + item.getAnnio());
-		sqlAsistencia_4.WHERE("scs_asistencia.numero =" + item.getNumero());
+		sqlAsistencia_4.WHERE("ejganio = " + item.getAnnio());
+		sqlAsistencia_4.WHERE("ejgnumero =" + item.getNumero());
+		sqlAsistencia_4.WHERE("ejgidtipoejg =" + item.getTipoEJG());
 		sqlAsistencia_4.WHERE("ROWNUM<2");
 
 		// consulta para obtener la relacion de asistencias con los datos de las
