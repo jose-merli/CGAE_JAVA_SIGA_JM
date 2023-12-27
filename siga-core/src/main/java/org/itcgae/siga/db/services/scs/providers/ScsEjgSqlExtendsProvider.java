@@ -253,77 +253,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				fechaImpugnacionHast = dateFormat.format(ejgItem.getFechaImpugnacionHast());
 				sql.WHERE("TO_DATE(EJG.FECHAAUTO,'DD/MM/RRRR') <= TO_DATE( '" + fechaImpugnacionHast + "','DD/MM/RRRR')");
 
-<<<<<<< HEAD
-		}
-		if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
-			sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
-		if (ejgItem.getNumAnnioProcedimiento() != null && ejgItem.getNumAnnioProcedimiento() != "") {
-			sql.WHERE("EJG.NUMEROPROCEDIMIENTO LIKE '%" + ejgItem.getNumAnnioProcedimiento() + "%'");
-		}
-		if (ejgItem.getAsunto() != null && ejgItem.getAsunto() != "")
-			sql.WHERE("EJG.OBSERVACIONES LIKE '%" + ejgItem.getAsunto() + "%'");
-		if (ejgItem.getNig() != null && ejgItem.getNig() != "")
-			sql.WHERE("EJG.NIG like '%" + ejgItem.getNig() + "%'");
-		if (ejgItem.getPerceptivo() != null && ejgItem.getPerceptivo() != "")
-			sql.WHERE("EJG.IDPRECEPTIVO = " + ejgItem.getPerceptivo());
-		if (ejgItem.getCalidad() != null && ejgItem.getCalidad() != "")
-			sql.WHERE("EJG.CALIDAD = '" + ejgItem.getCalidad() + "'");
-		if (ejgItem.getRenuncia() != null && ejgItem.getRenuncia() != "")
-			sql.WHERE("EJG.IDRENUNCIA = " + ejgItem.getRenuncia());
-		if (ejgItem.getPonente() != null && ejgItem.getPonente() != "")
-			sql.WHERE("EJG.IDPONENTE = " + ejgItem.getPonente());
-		if (ejgItem.getFechaPonenteDesd() != null) {
-			fechaPonenteDesd = dateFormat.format(ejgItem.getFechaPonenteDesd());
-			sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') >= TO_DATE( '" + fechaPonenteDesd
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getFechaPonenteHast() != null) {
-			fechaPonenteHast = dateFormat.format(ejgItem.getFechaPonenteHast());
-			sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '" + fechaPonenteHast
-					+ "','DD/MM/RRRR')");
-		}
-		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-			sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
-		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
-				|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
-			sql.WHERE(condicionAnnioNumActas);
-		}
-		if (ejgItem.getNumRegRemesa1() != null && ejgItem.getNumRegRemesa1() != ""
-				|| ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != ""
-				|| ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
-			sql.WHERE(condicionNumRegRemesa);
-
-		if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
-			sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
-		// LOGICA DE ROL
-		if (ejgItem.getRol() != null && ejgItem.getRol() != ""
-			&& ((ejgItem.getNif()!= null && !ejgItem.getNif().isEmpty())
-				|| (ejgItem.getApellidos()!= null && !ejgItem.getApellidos().isEmpty())
-				|| (ejgItem.getNombre()!= null && !ejgItem.getNombre().isEmpty())
-					)) {
-			// Controlar que Rol es el 1 para añadir el parentesís necesario para la QUERY.
-			boolean banderaRolprimero = false;
-			// Controlar si ya esta activo el 1 Rol.
-			boolean checkRolone = false;
-			// Obtener el último Rol.
-			int rolUltimo = Integer.parseInt(ejgItem.getRol().substring(ejgItem.getRol().length() - 1));
-			// Contador del Rol Actual
-			int contadorRolActual = 0;
-			// Verificar que contengan Solicitantes.
-			if (ejgItem.getRol().contains("1")) {
-				/*
-				 * Comprobar que el Rol 1 si viene True = Entonces marcarmos TRUE la
-				 * banderaRolprimero Compronar que el Rol 1 si viene False = Entonces marcamos
-				 * False la banderaRolprimero
-				 */
-				checkRolone = (checkRolone == true) ? true : false;
-				/*
-				 * Comprobar que el Rol 1 si viene False = Entonces marcarmos TRUE porque será
-				 * el 1 Rol. Compronar que el Rol 1 si viene True = Entonces ya tenemos el 1 Rol
-				 * marcado.
-				 */
-				banderaRolprimero = (checkRolone == true) ? false : true;
-=======
 			}
 			if (ejgItem.getJuzgado() != null && ejgItem.getJuzgado() != "")
 				sql.WHERE("EJG.JUZGADO = " + ejgItem.getJuzgado());
@@ -362,7 +291,6 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					|| ejgItem.getNumRegRemesa2() != null && ejgItem.getNumRegRemesa2() != ""
 					|| ejgItem.getNumRegRemesa3() != null && ejgItem.getNumRegRemesa3() != "")
 				sql.WHERE(condicionNumRegRemesa);
->>>>>>> 1d328f185867d5899d1daddb4ebdf6368b307dc0
 
 			if (ejgItem.getAnnioCAJG() != null && ejgItem.getAnnioCAJG() != "")
 				sql.WHERE("EJG.aniocajg = " + ejgItem.getAnnioCAJG());
@@ -586,14 +514,17 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						// letrado designas
 						sql.JOIN(
 								"SCS_EJGDESIGNA EJGDESIGNA ON EJGDESIGNA.IDINSTITUCION = EJG.idinstitucion and EJGDESIGNA.idtipoejg = ejg.idtipoejg and EJGDESIGNA.ANIOEJG = ejg.anio and EJGDESIGNA.numeroejg = ejg.numero");
-						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "") {
 							sql.WHERE("EJGDESIGNA.IDTURNO = " + ejgItem.getIdTurno());
+						}
+						
 					} else if (ejgItem.getTipoLetrado().equals("A")) {
 						// letrado asistencias
 						sql.JOIN(
 								"SCS_ASISTENCIA ASISTENCIA ON ASISTENCIA.IDINSTITUCION = EJG.idinstitucion and ASISTENCIA.EJGIDTIPOEJG = ejg.idtipoejg and ASISTENCIA.EJGANIO = ejg.anio and ASISTENCIA.ejgnumero = ejg.numero");
-						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
+						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "") {
 							sql.WHERE("ASISTENCIA.IDTURNO = " + ejgItem.getIdTurno());
+						}
 						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
 							sql.WHERE("ASISTENCIA.IDGUARDIA = " + ejgItem.getIdGuardia());
 					}
@@ -1451,7 +1382,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					sql.LEFT_OUTER_JOIN(
 							"cen_colegiado col on ejg.idpersona = col.idpersona and ejg.idinstitucion = col.idinstitucion");
 					if (ejgItem.getTipoLetrado().equals("E")) {
-						// letrado tramitador
+						
 						if (ejgItem.getIdTurno() != null && ejgItem.getIdTurno() != "")
 							sql.WHERE("EJG.GUARDIATURNO_IDTURNO = " + ejgItem.getIdTurno());
 						if (ejgItem.getIdGuardia() != null && ejgItem.getIdGuardia() != "")
