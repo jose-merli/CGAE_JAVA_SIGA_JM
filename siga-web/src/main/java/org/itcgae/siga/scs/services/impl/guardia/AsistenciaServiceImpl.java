@@ -2972,7 +2972,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					scsCabeceraguardias.setFechaFin(new SimpleDateFormat("dd/MM/yyyy HH:mm")
 							.parse(tarjetaAsistenciaResponseItem.getFechaAsistencia()));
 					if(idPersona == 0L) {
-						scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+						scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));						
 					} else {
 						scsCabeceraguardias.setIdpersona(idPersona);
 					}
@@ -3001,7 +3001,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					if ("S/C".equals(saltoOcompensacion) || "S".equals(saltoOcompensacion)) {
 						SaltoCompGuardiaItem scgi = new SaltoCompGuardiaItem();
-						scgi.setIdPersona(idPersona.toString());
+						scgi.setIdPersona(scsCabeceraguardias.getIdpersona().toString());
 						scgi.setIdGuardia(tarjetaAsistenciaResponseItem.getIdGuardia());
 						scgi.setIdTurno(tarjetaAsistenciaResponseItem.getIdTurno());
 						scgi.setFecha(fechaHoy);
