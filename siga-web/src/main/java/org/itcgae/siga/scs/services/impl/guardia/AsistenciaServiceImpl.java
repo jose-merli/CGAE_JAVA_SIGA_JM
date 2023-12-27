@@ -2882,43 +2882,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					// Si no, lo aniadimos como refuerzo
 				} else {
 
-					// Recorremos para setear el idPersona del colegiado que tentemos que
-					// insertar(el que hace la asistencia)
-					for (ScsGuardiascolegiado scsGuardiascolegiado : guardiascolegiados) {
-						// Para cada guardia colegiado accedemos a sus cabeceras de guardia, a las que
-						// luego habra que setear del idPersona y ponerlo en la ultima posicion(por eso
-						// se ha obtenido el ultimo de la fila)
-
-						scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
-						scsGuardiascolegiado.setFacturado("N");
-						scsGuardiascolegiado.setIdfacturacion(null);
-						scsGuardiascolegiado.setPagado("N");
-						scsGuardiascolegiado
-								.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
-						scsGuardiascolegiado.setFechamodificacion(new Date());
-						scsGuardiascolegiado.setUsumodificacion(0);
-
-					}
-
-					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
-					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
-					scsCabeceraguardias.setFechamodificacion(new Date());
-					scsCabeceraguardias.setValidado("1");
-					scsCabeceraguardias.setFechavalidacion(new Date());
-					scsCabeceraguardias.setUsumodificacion(0);
-					scsCabeceraguardias.setFacturado(null);
-					scsCabeceraguardias.setIdfacturacion(null);
-					scsCabeceraguardias.setComensustitucion("Inclusión en guardia por refuerzo");
-					
-					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
-					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
-						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
-						try {
-							this.guardiasServiceImpl.triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
-						} catch (Exception e) {
-							LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
-						}
-					});
+					affectedRows += this.guardiasServiceImpl.crearCabecerasGuardiaComun(null, null, null, null, null,
+							null, "AsistenciasExpres", tarjetaAsistenciaResponseItem,scsCabeceraguardias, guardiascolegiados);
 					if (affectedRows <= 0) {
 						LOGGER.error(
 								"procesaGuardiasColegiadoSaltoComp() / Se intento aniadir el letrado como refuerzo en la guardia pero no se inserto nada");
@@ -3141,15 +3106,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						scsGuardiascolegiado.setUsumodificacion(0);
 
 					}
-
-					scsCabeceraguardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
-					scsCabeceraguardias.setPosicion((short) (scsCabeceraguardias.getPosicion().shortValue() + 1));
-					scsCabeceraguardias.setFechamodificacion(new Date());
-					scsCabeceraguardias.setValidado("1");
-					scsCabeceraguardias.setFechavalidacion(new Date());
-					scsCabeceraguardias.setUsumodificacion(0);
-
-					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
+					affectedRows += this.guardiasServiceImpl.crearCabecerasGuardiaComun(null, null, null, null, null,
+							null, "Asistencias", tarjetaAsistenciaResponseItem,scsCabeceraguardias,null);
 					guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
 						scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
 						try {
@@ -3259,6 +3217,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 
 	}
+
 
 	@Override
 	public UpdateResponseDTO asociarJusticiable(HttpServletRequest request, JusticiableItem justiciable,
