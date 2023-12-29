@@ -362,6 +362,9 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 					// Existe un Rol 1 ya seleccionado.
 					checkRolone = (checkRolone == true) ? true : false;
 					banderaRolprimero = (checkRolone == true) ? false : true;
+						
+					sqlContrarios.SELECT("1");
+					sqlContrarios.FROM("scs_contrariosejg contrario  ");
 										sqlContrarios.WHERE(
 								"contrario.anio = ejg.anio and contrario.numero = ejg.numero"
 								+ " and perjg.idpersona = contrario.idpersona and contrario.idinstitucion = perjg.idinstitucion"
