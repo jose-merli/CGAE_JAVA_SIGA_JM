@@ -2983,7 +2983,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 					// Las metemos validadas
 					scsCabeceraguardias.setValidado("1");
-					scsCabeceraguardias.setFechavalidacion(new Date());
+					// scsCabeceraguardias.setFechavalidacion(new Date());
 					scsCabeceraguardias.setUsumodificacion(0);
 
 					affectedRows += scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraguardias);
