@@ -2522,6 +2522,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						// UtilOficio utilOficio= new UtilOficio();
 
 						boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
+						
+						if (scsDesigna.getIdpretension() == 0) {
+							scsDesigna.setIdpretension(null);
+					      }
 
 						LOGGER.info("updateDetalleDesigna() / Validamos el NIG Salida");
 
