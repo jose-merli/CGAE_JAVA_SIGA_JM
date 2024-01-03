@@ -46,11 +46,11 @@ public class GuardiasItem {
 	private boolean historico;
 	private String baremo;
 	private String nDias;
-	private Short disponibilidad;
+	private Double disponibilidad;
 	private Short numMinimoSimple;
 	private Double simpleOImporteIndividual;
 	private Short naPartir;
-	private Short maximo;
+	private Double maximo;
 	private String porDia;
 
 
@@ -303,18 +303,18 @@ public class GuardiasItem {
 		this.naPartir = naPartir;
 	}
 
-	public Short getMaximo() {
+	public Double getMaximo() {
 		return maximo;
 	}
 
-	public void setMaximo(Short maximo) {
+	public void setMaximo(Double maximo) {
 		this.maximo = maximo;
 	}
 
-	public Short getDisponibilidad() {
+	public Double getDisponibilidad() {
 		return disponibilidad;
 	}
-	public void setDisponibilidad(Short disponibilidad) {
+	public void setDisponibilidad(Double disponibilidad) {
 		this.disponibilidad = disponibilidad;
 	}
 	public String getPorDia() {
