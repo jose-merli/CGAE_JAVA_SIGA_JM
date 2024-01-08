@@ -5543,8 +5543,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				"GestionEJGServiceImpl.crearDocumentacionEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 		if (usuarios != null && !usuarios.isEmpty()) {
-			String[] extension = documentacionEjgItem.getNombreFichero().split("\\.");
-			if(!extensionValida(extension[1])) {
+			String[] extension = null;
+			
+			if(documentacionEjgItem.getNombreFichero() != null)
+			extension = documentacionEjgItem.getNombreFichero().split("\\.");
+			
+			if(extension != null && !extensionValida(extension[1])) {
 				extensionErronea = true;
 			}
 			else {
