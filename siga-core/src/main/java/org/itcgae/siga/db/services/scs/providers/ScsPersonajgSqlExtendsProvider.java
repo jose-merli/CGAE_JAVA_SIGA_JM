@@ -824,6 +824,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.FROM("(" + sqlUnidadFamiliar + " union " + sqlContrarioEjg + " union all " + sqlContrariosDesigna
 				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all " + sqlEJG + " union all "
 				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + ") consulta");
+		sql.ORDER_BY("numProcedimiento DESC");
 		sql.ORDER_BY("fechaapertura DESC");
 
 		return sql.toString();
@@ -1030,6 +1031,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.FROM("(" + sqlUnidadFamiliar + " union " + sqlContrarioEjg + " union all " + sqlContrariosDesigna
 				+ " union all " + sqlDefendidosDesigna + " union all " + sqlSoj + " union all " + sqlEJG + " union all "
 				+ sqlContrariosAsistencia + "union all " + sqlAsistencia + ") consulta");
+		sql.ORDER_BY("numProcedimiento DESC");
 		sql.ORDER_BY("fechaapertura DESC");
 
 		return sql.toString();
