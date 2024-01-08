@@ -30,33 +30,23 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
 		if (justiciableBusquedaItem.getNombre() != null && justiciableBusquedaItem.getNombre() != "") {
-			if(justiciableBusquedaItem.isModoBusqueda()) {
-				sql.WHERE(" nombre = '" + justiciableBusquedaItem.getNombre() + "'");
-			} else {
-				String columna = "nombre";
-				String cadena = justiciableBusquedaItem.getNombre();
-				sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
-			}
+			String columna = "nombre";
+			String cadena = justiciableBusquedaItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		
 		}
 
-		if (justiciableBusquedaItem.getApellido1() != null && justiciableBusquedaItem.getApellido1() != "") {
-			if(justiciableBusquedaItem.isModoBusqueda()) {
-				sql.WHERE(" apellido1 = '" + justiciableBusquedaItem.getApellido1() + "'");
-			} else {
-				String columna = "apellido1";
-				String cadena = justiciableBusquedaItem.getApellido1();
-				sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+		if (justiciableBusquedaItem.getApellidos() != null && justiciableBusquedaItem.getApellidos() != "") {
+			
+			String[] splitApellidos = justiciableBusquedaItem.getApellidos().trim().split("\\s+");
+			if(splitApellidos.length>1) {
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("apellido1", splitApellidos[0]));
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("apellido2", splitApellidos[1]));
 			}
-		}
-		
-		if (justiciableBusquedaItem.getApellido2() != null && justiciableBusquedaItem.getApellido2() != "") {
-			if(justiciableBusquedaItem.isModoBusqueda()) {
-				sql.WHERE(" apellido2 = '" + justiciableBusquedaItem.getApellido2() + "'");
-			} else {
-				String columna = "apellido2";
-				String cadena = justiciableBusquedaItem.getApellido2();
-				sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+			else {
+				sql.WHERE("( "+UtilidadesString.filtroTextoBusquedas("apellido1", splitApellidos[0])+" OR "+UtilidadesString.filtroTextoBusquedas("apellido2", splitApellidos[0])+" )");
 			}
+			
 		}
 
 		if (justiciableBusquedaItem.getNif() != null && justiciableBusquedaItem.getNif() != "") {
