@@ -229,6 +229,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		sql.WHERE("IDTURNO = " + guardiaItem.getIdTurno());
 		sql.WHERE("IDGUARDIA = " + guardiaItem.getIdGuardia());
 		sql.WHERE("FECHAINICIO = TO_DATE('" + formatoFecha.format(guardiaItem.getFechadesde()) + "', 'DD/MM/YYYY')");
+		sql.ORDER_BY("FECHAFIN ASC");
 		return sql.toString();
 	}
 	

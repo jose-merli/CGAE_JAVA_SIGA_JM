@@ -2319,12 +2319,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 					List<ComboItem> combosItems = new ArrayList<ComboItem>();
 					
 					ArrayList<String> fechas = scsGuardiasturnoExtendsMapper.getFechasByCabeceraGuardiaColegiado(guardiaItem, idInstitucion.toString());
-					SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+					SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-mm-dd");
+					SimpleDateFormat formatoFinal = new SimpleDateFormat("dd/MM/yyyy");
 					for(String fecha : fechas) {
 						ComboItem comboItem = new ComboItem();
-						Date fechaActual = formatoFecha.parse(fecha);
+						Date fechaActual = formatoOriginal.parse(fecha.split(" ")[0]);
 						
-						comboItem.setLabel(this.diaDeLaSemana(fechaActual.getDay()) + " " + formatoFecha.format(new Date(fecha)));
+						comboItem.setLabel(this.diaDeLaSemana(fechaActual.getDay()) + " " + formatoFinal.format(fechaActual));
 						combosItems.add(comboItem);
 					}
 					comboDTO.setCombooItems(combosItems);
@@ -2353,25 +2354,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private String diaDeLaSemana(int dayOfWeek) {
 		String dia = "";
 		switch(dayOfWeek) {
-		case 1:
+		case 0:
 			dia = "D";
 			break;
-		case 2:
+		case 1:
 			dia = "L";
 			break;
-		case 3:
+		case 2:
 			dia = "M";
 			break;
-		case 4:
+		case 3:
 			dia = "X";
 			break;
-		case 5:
+		case 4:
 			dia = "J";
 			break;
-		case 6: 
+		case 5: 
 			dia = "V";
 			break;
-		case 7:
+		case 6:
 			dia = "S";
 			break;
 		}
