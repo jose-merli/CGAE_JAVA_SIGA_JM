@@ -431,15 +431,15 @@ public class EjgController {
 	}
 
 	// Actualizar turno, guardia y letrado
-	@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos,
-			HttpServletRequest request) {
-		UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
-		if(response.getStatus().equals(SigaConstants.OK)) {
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		}else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+//	@RequestMapping(value = "/gestion-ejg/guardarServiciosTramitacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<UpdateResponseDTO> guardarServiciosTramitacion(@RequestBody EjgItem datos,
+//			HttpServletRequest request) {
+//		UpdateResponseDTO response = gestionEJG.guardarServiciosTramitacion(datos, request);
+//		if(response.getStatus().equals(SigaConstants.OK)) {
+//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+//		}else
+//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 
 	// borrarEstado
 	@RequestMapping(value = "/gestion-ejg/borrarEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
