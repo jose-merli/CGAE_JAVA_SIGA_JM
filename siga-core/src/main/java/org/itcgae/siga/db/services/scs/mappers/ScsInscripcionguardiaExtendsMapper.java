@@ -53,6 +53,30 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	})
 	List<InscripcionGuardiaItem> getColaGuardias(String idGuardia, String idTurno, String fecha,String ultimo,String ordenaciones, String idInstitucion, String idgrupoguardia, Boolean porGrupos);
 
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "getColaGuardiasNueva")
+	@Results({
+		@Result(column = "NUMEROGRUPO", property="numeroGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGRUPOGUARDIACOLEGIADO", property = "idGrupoGuardiaColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDENGRUPO", property = "orden", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORDENINSC", property = "ordenBD", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAVALIDACION", property = "fechaValidacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COMPENSACIONES", property = "compensaciones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SALTOS", property = "saltos", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "orden_cola", property = "ordenCola", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GRUPO", property = "idGrupoGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "Fechasuscripcion", property = "fechaSuscripcion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "IDGRUPOGUARDIA_ULTIMO", property = "ultimoCola", jdbcType = JdbcType.NUMERIC)
+	})
+	List<InscripcionGuardiaItem> getColaGuardiasNueva(String idGuardia, String idTurno, String ordenaciones, String fecha, String posicionColaUltimo, String idInstitucion);
+	
 	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "getColaGuardiasByNumColegiado")
 	@Results({
 		@Result(column = "NUMEROGRUPO", property="numeroGrupo", jdbcType = JdbcType.VARCHAR),
@@ -305,8 +329,11 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 	@Results({ 
 	})
 	String requeridaValidacionCampo(String string, String idturno, String idguardia, String idpersona);
-
-
+	
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "getPosicionUltimoColaGuardia")
+	@Results({ 
+	})
+	String getPosicionUltimoColaGuardia(String idTurno, String idGuardia, String idInstitucion, String ordenaciones, String fecha);
 
 	@UpdateProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "UpdateInscripcionTurno")
 	int UpdateInscripcionTurno(String string, String idturno, BusquedaInscripcionMod a, String fECHABAJA);
