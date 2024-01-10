@@ -1489,10 +1489,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 							mapilla.put(cola.get(0).getAntiguedadcola(), " ANTIGUEDADCOLA desc, ");
 						}
 						if (cola.get(0).getAlfabeticoapellidos() > 0 && cola.get(0).getOrdenacionmanual() <= 0)
-							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS asc, ");
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICO asc, ");
 						else if (cola.get(0).getAlfabeticoapellidos() < 0 && cola.get(0).getOrdenacionmanual() <= 0) {
 							cola.get(0).setAlfabeticoapellidos((short) -cola.get(0).getAlfabeticoapellidos());
-							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICOAPELLIDOS desc, ");
+							mapilla.put(cola.get(0).getAlfabeticoapellidos(), "ALFABETICO desc, ");
 						}
 						if (cola.get(0).getFechanacimiento() > 0 && cola.get(0).getOrdenacionmanual() <= 0)
 							mapilla.put(cola.get(0).getFechanacimiento(), "FECHANACIMIENTO asc, ");
@@ -1502,7 +1502,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						}
 						if (cola.get(0).getOrdenacionmanual() > 0) {
-							mapilla.put(cola.get(0).getOrdenacionmanual(), "NUMEROGRUPO, ORDENGRUPO, ");
+							mapilla.put(cola.get(0).getOrdenacionmanual(), "ORDENMANUAL, ");
 							isOrdenacionManual = true;}
 
 						if (cola.get(0).getNumerocolegiado() > 0 && cola.get(0).getOrdenacionmanual() <= 0)
@@ -1517,7 +1517,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 								ordenaciones += orden;
 							}
 						if (!ordenaciones.isEmpty()) {
-							ordenaciones.substring(0, ordenaciones.length() - 1);
+							ordenaciones = ordenaciones.trim();
+							ordenaciones = ordenaciones.substring(0, ordenaciones.length() - 1);
 						} else {
 							ordenaciones = " ANTIGUEDADCOLA, "; // por defecto
 						}
@@ -1565,11 +1566,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 					}
 
 					String porGrupos = guardiasItem.getPorGrupos();
-					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
-							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
-							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos.equals("1"));
+//					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
+//							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
+//							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos.equals("1"));
+					
+					String posicionColaUltimo = scsInscripcionguardiaExtendsMapper.getPosicionUltimoColaGuardia(guardiasItem.getIdTurno(), guardiasItem.getIdGuardia(), idInstitucion.toString(), ordenaciones, guardiasItem.getLetradosIns());
+					
+					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardiasNueva(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), ordenaciones, guardiasItem.getLetradosIns(), posicionColaUltimo, idInstitucion.toString());
 					// cuando marcamos orden = manual por primera vez
-					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && "1".equals(porGrupos)) {
+					if (ordenaciones.contains("ORDENMANUAL") && "1".equals(porGrupos)) {
 						int j = 1;
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
@@ -1582,7 +1587,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							}
 						}
 
-					} else if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && !"1".equals(porGrupos)) {
+					} else if (ordenaciones.contains("ORDENMANUAL") && !"1".equals(porGrupos)) {
 						int j = colaGuardia.size();
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
