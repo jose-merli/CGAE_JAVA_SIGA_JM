@@ -241,7 +241,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                                     .andIdinstitucionEqualTo(idInstitucion)
                                     .andIdactuacionEqualTo(Long.valueOf(idActuacion))
                                     .andIdtipoactuacionEqualTo(scsActuacionasistencia.getIdtipoactuacion())
-                                    .andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistencia());
+                                    .andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistenciacolegio());
 
                             List<ScsActuacionasistcostefijo> costesActuacion = scsActuacionasistcostefijoMapper.selectByExample(scsActuacionasistcostefijoExample);
 
