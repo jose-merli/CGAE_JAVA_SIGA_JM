@@ -12,13 +12,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,11 +35,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import javax.swing.text.MaskFormatter;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
-
-import javax.swing.text.MaskFormatter;
 
 
 /**
@@ -410,21 +411,11 @@ public class UtilidadesString {
 	}
 
 	public static void setFileContent(File ficheroFOP, String sPlantillaFO) throws Exception {
-		try {
-			StringReader is = new StringReader(sPlantillaFO);
-			OutputStream os = new FileOutputStream(ficheroFOP);
-			int car;
-			while ((car = is.read()) != -1) {
-				os.write(car);
-			}
-			os.flush();
-			os.close();
-			is.close();
-
-		} catch (IOException e) {
-			throw new Exception("Error al insertar contenido en fichero", e);
-		}
-
+	    try (Writer writer = new OutputStreamWriter(new FileOutputStream(ficheroFOP), StandardCharsets.UTF_8)) {
+	        writer.write(sPlantillaFO);
+	    } catch (IOException e) {
+	        throw new Exception("Error al insertar contenido en el fichero", e);
+	    }
 	}
 
 	public static String reemplazaEntreMarcasCon(String texto, String marcaInicial, String marcaFinal,
