@@ -223,7 +223,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		SQL sql = new SQL();
 		SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
 		
-		sql.SELECT("FECHAFIN");
+		sql.SELECT_DISTINCT("FECHAFIN");
 		sql.FROM("SCS_GUARDIASCOLEGIADO");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("IDTURNO = " + guardiaItem.getIdTurno());
