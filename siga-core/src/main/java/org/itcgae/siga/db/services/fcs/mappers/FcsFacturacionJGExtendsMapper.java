@@ -39,8 +39,9 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
     List<FacturacionItem> buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getNumeroFacturacionesNoCerradas")
-    @Results({@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.INTEGER)})
-    Integer getNumeroFacturacionesNoCerradas(FacturacionItem facturacionItem, Short idInstitucion);
+    @Results({@Result(column = "BORRAPORGRUPO", property = "borrarPorGrupo", jdbcType = JdbcType.VARCHAR),
+    		@Result(column = "BORRARPORESTADO", property = "borrarPorEstado", jdbcType = JdbcType.VARCHAR)})
+    List<FacturacionItem> getNumeroFacturacionesNoCerradas(FacturacionItem facturacionItem, Short idInstitucion);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "datosFacturacion")
     @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),

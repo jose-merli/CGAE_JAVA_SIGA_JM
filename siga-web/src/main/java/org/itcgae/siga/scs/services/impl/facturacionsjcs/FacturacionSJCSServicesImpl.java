@@ -593,13 +593,15 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         boolean response = true;
 
         try {
-            Integer numero = fcsFacturacionJGExtendsMapper.getNumeroFacturacionesNoCerradas(facturacionItem,
+        	List<FacturacionItem> factNoCerradas = fcsFacturacionJGExtendsMapper.getNumeroFacturacionesNoCerradas(facturacionItem,
                     idInstitucion);
+        	
+        	FacturacionItem checkFact = factNoCerradas.get(0);
 
-            // Se comprueba que la facturación no se encuentra en estado "cerrada (idEstado
-            // = 30)" y que no exista una facturación con fecha de ejecución posterior a la
+            // Se comprueba que la facturación no se encuentra en ningun estado en el que no
+        	// se pueda borrar y que no exista una facturación con fecha de ejecución posterior a la
             // fecha de ejecución de la facturación que se quiere eliminar
-            if (facturacionItem.getIdEstado().equals("30") || null == numero || numero > 0) {
+            if ( null == checkFact || checkFact.getBorrarPorGrupo().equals("0") || checkFact.getBorrarPorEstado().equals("0") ) {
                 response = false;
             }
         } catch (Exception e) {
