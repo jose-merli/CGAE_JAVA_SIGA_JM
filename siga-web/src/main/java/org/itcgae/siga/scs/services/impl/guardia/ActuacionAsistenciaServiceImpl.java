@@ -378,7 +378,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             newActuacion.setDiadespues("N");
                         }
                         newActuacion.setIdtipoactuacion(Short.valueOf(datosGenerales.getTipoActuacion()));
-                        newActuacion.setIdtipoasistencia(scsAsistencia.getIdtipoasistencia());
+                        newActuacion.setIdtipoasistencia(scsAsistencia.getIdtipoasistenciacolegio());
                         if(!UtilidadesString.esCadenaVacia(datosGenerales.getJuzgado())){
                             newActuacion.setIdjuzgado(Long.valueOf(datosGenerales.getJuzgado()));
                             newActuacion.setIdinstitucionJuzg(idInstitucion);
@@ -419,7 +419,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         if(tipoActList != null && tipoActList.isEmpty()) {
                         	ScsTipoactuacion scsTipoactuacionRecord = new ScsTipoactuacion();
                         	scsTipoactuacionRecord.setIdinstitucion(newActuacion.getIdinstitucion());
-                        	scsTipoactuacionRecord.setIdtipoasistencia(scsAsistencia.getIdtipoasistencia());
+                        	scsTipoactuacionRecord.setIdtipoasistencia(scsAsistencia.getIdtipoasistenciacolegio());
                         	scsTipoactuacionRecord.setIdtipoactuacion(newActuacion.getIdtipoactuacion());
                         	
                         	//Recuperamos la descripcion de Tipo Asistencia
@@ -453,7 +453,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             scsActuacionasistcostefijo.setIdinstitucion(scsAsistencia.getIdinstitucion());
                             scsActuacionasistcostefijo.setIdactuacion(newActuacion.getIdactuacion());
                             scsActuacionasistcostefijo.setIdtipoactuacion(newActuacion.getIdtipoactuacion());
-                            scsActuacionasistcostefijo.setIdtipoasistencia(scsAsistencia.getIdtipoasistencia());
+                            scsActuacionasistcostefijo.setIdtipoasistencia(scsAsistencia.getIdtipoasistenciacolegio());
                             scsActuacionasistcostefijo.setIdcostefijo(Short.valueOf(datosGenerales.getIdCoste()));
                             scsActuacionasistcostefijo.setFechamodificacion(new Date());
                             scsActuacionasistcostefijo.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -529,7 +529,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                                 scsActuacionasistcostefijo.setIdinstitucion(scsAsistencia.getIdinstitucion());
                                 scsActuacionasistcostefijo.setIdactuacion(scsActuacionasistencia.getIdactuacion());
                                 scsActuacionasistcostefijo.setIdtipoactuacion(scsActuacionasistencia.getIdtipoactuacion());
-                                scsActuacionasistcostefijo.setIdtipoasistencia(scsAsistencia.getIdtipoasistencia());
+                                scsActuacionasistcostefijo.setIdtipoasistencia(scsAsistencia.getIdtipoasistenciacolegio());
                                 scsActuacionasistcostefijo.setIdcostefijo(Short.valueOf(datosGenerales.getIdCoste()));
                                 scsActuacionasistcostefijo.setFechamodificacion(new Date());
                                 scsActuacionasistcostefijo.setUsumodificacion(usuarios.get(0).getIdusuario());

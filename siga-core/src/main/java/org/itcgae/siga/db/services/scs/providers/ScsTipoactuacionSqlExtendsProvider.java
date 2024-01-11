@@ -44,11 +44,11 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		if(!historico) {
 			sql.WHERE("ACTUACION.FECHABAJA IS NULL");
 		}
-		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo,actuacion.comisariajuzgadopordefecto, to_date(ACTUACION.fechabaja,'DD/MM/RRRR'), cat.descripcion");
+		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo,actuacion.comisariajuzgadopordefecto, to_date(ACTUACION.fechabaja,'DD/MM/RRRR'), actuacion.descripcion");
 
 		sqlfinal.SELECT("*");
 		sqlfinal.FROM("(" + sql.toString() + ") consulta");
-		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		sqlfinal.ORDER_BY("consulta.descripciontipoactuacion");
 		return sqlfinal.toString();
 	}
 	

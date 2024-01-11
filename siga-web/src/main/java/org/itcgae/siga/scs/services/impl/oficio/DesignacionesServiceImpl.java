@@ -2522,6 +2522,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						// UtilOficio utilOficio= new UtilOficio();
 
 						boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
+						
+						if (scsDesigna.getIdpretension() == 0) {
+							scsDesigna.setIdpretension(null);
+					      }
 
 						LOGGER.info("updateDetalleDesigna() / Validamos el NIG Salida");
 
@@ -6736,6 +6740,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						if (designaItem.getIdTipoDesignaColegio() != 0) {
 							scsDesigna.setIdtipodesignacolegio((short) designaItem.getIdTipoDesignaColegio());
+						}else {
+							scsDesigna.setIdtipodesignacolegio(null);
 						}
 
 						scsDesigna.setArt27(designaItem.getArt27());
@@ -6859,7 +6865,16 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							LOGGER.info(
 									"updateDesigna() / scsDesignacionesExtendsMapper.update()-> Entrada a scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");
 
-							scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+//							scsDesignacionesExtendsMapper.updateByPrimaryKeySelective(scsDesigna);
+							
+							ScsDesignaExample scsDesignaExample = new ScsDesignaExample();
+							scsDesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(scsDesigna.getAnio())
+							.andNumeroEqualTo(scsDesigna.getNumero()).andIdturnoEqualTo(scsDesigna.getIdturno());
+							int nregistros = scsDesignacionesExtendsMapper.updateByExample(scsDesigna, scsDesignaExample);
+							
+							LOGGER.info(
+									"updateDesigna() / scsDesignacionesExtendsMapper.update() -> Se han actualizado: " + nregistros);
+
 
 							LOGGER.info(
 									"updateDesigna() / scsDesignacionesExtendsMapper.update() -> Salida de scsDesignacionesExtendsMapper para insertar tarjeta detalle designaciones");

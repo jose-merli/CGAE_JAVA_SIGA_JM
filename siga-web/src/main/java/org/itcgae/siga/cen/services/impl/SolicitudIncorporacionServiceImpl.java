@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.*;
@@ -750,8 +751,18 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
 					
+					CenSolicitudincorporacion solIncorporacion;
+					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+					// Se comprueba el colegiado para detectar si se generaría una anomalía de residencia con su aprobación
+					// Validacion de nuevo parametro para comprobar si se detecta anomalias por institucion o no.
+					Boolean hasToCheckAnomalias = this.checkValueParameter("VALIDACION_ANOMALIAS_RESIDENCIA", (idInstitucion != null ? idInstitucion : SigaConstants.IDINSTITUCION_0_SHORT));
+					
+					if (hasToCheckAnomalias) {
+						detectarAnomalia(solIncorporacion);
+					}
+					
 					// Se llama a un método inferior para no perder el rollback de la transacción en caso de error
-					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request);
+					aprobarSolicitudTransaccion(usuarios, idSolicitud, response, request, solIncorporacion);
 					
 				}catch(Exception e){
 					LOGGER.error(e.getMessage());
@@ -770,16 +781,15 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	}
 	
 	@Transactional(timeout=2400)
-	private void aprobarSolicitudTransaccion(List<AdmUsuarios> usuarios, Long idSolicitud, InsertResponseDTO response, HttpServletRequest request) throws Exception {
+	private void aprobarSolicitudTransaccion(List<AdmUsuarios> usuarios, Long idSolicitud, InsertResponseDTO response, HttpServletRequest request, CenSolicitudincorporacion solIncorporacion) throws Exception {
 		Long idDireccion;
 		Long idPersona;
 		Short idBancario = 0;
 		int insertColegiado;
 		int insertCliente;
 		int updateSolicitud = 0;
-		CenSolicitudincorporacion solIncorporacion;
 		AdmUsuarios usuario = usuarios.get(0);
-		solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+		
 		//insertamos datos personales
 		idPersona = insertarDatosPersonales(solIncorporacion, usuario);
 		insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
@@ -1930,6 +1940,54 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			numColegiado = reserva.getNcolegiado();
 		}
 		return numColegiado;
+	}
+
+	/**
+	 * Comprueba si se generaría una anomalía de residencia en el colegiado
+	 * @param nif 
+	 * @return true si se ha detectado un caso que produciría una anomalía, false si no
+	 */
+	private void detectarAnomalia(CenSolicitudincorporacion solicitudIncorporacion) throws Exception{
+		boolean anomaliaDetectada = true;
+		
+		// Comprueba si se generaría una anomalía
+		anomaliaDetectada = controlResidenciaService.compruebaColegiacionEnVigor(solicitudIncorporacion);
+		
+		if (anomaliaDetectada) {
+			LOGGER.error("aprobarSolicitud() --> Se ha detectado un caso que generaría una anomalía de residencia en el colegiado");
+			throw new Exception("No se permite aprobar la solicitud porque generaría una anomalía de residencia en el colegiado");
+		}
+	}
+	
+	
+	private Boolean checkValueParameter(String parameter, Short idInstitucion) {
+		
+		GenParametrosExample paramExample = new GenParametrosExample();
+		Boolean resultReturn = null;
+
+		LOGGER.info(
+				"checkValueParameter() / genParametroMapper.selectByExample() -> Entrada a GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
+		
+		paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(idInstitucion);
+		
+		List<GenParametros> paramResults = genParametroMapper.selectByExample(paramExample);
+
+		if (CollectionUtils.isEmpty(paramResults)) {
+			LOGGER.info(
+					"SolicitudIncorporacionService/checkValueParameter() --> No se ha obtenido ningun valor del parametro (" + parameter + ") para la institucion (" + idInstitucion + "). Se procede a la busqueda por defecto.");
+
+			paramExample = new GenParametrosExample();
+			paramExample.createCriteria().andParametroEqualTo(parameter).andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_0_SHORT);
+			paramResults = genParametroMapper.selectByExample(paramExample);
+		}
+		
+		LOGGER.info(
+		"checkValueParameter() / genParametroMapper.selectByExample() -> Salida de GenParametrosMapper para obtener información del parametro para checkear anomalias en validacion de residencia");
+
+		String paramResValue = !CollectionUtils.isEmpty(paramResults) ? paramResults.get(0).getValor() : "";
+		
+		
+		return !paramResValue.isEmpty() && ("S".equalsIgnoreCase(paramResValue) || "1".equalsIgnoreCase(paramResValue) || Boolean.parseBoolean(paramResValue)) ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 }

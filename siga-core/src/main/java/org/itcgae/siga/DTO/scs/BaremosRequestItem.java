@@ -11,11 +11,11 @@ public class BaremosRequestItem {
 	String nDias;
 	String baremo;
 	String dias;
-	Short disponibilidad;
+	Double disponibilidad;
 	Short numMinimoSimple;
 	Double simpleOImporteIndividual;
 	Short naPartir;
-	Short maximo;
+	Double maximo;
 	String porDia;
 	String idTurno;
 	String idGuardia;
