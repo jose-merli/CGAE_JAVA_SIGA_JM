@@ -2298,6 +2298,92 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 		return comboDTO;
 	}
+	
+	public ComboDTO getFechasByCabeceraGuardiaColegiado(HttpServletRequest request, GuardiasItem guardiaItem) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"getFechasByCabeceraGuardiaColegiado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"getFechasByCabeceraGuardiaColegiado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && usuarios.size() > 0) {
+
+					List<ComboItem> combosItems = new ArrayList<ComboItem>();
+					
+					ArrayList<String> fechas = scsGuardiasturnoExtendsMapper.getFechasByCabeceraGuardiaColegiado(guardiaItem, idInstitucion.toString());
+					SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-mm-dd");
+					SimpleDateFormat formatoFinal = new SimpleDateFormat("dd/MM/yyyy");
+					for(String fecha : fechas) {
+						ComboItem comboItem = new ComboItem();
+						Date fechaActual = formatoOriginal.parse(fecha.split(" ")[0]);
+						
+						comboItem.setLabel(this.diaDeLaSemana(fechaActual.getDay()) + " " + formatoFinal.format(fechaActual));
+						combosItems.add(comboItem);
+					}
+					comboDTO.setCombooItems(combosItems);
+					
+
+					if (combosItems == null || combosItems.isEmpty()) {
+
+						error.setCode(200);
+						error.setMessage("sjcs.guardia.asistencia.nohayguardia");
+						error.description("sjcs.guardia.asistencia.nohayguardia");
+						comboDTO.setError(error);
+
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("getFechasByCabeceraGuardiaColegiado() / ERROR: " + e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al obtener las fechas de las guardias de la cabecera " + e);
+			error.description("Error al obtener combo fechas disponibles GC " + e);
+			comboDTO.setError(error);
+		}
+		return comboDTO;
+	}
+	
+	private String diaDeLaSemana(int dayOfWeek) {
+		String dia = "";
+		switch(dayOfWeek) {
+		case 0:
+			dia = "D";
+			break;
+		case 1:
+			dia = "L";
+			break;
+		case 2:
+			dia = "M";
+			break;
+		case 3:
+			dia = "X";
+			break;
+		case 4:
+			dia = "J";
+			break;
+		case 5: 
+			dia = "V";
+			break;
+		case 6:
+			dia = "S";
+			break;
+		}
+		
+		return dia;
+	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -11671,10 +11757,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info("Se comprueba si para ese periodo existe una guardia para el letrado");
 				// Se comprueba si para ese periodo existe una guardia para el letrado
 				try {
-					if (validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(),
-							beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(),
-							beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo)) // TODO: (L) 
-						throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
+					if(separarGuardia) {
+						if (validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(),
+								beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(),
+								beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo)) // TODO: (L) 
+							throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
+					}
+					
 					
 					// Cuando en el front el checkbox esta activo, en el back se guarda como "0"
 					//boolean separarGuardia = separarGuardias(guardiasTurnoItem);
@@ -12859,7 +12948,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					if (guardiasTurno != null && guardiasTurno.size() > 0) {
 						guardiasTurno = guardiasTurno.stream().map(it -> {
-							it.setTipoDia(("Selección: Labor. " + it.getSeleccionLaborables() + ", Fest. "
+							it.setTipoDia((guardiaCol.getCantidadDias() + " días: Labor. " + it.getSeleccionLaborables() + ", Fest. "
 									+ it.getSeleccionFestivos()).replace("null", ""));
 							return it;
 						}).collect(Collectors.toList());

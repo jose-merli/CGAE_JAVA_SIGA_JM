@@ -180,5 +180,7 @@ public interface GuardiasService {
 			HttpServletRequest request);
 
 	public ComboDTO getComboDiasDisponiblesGC(HttpServletRequest request, GuardiasItem guardiaDia);
+	
+	public ComboDTO getFechasByCabeceraGuardiaColegiado(HttpServletRequest request, GuardiasItem guardiaDia);
 
 }

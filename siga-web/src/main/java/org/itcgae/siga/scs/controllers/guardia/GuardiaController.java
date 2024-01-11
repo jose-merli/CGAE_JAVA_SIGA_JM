@@ -560,6 +560,29 @@ public class GuardiaController {
 		}
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	
+	@GetMapping(value = "/getFechasByCabeceraGuardiaColegiado")
+	public ResponseEntity<ComboDTO> getFechasByCabeceraGuardiaColegiado(HttpServletRequest request, 
+			@RequestParam String fechaIni, 
+			@RequestParam String fechaFin,
+			@RequestParam String idTurno,
+			@RequestParam String idGuardia) throws Exception {
+		ComboDTO response = null;
+		try {
+			GuardiasItem guardiaDia = new GuardiasItem();
+			//Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);  
+			guardiaDia.setFechadesde(new SimpleDateFormat("dd/MM/yyyy").parse(fechaIni));
+			guardiaDia.setFechahasta(new SimpleDateFormat("dd/MM/yyyy").parse(fechaFin));
+			guardiaDia.setIdTurno(idTurno);
+			guardiaDia.setIdGuardia(idGuardia);
+			response = guardiasService.getFechasByCabeceraGuardiaColegiado(request, guardiaDia);
+		}catch(Exception e) {
+			throw e;
+		}
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 
 
 //	@PostMapping(value = "/solicitarBajaInscripcion", produces = MediaType.APPLICATION_JSON_VALUE)

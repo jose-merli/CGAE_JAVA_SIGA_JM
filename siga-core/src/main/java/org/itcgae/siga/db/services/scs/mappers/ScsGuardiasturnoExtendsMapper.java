@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -940,6 +941,10 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @Result(column = "ENVIOCENTRALITA", property = "envioCentralita", jdbcType = JdbcType.VARCHAR),
 	 	})
 	 List<GuardiasTurnoItem> getAllDatosGuardia(String idInstitucion, String idTurno, String idGuardia);
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getFechasByCabeceraGuardiaColegiado")
+	 @Result(column = "fechafin")
+	 ArrayList<String> getFechasByCabeceraGuardiaColegiado(org.itcgae.siga.DTOs.scs.GuardiasItem guardiaItem, String idInstitucion);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getCalGuardias")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),
