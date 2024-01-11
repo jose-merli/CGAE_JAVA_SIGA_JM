@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.scs.mappers;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -592,6 +593,9 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getConjuntoGuardiaFromGuardiaTurno")
 	 @Results({ @Result(column = "IDCONJUNTOGUARDIA", property = "IDCONJUNTOGUARDIA", jdbcType = JdbcType.VARCHAR)})
 	 String getConjuntoGuardiaFromGuardiaTurno(String idGuardia, String idTurno, String idInstitucion) ;
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getResumenBaremos")
+	 List<String> getResumenBaremos(String idGuardia, String idInstitucion) ;
 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getGuardiasToProg")
 	 @Results()
@@ -937,6 +941,10 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		 @Result(column = "ENVIOCENTRALITA", property = "envioCentralita", jdbcType = JdbcType.VARCHAR),
 	 	})
 	 List<GuardiasTurnoItem> getAllDatosGuardia(String idInstitucion, String idTurno, String idGuardia);
+	 
+	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getFechasByCabeceraGuardiaColegiado")
+	 @Result(column = "fechafin")
+	 ArrayList<String> getFechasByCabeceraGuardiaColegiado(org.itcgae.siga.DTOs.scs.GuardiasItem guardiaItem, String idInstitucion);
 	 
 	 @SelectProvider(type=ScsGuardiasturnoSqlExtendsProvider.class, method="getCalGuardias")
 	 @Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL),

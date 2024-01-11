@@ -69,7 +69,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("tiporesolucion.idtiporesolucion as VALUE");
 		sql.SELECT("catalogoResolucion.descripcion AS DESCRIPCION");
 		sql.FROM("SCS_TIPORESOLUCION tiporesolucion");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS catalogoResolucion on catalogoResolucion.idrecurso = tiporesolucion.DESCRIPCION and catalogoResolucion.idlenguaje = "
 						+ idLenguaje);
 
@@ -89,7 +89,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("tipoejg.IDTIPOEJGCOLEGIO");
 		sql.SELECT("cat.descripcion");
 		sql.FROM("SCS_TIPOEJGCOLEGIO tipoejg");
-		sql.INNER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = tipoejg.descripcion and cat.idlenguaje = '"
+		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = tipoejg.descripcion and cat.idlenguaje = '"
 				+ idLenguaje + "'");
 		sql.WHERE("tipoejg.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("tipoejg.fecha_baja is null");
@@ -136,7 +136,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("estado.IDESTADOEJG");
 		sql.SELECT("cat.descripcion");
 		sql.FROM("SCS_MAESTROESTADOSEJG estado");
-		sql.INNER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = estado.descripcion and cat.idlenguaje = '"
+		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos cat on cat.IDRECURSO = estado.descripcion and cat.idlenguaje = '"
 				+ idLenguaje + "'");
 		sql.WHERE("estado.fecha_baja is null");
 		sql.WHERE("VISIBLECOMISION = 1");

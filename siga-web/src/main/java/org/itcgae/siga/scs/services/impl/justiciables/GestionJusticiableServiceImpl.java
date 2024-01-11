@@ -506,7 +506,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		JusticiableItem justiciableItem = new JusticiableItem();
 
 		justiciableItem.setApellido1(personajg.getApellido1());
-		justiciableItem.setApellido2(personajg.getApellido2());
+		if(personajg.getApellido2() == null) {
+			justiciableItem.setApellido2(" ");
+		}else {
+			justiciableItem.setApellido2(personajg.getApellido2());
+		}
+		
 
 		String apellidos = "";
 
@@ -514,7 +519,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			apellidos += personajg.getApellido1() + " ";
 		}
 
-		if (personajg.getApellido2() != null) {
+		if (personajg.getApellido2() != null &&  !personajg.getApellido2().equalsIgnoreCase(" ")) {
 			apellidos += personajg.getApellido2();
 		}
 
@@ -1487,6 +1492,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setFecha(asuntoEjg.getFecha());
 		asunto.setIdInstitucion(asuntoEjg.getIdInstitucion());
 		asunto.setTurnoGuardia(asuntoEjg.getTurnoGuardia());
+		asunto.setNumProcedimiento(asuntoClave.getNumProcedimiento());
 
 		// Obtenemos colegiado
 
@@ -1681,7 +1687,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setDatosInteres(asuntoDesigna.getDatosInteres());
 		asunto.setNumero(asuntoDesigna.getNumero());
 		asunto.setCodigo(asuntoDesigna.getCodigo());
-		
+		asunto.setNumProcedimiento(asuntoClave.getNumProcedimiento());
 
 		// Obtenemos colegiado
 
@@ -1766,7 +1772,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		asunto.setIdInstitucion(asuntoAsistencia.getIdInstitucion());
 		asunto.setTurnoGuardia(asuntoAsistencia.getTurnoGuardia());
 		asunto.setDatosInteres(asuntoAsistencia.getDatosInteres());
-
+		asunto.setNumProcedimiento(asuntoClave.getNumProcedimiento());
 		// Obtenemos colegiado
 
 		FichaPersonaItem colegiado = null;

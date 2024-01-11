@@ -24,7 +24,7 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsAreaSqlProvider {
 		sql.SELECT("rec.descripcion");
 
 		sql.FROM("SCS_JURISDICCION jurisdiccion");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec on rec.idrecurso= jurisdiccion.DESCRIPCION and rec.idlenguaje = (select idLenguaje from Adm_Usuarios where idInstitucion = "+ idInstitucion +" and nif = '"+ nif +"')");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec on rec.idrecurso= jurisdiccion.DESCRIPCION and rec.idlenguaje = (select idLenguaje from Adm_Usuarios where idInstitucion = "+ idInstitucion +" and nif = '"+ nif +"')");
 		
 		sql.ORDER_BY("rec.DESCRIPCION");
 

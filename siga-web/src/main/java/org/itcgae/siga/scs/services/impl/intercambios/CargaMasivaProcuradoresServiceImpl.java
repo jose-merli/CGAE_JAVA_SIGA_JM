@@ -71,6 +71,7 @@ import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsEjgdesignaExample;
 import org.itcgae.siga.db.entities.ScsEstadoejg;
 import org.itcgae.siga.db.entities.ScsProcurador;
+import org.itcgae.siga.db.entities.ScsProcuradorExample;
 import org.itcgae.siga.db.entities.ScsProcuradorKey;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -373,7 +374,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 								scsEstadoejg.setAnio(ejg.getAnio());
 								scsEstadoejg.setNumero(ejg.getNumero());
 								scsEstadoejg.setAutomatico("1");
-								scsEstadoejg.setIdestadoejg(new Short("9")); //REMITIDO A COMISIÓN
+								scsEstadoejg.setIdestadoejg(new Short("19")); //DESIGNADO PROCURADOR
 								scsEstadoejg.setFechainicio(new Date());
 								scsEstadoejg.setFechamodificacion(new Date());
 								scsEstadoejg.setUsumodificacion(usuario.getUsumodificacion());
@@ -653,7 +654,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			if(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR)!=null && !hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("") &&
 				!hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("dd/mm/yyyy") && !hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().equals("Requerido")){
 				try {
-					cargaMasivaDatosPDItem.setFechaDesignaProcurador(new SimpleDateFormat("dd-MM-yyyy").parse(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString()));
+					cargaMasivaDatosPDItem.setFechaDesignaProcurador(new SimpleDateFormat("dd/MM/yyyy").parse(hashtable.get(SigaConstants.PD_FECHADESIGPROCURADOR).toString().replaceAll("-", "/")));
 				} catch (ParseException e1) {
 					errorLinea.append("Fecha de designacion de procurador mal introducida. Debe ser dd/mm/yyyy. ");
 				}
@@ -666,25 +667,23 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 			   !hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString().equals("nnnnn") && !hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString().equals("Requerido")){
 				cargaMasivaDatosPDItem.setNumColProcurador(hashtable.get(SigaConstants.PD_NUMCOLPROCURADOR).toString());
 
-				
-				// PREGUNTAR ESTO!!!!!!
-				
 				if(!procuradorHashtable.containsKey(cargaMasivaDatosPDItem.getNumColProcurador())){
 					try {
-						ScsProcuradorKey procuradorKey = new ScsProcuradorKey();
-						
-						procuradorKey.setIdinstitucion(cargaMasivaDatosPDItem.getIdInstitucion());
-						procuradorKey.setIdprocurador(Long.valueOf(cargaMasivaDatosPDItem.getNumColProcurador()));
-						scsProcurador  = scsProcuradorMapper.selectByPrimaryKey(procuradorKey);
+						ScsProcuradorExample procuradorExample = new ScsProcuradorExample();
+						procuradorExample.createCriteria().andIdinstitucionEqualTo(cargaMasivaDatosPDItem.getIdInstitucion())
+							.andNcolegiadoEqualTo(cargaMasivaDatosPDItem.getNumColProcurador());
+						List<ScsProcurador> listaProcurador = scsProcuradorMapper.selectByExample(procuradorExample);
+						if(listaProcurador != null && !listaProcurador.isEmpty()) {
+							scsProcurador = listaProcurador.get(0);
+						}else {
+							scsProcurador = null;
+						}
 					} catch (BusinessException e) {
 						scsProcurador = null;
 					}
 				}else{
 					scsProcurador = procuradorHashtable.get(cargaMasivaDatosPDItem.getNumColProcurador());	
 				}
-				
-				// PREGUNTAR LO ANTERIOR!!!!!
-				
 				
 				StringBuffer nombre = null;
 				if(scsProcurador!=null){
@@ -734,7 +733,7 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 					
 					List<ScsDesigna> designaciones =  scsDesignaMapper.selectByExample(designaExample);
 					
-					if(designaciones==null){
+					if(designaciones==null || designaciones.isEmpty()){
 						throw new BusinessException("No existe la designa seleccionada");
 					}else if (designaciones.size()>1){
 						throw new BusinessException("El codigo de designa no es unico para ese año");
@@ -774,6 +773,11 @@ public class CargaMasivaProcuradoresServiceImpl implements ICargaMasivaProcurado
 
 					List<ScsEjg> ejgs =  scsEjgMapper.selectByExample(ejgExample);
 					
+					if(ejgs==null || ejgs.isEmpty()){
+						throw new BusinessException("No existe el ejg seleccionado");
+					}else if (ejgs.size()>1){
+						throw new BusinessException("El número de EJG no es unico para ese año");
+					}
 					ScsEjg ejg = ejgs.get(0);
 
 					if(cargaMasivaDatosPDItem.getDesigaAbogadoAnio()!=null){

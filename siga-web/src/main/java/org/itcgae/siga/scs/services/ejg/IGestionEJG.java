@@ -30,8 +30,10 @@ import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
+import org.itcgae.siga.exception.BusinessException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -64,7 +66,7 @@ public interface IGestionEJG {
 	
 	UpdateResponseDTO editarEstado(EstadoEjgItem datos, HttpServletRequest request) throws Exception;
 	
-	ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request);
+	ResponseEntity<InputStreamResource> descargarExpedientesJG(List<EjgItem> datos, HttpServletRequest request) throws BusinessException;
 	
 	EjgDTO insertaDatosGenerales(EjgItem datos, HttpServletRequest request) throws Exception;
 	

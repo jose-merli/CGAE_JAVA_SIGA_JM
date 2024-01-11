@@ -8,18 +8,18 @@ public class ScsTipoDesignaColegioSqlExtendsProvider extends ScsTipodesignacoleg
 	public String comboTipoDesignacion(Short idLenguaje, String idInstitucion) {
 
 		SQL sql = new SQL();
-
+		SQL sqlfinal = new SQL();
+		
 		sql.SELECT("tipodes.IDTIPODESIGNACOLEGIO");
-		sql.SELECT("cat.descripcion");
+		sql.SELECT("f_siga_getrecurso(tipodes.descripcion,"+idLenguaje+") DESCRIPCION");
 		sql.FROM("SCS_TIPODESIGNACOLEGIO tipodes");
-		sql.INNER_JOIN(
-				"gen_recursos_catalogos cat on cat.IDRECURSO = tipodes.descripcion and cat.idlenguaje = '"
-						+ idLenguaje + "'");
 		sql.WHERE("tipodes.fecha_baja is null");
 		sql.WHERE("tipodes.idinstitucion = " + idInstitucion);
-		sql.ORDER_BY("cat.descripcion");
 
-		return sql.toString();
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 	
 }

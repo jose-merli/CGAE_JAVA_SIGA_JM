@@ -74,6 +74,7 @@ public class GuardiasItem {
 	private String idListaGuardia;
 	private String orden;
 	private Short idInstitucion;
+	private String cantidadDias;
 	//Aux para GuardiasColegiado
 	private String fechaIntro;
 	private String idCalendarioProgramado;
@@ -85,6 +86,14 @@ public class GuardiasItem {
 
 	public void setIdListaGuardia(String idListaGuardia) {
 		this.idListaGuardia = idListaGuardia;
+	}
+
+	public String getCantidadDias() {
+		return cantidadDias;
+	}
+
+	public void setCantidadDias(String cantidadDias) {
+		this.cantidadDias = cantidadDias;
 	}
 
 	public String getOrden() {

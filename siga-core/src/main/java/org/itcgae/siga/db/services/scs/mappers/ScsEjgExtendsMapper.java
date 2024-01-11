@@ -58,7 +58,8 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NIG", property = "nig", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTIPOEJG", property = "idTipoEjg", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOEJG", property = "tipo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "dilnigproc", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "numeroasoc", property = "numeroAsoc", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AsuntosJusticiableItem> searchClaveAsuntosEJG(AsuntosJusticiableItem asuntosJusticiableItem, Integer tamMaximo,
 													   String idLenguaje);
@@ -78,6 +79,9 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 
 	})
 	List<EjgItem> busquedaEJG(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje);
+	
+	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaTotalRegistrosEJG")
+	String busquedaTotalRegistrosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "busquedaEJGFinal")
 	@Results({

@@ -150,6 +150,18 @@ public class DesignacionesController {
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@RequestMapping(value = "/busquedaTotalRegistrosDesignaciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> busquedaTotalRegistrosDesignas(@RequestBody DesignaItem item, HttpServletRequest request) {
+		StringDTO response = designacionesService.busquedaTotalRegistrosDesignas(item, request);
+//		}
+		if (response != null) {
+			return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<StringDTO>(new StringDTO(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	
 	@RequestMapping(value = "/busquedaNuevaDesigna", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

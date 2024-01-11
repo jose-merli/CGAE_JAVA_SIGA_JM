@@ -17,7 +17,7 @@ public class ScsTipoSOJSqlExtendsProvider extends ScsTiposojSqlProvider {
 //		sql.WHERE("tiposoj.idinstitucion = " + idInstitucion);
 		
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -34,7 +34,7 @@ public class ScsTipoSOJSqlExtendsProvider extends ScsTiposojSqlProvider {
 		sql.WHERE("tipocolegio.idinstitucion = " + idInstitucion);
 		
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -51,7 +51,7 @@ public class ScsTipoSOJSqlExtendsProvider extends ScsTiposojSqlProvider {
 		sql.WHERE("tipocon.idinstitucion = " + idInstitucion);
 		
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}
@@ -68,7 +68,7 @@ public class ScsTipoSOJSqlExtendsProvider extends ScsTiposojSqlProvider {
 		sql.WHERE("tipores.idinstitucion = " + idInstitucion);
 		
 		sqlfinal.SELECT("*");
-		sqlfinal.FROM("(" + sql.toString() + ") AS consulta");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
 		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
 		return sqlfinal.toString();
 	}

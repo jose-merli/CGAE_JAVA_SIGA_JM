@@ -30,23 +30,33 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
 		if (justiciableBusquedaItem.getNombre() != null && justiciableBusquedaItem.getNombre() != "") {
-			String columna = "nombre";
-			String cadena = justiciableBusquedaItem.getNombre();
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-		
+			if(justiciableBusquedaItem.isModoBusqueda()) {
+				sql.WHERE(" nombre = '" + justiciableBusquedaItem.getNombre() + "'");
+			} else {
+				String columna = "nombre";
+				String cadena = justiciableBusquedaItem.getNombre();
+				sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
+			}
 		}
 
-		if (justiciableBusquedaItem.getApellidos() != null && justiciableBusquedaItem.getApellidos() != "") {
-			
-			String[] splitApellidos = justiciableBusquedaItem.getApellidos().trim().split("\\s+");
-			if(splitApellidos.length>1) {
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("apellido1", splitApellidos[0]));
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("apellido2", splitApellidos[1]));
+		if (justiciableBusquedaItem.getApellido1() != null && justiciableBusquedaItem.getApellido1() != "") {
+			if(justiciableBusquedaItem.isModoBusqueda()) {
+				sql.WHERE(" apellido1 = '" + justiciableBusquedaItem.getApellido1() + "'");
+			} else {
+				String columna = "apellido1";
+				String cadena = justiciableBusquedaItem.getApellido1();
+				sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
 			}
-			else {
-				sql.WHERE("( "+UtilidadesString.filtroTextoBusquedas("apellido1", splitApellidos[0])+" OR "+UtilidadesString.filtroTextoBusquedas("apellido2", splitApellidos[0])+" )");
+		}
+		
+		if (justiciableBusquedaItem.getApellido2() != null && justiciableBusquedaItem.getApellido2() != "") {
+			if(justiciableBusquedaItem.isModoBusqueda()) {
+				sql.WHERE(" apellido2 = '" + justiciableBusquedaItem.getApellido2() + "'");
+			} else {
+				String columna = "apellido2";
+				String cadena = justiciableBusquedaItem.getApellido2();
+				sql.WHERE(UtilidadesString.filtroTextoBusquedasPorDerecha(columna, cadena));
 			}
-			
 		}
 
 		if (justiciableBusquedaItem.getNif() != null && justiciableBusquedaItem.getNif() != "") {
@@ -626,6 +636,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("tipo");
 		sql.SELECT("fechaapertura");
 		sql.SELECT("idTurno");
+		sql.SELECT("numProcedimiento");
 		
 		SQL sqlUnidadFamiliar = new SQL();
 		sqlUnidadFamiliar.SELECT("unidadFamiliar.idinstitucion");
@@ -645,6 +656,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND numero = UNIDADFAMILIAR.numero "
 				+ "AND idtipoejg = UNIDADFAMILIAR.idtipoejg) AS fechaapertura");
 		sqlUnidadFamiliar.SELECT("null as idTurno");
+		sqlUnidadFamiliar.SELECT("(SELECT scs_ejg.NUMEROPROCEDIMIENTO FROM scs_ejg "
+				+ "WHERE idinstitucion = UNIDADFAMILIAR.idinstitucion "
+				+ "AND anio = UNIDADFAMILIAR.anio "
+				+ "AND numero = UNIDADFAMILIAR.numero "
+				+ "AND idtipoejg = UNIDADFAMILIAR.idtipoejg) AS numProcedimiento");
 		sqlUnidadFamiliar.FROM("SCS_UNIDADFAMILIAREJG unidadFamiliar");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idinstitucion = '" + idInstitucion + "'");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idpersona = '" + idPersona + "'");
@@ -666,6 +682,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND numero = CONTRARIOEJG.numero "
 				+ "AND idtipoejg = CONTRARIOEJG.idtipoejg) AS fechaapertura");
 		sqlContrarioEjg.SELECT("null as idTurno");
+		sqlContrarioEjg.SELECT("(SELECT scs_ejg.NUMEROPROCEDIMIENTO  FROM scs_ejg "
+				+ "WHERE idinstitucion = CONTRARIOEJG.idinstitucion "
+				+ "AND anio = CONTRARIOEJG.anio "
+				+ "AND numero = CONTRARIOEJG.numero "
+				+ "AND idtipoejg = CONTRARIOEJG.idtipoejg) AS numProcedimiento");
 		sqlContrarioEjg.FROM("SCS_CONTRARIOSEJG CONTRARIOEJG");
 		sqlContrarioEjg.WHERE("CONTRARIOEJG.idinstitucion = '" + idInstitucion + "'");
 		sqlContrarioEjg.WHERE("CONTRARIOEJG.idpersona = '" + idPersona + "'");
@@ -687,6 +708,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND numero = CONTRARIOSDESIGNA.numero "
 				+ "AND idturno = CONTRARIOSDESIGNA.idturno) AS fechaapertura");
 		sqlContrariosDesigna.SELECT("null as idTurno");
+		sqlContrariosDesigna.SELECT("(SELECT SCS_DESIGNA.NUMPROCEDIMIENTO FROM SCS_DESIGNA "
+				+ "WHERE idinstitucion = CONTRARIOSDESIGNA.idinstitucion "
+				+ "AND anio = CONTRARIOSDESIGNA.anio "
+				+ "AND numero = CONTRARIOSDESIGNA.numero "
+				+ "AND idturno = CONTRARIOSDESIGNA.idturno) AS numProcedimiento");
 		sqlContrariosDesigna.FROM("SCS_CONTRARIOSDESIGNA CONTRARIOSDESIGNA");
 		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
 		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idpersona = '" + idPersona + "'");
@@ -708,6 +734,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND numero = DEFENDIDOSDESIGNA.numero "
 				+ "AND idturno = DEFENDIDOSDESIGNA.idturno) AS fechaapertura");
 		sqlDefendidosDesigna.SELECT("null as idTurno");
+		sqlDefendidosDesigna.SELECT("(SELECT SCS_DESIGNA.NUMPROCEDIMIENTO FROM SCS_DESIGNA "
+				+ "WHERE idinstitucion = DEFENDIDOSDESIGNA.idinstitucion "
+				+ "AND anio = DEFENDIDOSDESIGNA.anio "
+				+ "AND numero = DEFENDIDOSDESIGNA.numero "
+				+ "AND idturno = DEFENDIDOSDESIGNA.idturno) AS numProcedimiento");
 		sqlDefendidosDesigna.FROM("SCS_DEFENDIDOSDESIGNA DEFENDIDOSDESIGNA");
 		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
 		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idpersona = '" + idPersona + "'");
@@ -725,6 +756,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlSoj.SELECT("'S' as tipo");
 		sqlSoj.SELECT("fechaapertura");
 		sqlSoj.SELECT("TO_CHAR(idturno) idTurno");
+		sqlSoj.SELECT("NULL AS numProcedimiento");
 		sqlSoj.FROM("SCS_SOJ SOJ");
 		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
 		sqlSoj.WHERE("SOJ.idpersonajg = '" + idPersona + "'");
@@ -742,6 +774,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlEJG.SELECT("'E' as tipo");
 		sqlEJG.SELECT("fechaapertura");
 		sqlEJG.SELECT("null as idTurno");
+		sqlEJG.SELECT("EJG.NUMEROPROCEDIMIENTO AS numProcedimiento");
 		sqlEJG.FROM("SCS_EJG EJG");
 		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
 		sqlEJG.WHERE("EJG.idpersonajg = '" + idPersona + "'");
@@ -762,6 +795,10 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = CONTRARIOSASISTENCIA.anio "
 				+ "AND numero = CONTRARIOSASISTENCIA.numero) AS fechaapertura");
 		sqlContrariosAsistencia.SELECT("null as idTurno");
+		sqlContrariosAsistencia.SELECT("(SELECT scs_asistencia.NUMEROPROCEDIMIENTO FROM SCS_ASISTENCIA "
+				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
+				+ "AND anio = CONTRARIOSASISTENCIA.anio "
+				+ "AND numero = CONTRARIOSASISTENCIA.numero) AS numProcedimiento");
 		sqlContrariosAsistencia.FROM("SCS_CONTRARIOSASISTENCIA CONTRARIOSASISTENCIA");
 		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idpersona = '" + idPersona + "'");
@@ -779,6 +816,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlAsistencia.SELECT("'A' as tipo");
 		sqlAsistencia.SELECT("fechahora AS fechaapertura");
 		sqlAsistencia.SELECT("null as idTurno");
+		sqlAsistencia.SELECT("ASISTENCIA.NUMEROPROCEDIMIENTO AS numProcedimiento");
 		sqlAsistencia.FROM("SCS_ASISTENCIA ASISTENCIA");
 		sqlAsistencia.WHERE("ASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlAsistencia.WHERE("ASISTENCIA.idpersonaJG = '" + idPersona + "'");
@@ -811,6 +849,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sql.SELECT("rol");
 		sql.SELECT("tipo");
 		sql.SELECT("fechaapertura");
+		sql.SELECT("numProcedimiento");
 
 		SQL sqlUnidadFamiliar = new SQL();
 		sqlUnidadFamiliar.SELECT("unidadFamiliar.idinstitucion");
@@ -829,6 +868,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = UNIDADFAMILIAR.anio "
 				+ "AND numero = UNIDADFAMILIAR.numero "
 				+ "AND idtipoejg = UNIDADFAMILIAR.idtipoejg) AS fechaapertura");
+		sqlUnidadFamiliar.SELECT("(SELECT scs_ejg.NUMEROPROCEDIMIENTO FROM scs_ejg "
+				+ "WHERE idinstitucion = UNIDADFAMILIAR.idinstitucion "
+				+ "AND anio = UNIDADFAMILIAR.anio "
+				+ "AND numero = UNIDADFAMILIAR.numero "
+				+ "AND idtipoejg = UNIDADFAMILIAR.idtipoejg) AS numProcedimiento");
 
 		sqlUnidadFamiliar.FROM("SCS_UNIDADFAMILIAREJG unidadFamiliar");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idinstitucion = '" + idInstitucion + "'");
@@ -850,6 +894,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = CONTRARIOEJG.anio "
 				+ "AND numero = CONTRARIOEJG.numero "
 				+ "AND idtipoejg = CONTRARIOEJG.idtipoejg) AS fechaapertura");
+		sqlContrarioEjg.SELECT("(SELECT scs_ejg.NUMEROPROCEDIMIENTO FROM scs_ejg "
+				+ "WHERE idinstitucion = CONTRARIOEJG.idinstitucion "
+				+ "AND anio = CONTRARIOEJG.anio "
+				+ "AND numero = CONTRARIOEJG.numero "
+				+ "AND idtipoejg = CONTRARIOEJG.idtipoejg) AS numProcedimiento");
 		sqlContrarioEjg.FROM("SCS_CONTRARIOSEJG CONTRARIOEJG");
 		sqlContrarioEjg.WHERE("CONTRARIOEJG.idinstitucion = '" + idInstitucion + "'");
 		sqlContrarioEjg.WHERE("CONTRARIOEJG.idpersona IN (" + idPersona + ", " + representadosIN + ")");
@@ -870,6 +919,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = CONTRARIOSDESIGNA.anio "
 				+ "AND numero = CONTRARIOSDESIGNA.numero "
 				+ "AND idturno = CONTRARIOSDESIGNA.idturno) AS fechaapertura");
+		sqlContrariosDesigna.SELECT("(SELECT SCS_DESIGNA.NUMPROCEDIMIENTO FROM SCS_DESIGNA "
+				+ "WHERE idinstitucion = CONTRARIOSDESIGNA.idinstitucion "
+				+ "AND anio = CONTRARIOSDESIGNA.anio "
+				+ "AND numero = CONTRARIOSDESIGNA.numero "
+				+ "AND idturno = CONTRARIOSDESIGNA.idturno) AS numProcedimiento");
 		sqlContrariosDesigna.FROM("SCS_CONTRARIOSDESIGNA CONTRARIOSDESIGNA");
 		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
 		sqlContrariosDesigna.WHERE("CONTRARIOSDESIGNA.idpersona  IN (" + idPersona + ", " + representadosIN + ")");
@@ -890,6 +944,11 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "AND anio = DEFENDIDOSDESIGNA.anio "
 				+ "AND numero = DEFENDIDOSDESIGNA.numero "
 				+ "AND idturno = DEFENDIDOSDESIGNA.idturno) AS fechaapertura");
+		sqlDefendidosDesigna.SELECT("(SELECT SCS_DESIGNA.NUMPROCEDIMIENTO FROM SCS_DESIGNA "
+				+ "WHERE idinstitucion = DEFENDIDOSDESIGNA.idinstitucion "
+				+ "AND anio = DEFENDIDOSDESIGNA.anio "
+				+ "AND numero = DEFENDIDOSDESIGNA.numero "
+				+ "AND idturno = DEFENDIDOSDESIGNA.idturno) AS numProcedimiento");
 		sqlDefendidosDesigna.FROM("SCS_DEFENDIDOSDESIGNA DEFENDIDOSDESIGNA");
 		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
 		sqlDefendidosDesigna.WHERE("DEFENDIDOSDESIGNA.idpersona IN (" + idPersona + ", " + representadosIN + ")");
@@ -906,6 +965,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		}
 		sqlSoj.SELECT("'S' as tipo");
 		sqlSoj.SELECT("fechaapertura");
+		sqlSoj.SELECT("NULL AS numProcedimiento");
 		sqlSoj.FROM("SCS_SOJ SOJ");
 		sqlSoj.WHERE("SOJ.idinstitucion = '" + idInstitucion + "'");
 		sqlSoj.WHERE("SOJ.idpersonajg IN (" + idPersona + ", " + representadosIN + ")");
@@ -922,6 +982,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		}
 		sqlEJG.SELECT("'E' as tipo");
 		sqlEJG.SELECT("fechaapertura");
+		sqlEJG.SELECT("EJG.NUMEROPROCEDIMIENTO AS numProcedimiento");
 		sqlEJG.FROM("SCS_EJG EJG");
 		sqlEJG.WHERE("EJG.idinstitucion = '" + idInstitucion + "'");
 		sqlEJG.WHERE("EJG.idpersonajg IN (" + idPersona + ")");
@@ -941,6 +1002,10 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
 				+ "AND anio = CONTRARIOSASISTENCIA.anio "
 				+ "AND numero = CONTRARIOSASISTENCIA.numero) AS fechaapertura");
+		sqlContrariosAsistencia.SELECT("(SELECT SCS_ASISTENCIA.NUMEROPROCEDIMIENTO FROM SCS_ASISTENCIA "
+				+ "WHERE idinstitucion = CONTRARIOSASISTENCIA.idinstitucion "
+				+ "AND anio = CONTRARIOSASISTENCIA.anio "
+				+ "AND numero = CONTRARIOSASISTENCIA.numero) AS numProcedimiento");
 		sqlContrariosAsistencia.FROM("SCS_CONTRARIOSASISTENCIA CONTRARIOSASISTENCIA");
 		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlContrariosAsistencia.WHERE("CONTRARIOSASISTENCIA.idpersona IN (" + idPersona + ", " + representadosIN + ")");
@@ -957,6 +1022,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		}
 		sqlAsistencia.SELECT("'A' as tipo");
 		sqlAsistencia.SELECT("fechahora AS fechaapertura");
+		sqlAsistencia.SELECT("ASISTENCIA.NUMEROPROCEDIMIENTO AS numProcedimiento");
 		sqlAsistencia.FROM("SCS_ASISTENCIA ASISTENCIA");
 		sqlAsistencia.WHERE("ASISTENCIA.idinstitucion = '" + idInstitucion + "'");
 		sqlAsistencia.WHERE("ASISTENCIA.idpersonaJG IN (" + idPersona + ", " + representadosIN + ")");
@@ -1043,7 +1109,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		
 		sql.INNER_JOIN("scs_personajg pjg on (uf.idpersona=pjg.idpersona and uf.idinstitucion=pjg.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("scs_personajg repre on (repre.idpersona =  pjg.idrepresentantejg AND repre.idinstitucion=pjg.idinstitucion)");
-		sql.LEFT_OUTER_JOIN("(select grc.descripcion, p.idparentesco, p.idinstitucion, grc.idlenguaje from scs_parentesco p inner join gen_recursos_catalogos grc on (grc.idrecurso=p.descripcion) where grc.idlenguaje= '" + idLenguaje + "'" + " ) pd on (pd.idparentesco=uf.idparentesco and pd.idinstitucion=uf.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("(select grc.descripcion, p.idparentesco, p.idinstitucion, grc.idlenguaje from scs_parentesco p left outer join gen_recursos_catalogos grc on (grc.idrecurso=p.descripcion) where grc.idlenguaje= '" + idLenguaje + "'" + " ) pd on (pd.idparentesco=uf.idparentesco and pd.idinstitucion=uf.idinstitucion)");
 		//sql.LEFT_OUTER_JOIN("scs_eejg_peticiones eejg_p on (eejg_p.numero = uf.numero and eejg_p.anio=uf.anio and eejg_p.idtipoejg = uf.idtipoejg and eejg_p.idinstitucion = uf.idinstitucion and eejg_p.idpersona=uf.idpersona)");
 
 		if(ejgItem.getAnnio() != null && ejgItem.getAnnio() != "")

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
@@ -45,4 +46,6 @@ public interface IBusquedaEJG {
 	ComboDTO comboRemesa(HttpServletRequest request);
 
 	InsertResponseDTO anadirExpedienteARemesa(List<EjgItem> datos, HttpServletRequest request) throws Exception;
+
+	StringDTO busquedaTotalRegistrosEJG(EjgItem ejgItem, HttpServletRequest request);
 }

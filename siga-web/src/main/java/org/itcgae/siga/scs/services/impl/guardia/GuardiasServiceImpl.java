@@ -957,10 +957,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 						// Esto sirve para ver si habrá que generar grupos automaticamente despues de
 						// updatear
 						resetGrupos = false;
-						if ((item.get(0).getPorgrupos().equals("1") || colas.get(0).getOrdenacionmanual() == 0)
+						if (("1".equals(item.get(0).getPorgrupos()) || colas.get(0).getOrdenacionmanual() == 0)
 								&& Short.valueOf(guardiasItem.getFiltros().split(",")[4]) != 0) {
 							resetGrupos = true;
 						}
+						
+						if (colas.get(0).getOrdenacionmanual() != 0) {
+							resetGrupos = true;
+						}
+						
 						guardia.setPorgrupos((Boolean.valueOf(guardiasItem.getPorGrupos()) ? "1" : "0"));
 						guardia.setIdordenacioncolas(Integer.valueOf(guardiasItem.getIdOrdenacionColas()));
 						// ROTAR COMPONENTES?
@@ -1465,8 +1470,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String ultimo = "";
 
 					if (guardias != null && !guardias.isEmpty())
-						ultimo = guardias.get(0).getIdpersonaUltimo() == null ? ""
-								: guardias.get(0).getIdpersonaUltimo().toString();
+						ultimo = guardias.get(0).getIdpersonaUltimo() == null ? "" : guardias.get(0).getIdpersonaUltimo().toString();
 
 
 					ScsOrdenacioncolasExample example2 = new ScsOrdenacioncolasExample();
@@ -1563,14 +1567,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 					String porGrupos = guardiasItem.getPorGrupos();
 					List<InscripcionGuardiaItem> colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(
 							guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(),
-							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
+							ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos.equals("1"));
 					// cuando marcamos orden = manual por primera vez
-					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos == "1") {
+					if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && "1".equals(porGrupos)) {
 						int j = 1;
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
 							if (colaGuardia.get(x).getNumeroGrupo() == null
-									|| colaGuardia.get(x).getNumeroGrupo().equals("null")) {
+									|| "null".equals(colaGuardia.get(x).getNumeroGrupo().toLowerCase())) {
 
 								colaGuardia.get(x).setNumeroGrupo(String.valueOf(x + 1));
 								j++;
@@ -1578,12 +1582,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 							}
 						}
 
-					} else if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && porGrupos != "1") {
+					} else if (ordenaciones.contains("NUMEROGRUPO, ORDENGRUPO,") && !"1".equals(porGrupos)) {
 						int j = colaGuardia.size();
 						for (int x = 0; x < colaGuardia.size(); x++) {
 							// rellenar todos los numero grupo y orden
 							if (colaGuardia.get(x).getNumeroGrupo() == null
-									|| colaGuardia.get(x).getNumeroGrupo().equals("null")) {
+									|| "null".equals(colaGuardia.get(x).getNumeroGrupo().toLowerCase())) {
 								
 								colaGuardia.get(x).setNumeroGrupo(String.valueOf(j));
 								colaGuardia.get(x).setOrden("1");
@@ -1615,8 +1619,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 							}
 							
 						}
-						if (porGrupos == "1" && (colaGuardia.get(y).getNumeroGrupo() == null
-								|| "null".equals(colaGuardia.get(y).getNumeroGrupo()))) {
+						if ("1".equals(porGrupos) && (colaGuardia.get(y).getNumeroGrupo() == null
+								|| "null".equals(colaGuardia.get(y).getNumeroGrupo().toLowerCase()))) {
 							needToRemove.add(colaGuardia.get(y)); // remove after
 							colaGuardiaNulos.add(colaGuardia.get(y));
 						}
@@ -1633,12 +1637,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 					colaGuardia.addAll(colaGuardiaHS2);
 					
 					colaGuardia.addAll(colaGuardiaNulos);
-					// reordenamos
 					
-					//Vamos a modificar los número de orden
+					// Reordenamos vamos a modificar los número de orden
 					Integer orden = 1;
 					for (InscripcionGuardiaItem cG : colaGuardia) {
-						if(porGrupos != "1") {
+						if("1".equals(porGrupos)) {
 							cG.setOrdenCola(orden.toString());
 							orden++;
 						}
@@ -1668,7 +1671,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper
 								.getColaGuardias(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), strDate,
-										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, porGrupos == "1");
+										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
 						// Obtenemos el ultimo id generado en los grupos
 						ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
 						grupoGuardiaExample.createCriteria()
@@ -1776,10 +1779,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 						}if(!isOrdenacionManual){ 
 						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
 								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
-								idInstitucion.toString(), grupoUltimo, porGrupos == "1");
+								idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
 						for (int i = 0; i < colaGuardia.size(); i++) {
 							if (colaGuardia.get(i).getNumeroGrupo() == null
-									|| colaGuardia.get(i).getNumeroGrupo() == "null") {
+									|| "null".equals(colaGuardia.get(i).getNumeroGrupo().toLowerCase())) {
 								colaGuardia.remove(i);
 							}
 						}
@@ -2123,7 +2126,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						for (int i = 0; i < inscripcionesGrupoNuevo.size(); i++) {
 							if (inscripcionesGrupoNuevo.get(i).getNumeroGrupo() == null
-									|| inscripcionesGrupoNuevo.get(i).getNumeroGrupo().equals("")) {
+									|| "".equals(inscripcionesGrupoNuevo.get(i).getNumeroGrupo())) {
 								Long idGGC = null;
 								if (inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado() != null) {
 									idGGC = Long.valueOf(inscripcionesGrupoNuevo.get(i).getIdGrupoGuardiaColegiado());
@@ -2289,6 +2292,92 @@ public class GuardiasServiceImpl implements GuardiasService {
 			comboDTO.setError(error);
 		}
 		return comboDTO;
+	}
+	
+	public ComboDTO getFechasByCabeceraGuardiaColegiado(HttpServletRequest request, GuardiasItem guardiaItem) {
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		Error error = new Error();
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"getFechasByCabeceraGuardiaColegiado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+				LOGGER.info(
+						"getFechasByCabeceraGuardiaColegiado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && usuarios.size() > 0) {
+
+					List<ComboItem> combosItems = new ArrayList<ComboItem>();
+					
+					ArrayList<String> fechas = scsGuardiasturnoExtendsMapper.getFechasByCabeceraGuardiaColegiado(guardiaItem, idInstitucion.toString());
+					SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-mm-dd");
+					SimpleDateFormat formatoFinal = new SimpleDateFormat("dd/MM/yyyy");
+					for(String fecha : fechas) {
+						ComboItem comboItem = new ComboItem();
+						Date fechaActual = formatoOriginal.parse(fecha.split(" ")[0]);
+						
+						comboItem.setLabel(this.diaDeLaSemana(fechaActual.getDay()) + " " + formatoFinal.format(fechaActual));
+						combosItems.add(comboItem);
+					}
+					comboDTO.setCombooItems(combosItems);
+					
+
+					if (combosItems == null || combosItems.isEmpty()) {
+
+						error.setCode(200);
+						error.setMessage("sjcs.guardia.asistencia.nohayguardia");
+						error.description("sjcs.guardia.asistencia.nohayguardia");
+						comboDTO.setError(error);
+
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error("getFechasByCabeceraGuardiaColegiado() / ERROR: " + e.getMessage(), e);
+			error.setCode(500);
+			error.setMessage("Error al obtener las fechas de las guardias de la cabecera " + e);
+			error.description("Error al obtener combo fechas disponibles GC " + e);
+			comboDTO.setError(error);
+		}
+		return comboDTO;
+	}
+	
+	private String diaDeLaSemana(int dayOfWeek) {
+		String dia = "";
+		switch(dayOfWeek) {
+		case 0:
+			dia = "D";
+			break;
+		case 1:
+			dia = "L";
+			break;
+		case 2:
+			dia = "M";
+			break;
+		case 3:
+			dia = "X";
+			break;
+		case 4:
+			dia = "J";
+			break;
+		case 5: 
+			dia = "V";
+			break;
+		case 6:
+			dia = "S";
+			break;
+		}
+		
+		return dia;
 	}
 
 	@Override
@@ -2474,8 +2563,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 			recordGrupoGuardia.setUsucreacion(idUsuario);
 			recordGrupoGuardia.setFechamodificacion(new Date());
 			recordGrupoGuardia.setUsumodificacion(idUsuario);
-
-			scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
+			if(ordenGrupo == 0) {
+				scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
+			}
+			
 		}
 
 		boolean nuevoGrupoGuardiaColegiado = false;
@@ -2493,7 +2584,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 		
 		recordGrupoGuardiaColegiado.setIdpersona(idPersona);
-		recordGrupoGuardiaColegiado.setOrden(ordenGrupo);
+		recordGrupoGuardiaColegiado.setOrden(1);
 		recordGrupoGuardiaColegiado.setIdgrupoguardia(idGrupoGuardia);
 		recordGrupoGuardiaColegiado.setIdinstitucion(idInstitucion);
 		recordGrupoGuardiaColegiado.setIdturno(idTurno);
@@ -2504,8 +2595,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 		recordGrupoGuardiaColegiado.setFechamodificacion(new Date());
 		recordGrupoGuardiaColegiado.setUsumodificacion(idUsuario);
 
-		if (nuevoGrupoGuardiaColegiado) {
-			scsGrupoguardiacolegiadoMapper.insert(recordGrupoGuardiaColegiado);
+		if (nuevoGrupoGuardiaColegiado && ordenGrupo == 0) {
+			scsGrupoguardiacolegiadoMapper.insert(recordGrupoGuardiaColegiado); // ESTE ES EL INSERT QUE LO EXPLOTA TODO
 		} else {
 			scsGrupoguardiacolegiadoMapper.updateByPrimaryKey(recordGrupoGuardiaColegiado);
 		}
@@ -3430,7 +3521,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 						try {
 							String respuestaAlEliminar = this.deleteByIdProgramacionCalendarios(listaNum.get(i), listDeleteCalBody, idInstitucion,
 									usuarios);
-							if ( respuestaAlEliminar == "") // si es vacio la respuesta, fue todo bien
+							if ( "".equals(respuestaAlEliminar)) // si es vacio la respuesta, fue todo bien
 								response++;
 							else
 								erroresRespuesta.add(respuestaAlEliminar);
@@ -3501,32 +3592,32 @@ public class GuardiasServiceImpl implements GuardiasService {
 			List<GuardiasCalendarioItem> guardiaIDList = scsGuardiasturnoExtendsMapper.getOneCalGuardia(listaCalendarios.get(j).getIdturno().toString(),
 					listaCalendarios.get(j).getIdguardia().toString(), dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
 					dateFormatFin.format( calendarioInfo.getFechacalfin()).toString(), idInstitucion.toString());
-			if(!guardiaIDList.isEmpty() && guardiaIDList != null) {
+			if(!guardiaIDList.isEmpty() && guardiaIDList != null && listDeleteCalBody.get(j).getContadorGenerados() != 0) {
 				idGuardias =guardiaIDList.get(0).getIdcalendarioguardias();
 				if (!esUltimoCalendario(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
 						Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
 						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia()))
 					controlEsUltimo++;
 
-				if (!validarBorradoGuardias(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
-						Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
-						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(),dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
-					controlGuardia++;
+				
+					if (!validarBorradoGuardias(Integer.valueOf(listaCalendarios.get(j).getIdinstitucion()),
+							Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
+							listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(),dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
+						controlGuardia++;
 
-				if(!validarColegiadosFacturados(idInstitucion, Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
-						listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
-					controlFacturados++;
+					if(!validarColegiadosFacturados(idInstitucion, Integer.parseInt(guardiaIDList.get(0).getIdcalendarioguardias()),
+							listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
+						controlFacturados++;
 
-				if(!validarTieneAsistencias(idInstitucion,listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
-						dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
-					controlAsistencias++;
+					if(!validarTieneAsistencias(idInstitucion,listaCalendarios.get(j).getIdturno(), listaCalendarios.get(j).getIdguardia(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString(), 
+							dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString()))
+						controlAsistencias++;
+				}
 				
-				
-				
-			}
+			
 			
 			
 		}
@@ -3616,6 +3707,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				commitCalendarios(tx);
 			} catch (Exception e) {
+				LOGGER.error(e.getCause());
 				LOGGER.error(Arrays.toString(e.getStackTrace()).replaceAll(", ", "\n"));
 				respuesta = "Error al eliminar calendarios programados";
 				// TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -3624,7 +3716,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		} else {
 			//CONSTRUCCION MENSAJE A MOSTRAR EN FRONT
-			String mensajeProgramacionError ="Calendario Desde" + dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString() +" Hasta "  + dateFormatFin.format( calendarioInfo.getFechacalfin()).toString();
+			String mensajeProgramacionError ="Calendario Desde " + dateFormatFin.format( calendarioInfo.getFechacalinicio()).toString() +" Hasta "  + dateFormatFin.format( calendarioInfo.getFechacalfin()).toString();
 			if(controlEsUltimo > 0) {
 				mensajeProgramacionError = mensajeProgramacionError + " No es el ultimo ";
 			}else if(controlGuardia > 0) {
@@ -5791,7 +5883,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info(new String[] { "*INICIO generacion",
 						guardia.getNombre() + " (" + fechaInicio1 + " - " + fechaFin1 + ")" });
 				//TODO(L) Podria hacer aqui la distinción entre calendarios programados y carga masiva?
-				if (porGrupos.equals("1")) {
+				if ("1".equals(porGrupos)) {
 					calcularMatrizLetradosGuardiaPorGrupos(lDiasASeparar, rotacion);
 				} else {
 					calcularMatrizLetradosGuardia(lDiasASeparar);//(L) arrayPeriodosLetradosSJCS1
@@ -7788,7 +7880,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			GuardiasTurnoItem vGuardia = scsGuardiasturnoExtendsMapper.getGuardia(idGuardia.toString(),
 					idTurno.toString(), idInstitucion.toString());
 			beanGuardia = (GuardiasTurnoItem) vGuardia;
-			porGrupos = beanGuardia.getPorGrupos().equals("1");// true
+			porGrupos = "1".equals(beanGuardia.getPorGrupos());// true
 			idOrdenacionColas = beanGuardia.getIdOrdenacionColas();
 			idPersonaUltimo = beanGuardia.getIdPersona_Ultimo();
 			idGrupoGuardiaUltimo = beanGuardia.getIdGrupoGuardiaColegiado_Ultimo();
@@ -11295,164 +11387,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 			iterLetrados = arrayLetrados.iterator();
 			while (iterLetrados.hasNext()) {
 				letrado = (LetradoInscripcionItem) iterLetrados.next();
-				String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
-				String NEW_FORMAT = "dd/MM/yyyy";
-				// Paso1: inserto un registro cada guardia:
-				beanCabeceraGuardias = new ScsCabeceraguardias();
-				// beanCabeceraGuardias.setIdinstitucion(letrado.getIdinstitucion());
-
-				if (letrado.getInscripcionGuardia() != null) {
-					beanCabeceraGuardias
-							.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
-					// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
-					beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
-					// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
-					beanCabeceraGuardias.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
-					// beanCabeceraGuardias.setIdpersona(letrado.getIdpersona());
-					beanCabeceraGuardias.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
-				} else if (letrado.getInscripcionTurno() != null) {
-					beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
-					// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
-					beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
-					// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
-					beanCabeceraGuardias.setIdguardia(null);
-					// beanCabeceraGuardias.setIdpersona(letrado.getIdpersona());
-					beanCabeceraGuardias.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
-				}
-
-				beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
-				// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
-				beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
-				// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
-				beanCabeceraGuardias.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
-				beanCabeceraGuardias.setIdcalendarioguardias(idCalendarioGuardias);
-				beanCabeceraGuardias.setFechainicio(new Date(fechaInicioPeriodo));
-				String fechaInicioPSt = fechaInicioPeriodo;
-				beanCabeceraGuardias.setFechaFin(new Date(fechaFinPeriodo));
-				String fechaFinPSt = fechaFinPeriodo;
-				beanCabeceraGuardias.setFechamodificacion(new Date());
-				SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-				String today = formatter.format(new Date());
-				beanCabeceraGuardias.setComensustitucion(mensaje);
-				beanCabeceraGuardias.setSustituto("0");
-				beanCabeceraGuardias.setUsumodificacion(usuModificacion1);
-				beanCabeceraGuardias.setFacturado("");
-				beanCabeceraGuardias.setPagado("");
-				String fechaAlta = null;
-				if (beanCabeceraGuardias.getFechaalta() != null) {
-					fechaAlta = formatter.format(beanCabeceraGuardias.getFechaalta());
-				}
-
-				// RGG cambio para cabeceras de guardia validadas
-				// String valorValidar =
-				// getValor(idInstitucion1.toString(),"SCS","VALIDAR_VOLANTE","N");
-				ScsGuardiasturnoKey key = new ScsGuardiasturnoKey();
-				if (letrado.getInscripcionGuardia() != null) {
-					key.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
-					key.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
-					key.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
-				} else if (letrado.getInscripcionTurno() != null) {
-					key.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
-					key.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
-					key.setIdguardia(null);
-				}
-				ScsGuardiasturno gt = scsGuardiasTurnoMapper.selectByPrimaryKey(key);
-				String valorValidar = gt.getRequeridavalidacion();
-//					if (valorValidar.equals("N")) {
-				if (valorValidar != null && valorValidar.equals("0")) {
-					// directamente quedan validados
-					beanCabeceraGuardias.setValidado("1");// true
-					beanCabeceraGuardias.setFechaalta(new Date());
-				} else {
-					// quedan pendientes de validacion
-					beanCabeceraGuardias.setValidado("0");// false
-				}
-
-				beanCabeceraGuardias.setFechaalta(new Date());
-				beanCabeceraGuardias.setUsualta(new Integer(usuModificacion1));
-				beanCabeceraGuardias.setPosicion(letrado.getPosicion().shortValue());
-				if (letrado.getNumeroGrupo() != null && !letrado.getNumeroGrupo().equals("")) {
-					beanCabeceraGuardias.setNumerogrupo(Integer.parseInt(letrado.getNumeroGrupo()));
-				}
-
-				// Se comprueba si para ese periodo existe una guardia para el letrado
-				if (validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(),
-						beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(),
-						beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo))
-					throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
-
-				if (letrado.getInscripcionGuardia() != null) {
-					scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias, fechaInicioPSt, fechaFinPSt, today,
-							letrado.getInscripcionGuardia().getIdInstitucion(),
-							letrado.getInscripcionGuardia().getIdturno(),
-							letrado.getInscripcionGuardia().getIdGuardia(),
-							letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
-				} else if (letrado.getInscripcionTurno() != null) {
-					scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias, fechaInicioPSt, fechaFinPSt, today,
-							letrado.getInscripcionTurno().getIdinstitucion().toString(),
-							letrado.getInscripcionTurno().getIdturno().toString(), null,
-							letrado.getInscripcionTurno().getIdpersona().toString(), fechaAlta);
-				} else {
-					scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias, fechaInicioPSt, fechaFinPSt, today,
-							letrado.getInscripcionGuardia().getIdInstitucion(),
-							letrado.getInscripcionGuardia().getIdturno(),
-							letrado.getInscripcionGuardia().getIdGuardia(),
-							letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
-				}
-				// Paso2: inserto un registro por dia de guardia en cada guardia:
-				iter = alDiasPeriodo.iterator();
-				while (iter.hasNext()) {
-					fechaPeriodo = (String) iter.next();
-
-					beanGuardiasColegiado = new ScsGuardiascolegiado();
-					if (letrado.getInscripcionGuardia() != null) {
-						beanGuardiasColegiado
-								.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
-						beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
-						beanGuardiasColegiado.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
-						beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
-					} else if (letrado.getInscripcionTurno() != null) {
-						beanGuardiasColegiado
-								.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
-						beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
-						beanGuardiasColegiado.setIdguardia(null);
-						beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
-					}
-
-					String NEW_FORMAT2 = "yyyy-MM-dd HH:mm:ss";
-					String OLD_FORMAT2 = "dd/MM/yyyy";
-//						beanGuardiasColegiado.setIdinstitucion(letrado.getIdinstitucion());
-//						beanGuardiasColegiado.setIdturno(letrado.getIdturno());
-//						beanGuardiasColegiado.setIdguardia(letrado.getIdguardia());
-//						beanGuardiasColegiado.setIdpersona(letrado.getIdpersona());
-					beanGuardiasColegiado.setFechainicio(new Date(fechaInicioPeriodo));
-					fechaInicioPSt = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, fechaInicioPeriodo);
-					beanGuardiasColegiado.setFechafin(new Date(fechaPeriodo));
-					fechaFinPSt = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, fechaPeriodo);
-					// Duracion segun tipoDias MES, SEMANA, QUINCENA, DIAS
-					int duracion = convertirUnidadesDuracion(beanGuardiasTurno1.getTipodiasGuardia());
-					// beanGuardiasColegiado.setDiasguardia(new
-					// Long(beanGuardiasTurno1.getDiasGuardia().longValue()));
-					beanGuardiasColegiado.setDiasguardia(new Long(duracion));
-					beanGuardiasColegiado.setDiasacobrar(new Long(beanGuardiasTurno1.getDiasPagados().longValue()));
-					beanGuardiasColegiado.setFechamodificacion(new Date());
-					today = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, formatter.format(new Date()));
-					beanGuardiasColegiado.setUsumodificacion(usuModificacion1);
-					beanGuardiasColegiado.setReserva("N");
-					beanGuardiasColegiado.setObservaciones("-");
-					beanGuardiasColegiado.setFacturado("N");
-					beanGuardiasColegiado.setPagado("N");
-					beanGuardiasColegiado.setIdfacturacion(null);
-					scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
-							today); // generado					
-					try {
-						beanGuardiasColegiado.setFechainicio(new SimpleDateFormat("yyyy-MM-dd").parse(fechaInicioPSt));
-						beanGuardiasColegiado.setFechafin(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFinPSt));
-						this.triggerGuardiaColegiadoAID(beanGuardiasColegiado, 1);
-					} catch (Exception e) {
-						LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
-					}					
-				}
+				crearCabecerasGuardiaComun(idCalendarioGuardias, mensaje, fechaInicioPeriodo, fechaFinPeriodo, letrado,
+						alDiasPeriodo, "Calendarios", null,null,null);
 			}
 		}
 
@@ -11473,6 +11409,226 @@ public class GuardiasServiceImpl implements GuardiasService {
 		mapLog11.put("","");
 		listaDatosExcelGeneracionCalendarios.add(mapLog11);
 
+	}
+
+	int crearCabecerasGuardiaComun(Integer idCalendarioGuardias, String mensaje, String fechaInicioPeriodo,
+			String fechaFinPeriodo, LetradoInscripcionItem letrado, ArrayList alDiasPeriodo, String origen,TarjetaAsistenciaResponseItem tarjetaAsistenciaResponseItem,
+			ScsCabeceraguardias scsCabeceraGuardias, List<ScsGuardiascolegiado> guardiascolegiados) throws Exception {
+		ScsCabeceraguardias beanCabeceraGuardias;
+		beanCabeceraGuardias = new ScsCabeceraguardias();
+		if(origen.equalsIgnoreCase("Calendarios")) {
+			Iterator iter;
+			String fechaPeriodo;
+			
+			ScsGuardiascolegiado beanGuardiasColegiado;
+			String OLD_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+			String NEW_FORMAT = "dd/MM/yyyy";
+			// Paso1: inserto un registro cada guardia:
+			
+			// beanCabeceraGuardias.setIdinstitucion(letrado.getIdinstitucion());
+
+			if (letrado.getInscripcionGuardia() != null) {
+				beanCabeceraGuardias
+						.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+				// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
+				beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
+				// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
+				beanCabeceraGuardias.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
+				// beanCabeceraGuardias.setIdpersona(letrado.getIdpersona());
+				beanCabeceraGuardias.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
+			} else if (letrado.getInscripcionTurno() != null) {
+				beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
+				// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
+				beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
+				// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
+				beanCabeceraGuardias.setIdguardia(null);
+				// beanCabeceraGuardias.setIdpersona(letrado.getIdpersona());
+				beanCabeceraGuardias.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
+			}
+
+			beanCabeceraGuardias.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+			// beanCabeceraGuardias.setIdturno(letrado.getIdturno());
+			beanCabeceraGuardias.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
+			// beanCabeceraGuardias.setIdguardia(letrado.getIdguardia());
+			beanCabeceraGuardias.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
+			beanCabeceraGuardias.setIdcalendarioguardias(idCalendarioGuardias);
+			beanCabeceraGuardias.setFechainicio(new Date(fechaInicioPeriodo));
+			String fechaInicioPSt = fechaInicioPeriodo;
+			beanCabeceraGuardias.setFechaFin(new Date(fechaFinPeriodo));
+			String fechaFinPSt = fechaFinPeriodo;
+			beanCabeceraGuardias.setFechamodificacion(new Date());
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+			String today = formatter.format(new Date());
+			beanCabeceraGuardias.setComensustitucion(mensaje);
+			beanCabeceraGuardias.setSustituto("0");
+			beanCabeceraGuardias.setUsumodificacion(usuModificacion1);
+			beanCabeceraGuardias.setFacturado("");
+			beanCabeceraGuardias.setPagado("");
+			String fechaAlta = null;
+			if (beanCabeceraGuardias.getFechaalta() != null) {
+				fechaAlta = formatter.format(beanCabeceraGuardias.getFechaalta());
+			}
+
+			// RGG cambio para cabeceras de guardia validadas
+			// String valorValidar =
+			// getValor(idInstitucion1.toString(),"SCS","VALIDAR_VOLANTE","N");
+			ScsGuardiasturnoKey key = new ScsGuardiasturnoKey();
+			if (letrado.getInscripcionGuardia() != null) {
+				key.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+				key.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
+				key.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
+			} else if (letrado.getInscripcionTurno() != null) {
+				key.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
+				key.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
+				key.setIdguardia(null);
+			}
+			ScsGuardiasturno gt = scsGuardiasTurnoMapper.selectByPrimaryKey(key);
+			String valorValidar = gt.getRequeridavalidacion();
+//						if (valorValidar.equals("N")) {
+			if (valorValidar != null && valorValidar.equals("0")) {
+				// directamente quedan validados
+				beanCabeceraGuardias.setValidado("1");// true
+				beanCabeceraGuardias.setFechaalta(new Date());
+			} else {
+				// quedan pendientes de validacion
+				beanCabeceraGuardias.setValidado("0");// false
+			}
+
+			beanCabeceraGuardias.setFechaalta(new Date());
+			beanCabeceraGuardias.setUsualta(new Integer(usuModificacion1));
+			beanCabeceraGuardias.setPosicion(letrado.getPosicion().shortValue());
+			if (letrado.getNumeroGrupo() != null && !letrado.getNumeroGrupo().equals("")) {
+				beanCabeceraGuardias.setNumerogrupo(Integer.parseInt(letrado.getNumeroGrupo()));
+			}
+
+			// Se comprueba si para ese periodo existe una guardia para el letrado
+			if (validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(),
+					beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(),
+					beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo))
+				throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
+
+			if (letrado.getInscripcionGuardia() != null) {
+				scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias, fechaInicioPSt, fechaFinPSt, today,
+						letrado.getInscripcionGuardia().getIdInstitucion(),
+						letrado.getInscripcionGuardia().getIdturno(),
+						letrado.getInscripcionGuardia().getIdGuardia(),
+						letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
+			} else if (letrado.getInscripcionTurno() != null) {
+				scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias, fechaInicioPSt, fechaFinPSt, today,
+						letrado.getInscripcionTurno().getIdinstitucion().toString(),
+						letrado.getInscripcionTurno().getIdturno().toString(), null,
+						letrado.getInscripcionTurno().getIdpersona().toString(), fechaAlta);
+			} else {
+				scsCabeceraguardiasMapper.insertSelective2(beanCabeceraGuardias, fechaInicioPSt, fechaFinPSt, today,
+						letrado.getInscripcionGuardia().getIdInstitucion(),
+						letrado.getInscripcionGuardia().getIdturno(),
+						letrado.getInscripcionGuardia().getIdGuardia(),
+						letrado.getInscripcionGuardia().getIdPersona(), fechaAlta);
+			}
+			// Paso2: inserto un registro por dia de guardia en cada guardia:
+			iter = alDiasPeriodo.iterator();
+			while (iter.hasNext()) {
+				fechaPeriodo = (String) iter.next();
+
+				beanGuardiasColegiado = new ScsGuardiascolegiado();
+				if (letrado.getInscripcionGuardia() != null) {
+					beanGuardiasColegiado
+							.setIdinstitucion(new Short(letrado.getInscripcionGuardia().getIdInstitucion()));
+					beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionGuardia().getIdturno()));
+					beanGuardiasColegiado.setIdguardia(new Integer(letrado.getInscripcionGuardia().getIdGuardia()));
+					beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionGuardia().getIdPersona()));
+				} else if (letrado.getInscripcionTurno() != null) {
+					beanGuardiasColegiado
+							.setIdinstitucion(new Short(letrado.getInscripcionTurno().getIdinstitucion()));
+					beanGuardiasColegiado.setIdturno(new Integer(letrado.getInscripcionTurno().getIdturno()));
+					beanGuardiasColegiado.setIdguardia(null);
+					beanGuardiasColegiado.setIdpersona(new Long(letrado.getInscripcionTurno().getIdpersona()));
+				}
+
+				String NEW_FORMAT2 = "yyyy-MM-dd HH:mm:ss";
+				String OLD_FORMAT2 = "dd/MM/yyyy";
+//							beanGuardiasColegiado.setIdinstitucion(letrado.getIdinstitucion());
+//							beanGuardiasColegiado.setIdturno(letrado.getIdturno());
+//							beanGuardiasColegiado.setIdguardia(letrado.getIdguardia());
+//							beanGuardiasColegiado.setIdpersona(letrado.getIdpersona());
+				beanGuardiasColegiado.setFechainicio(new Date(fechaInicioPeriodo));
+				fechaInicioPSt = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, fechaInicioPeriodo);
+				beanGuardiasColegiado.setFechafin(new Date(fechaPeriodo));
+				fechaFinPSt = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, fechaPeriodo);
+				// Duracion segun tipoDias MES, SEMANA, QUINCENA, DIAS
+				int duracion = convertirUnidadesDuracion(beanGuardiasTurno1.getTipodiasGuardia());
+				// beanGuardiasColegiado.setDiasguardia(new
+				// Long(beanGuardiasTurno1.getDiasGuardia().longValue()));
+				beanGuardiasColegiado.setDiasguardia(new Long(duracion));
+				beanGuardiasColegiado.setDiasacobrar(new Long(beanGuardiasTurno1.getDiasPagados().longValue()));
+				beanGuardiasColegiado.setFechamodificacion(new Date());
+				today = changeDateFormat(OLD_FORMAT2, NEW_FORMAT2, formatter.format(new Date()));
+				beanGuardiasColegiado.setUsumodificacion(usuModificacion1);
+				beanGuardiasColegiado.setReserva("N");
+				beanGuardiasColegiado.setObservaciones("-");
+				beanGuardiasColegiado.setFacturado("N");
+				beanGuardiasColegiado.setPagado("N");
+				beanGuardiasColegiado.setIdfacturacion(null);
+				scsGuardiascolegiadoMapper.insertSelective2(beanGuardiasColegiado, fechaInicioPSt, fechaFinPSt,
+						today); // generado					
+				try {
+					beanGuardiasColegiado.setFechainicio(new SimpleDateFormat("yyyy-MM-dd").parse(fechaInicioPSt));
+					beanGuardiasColegiado.setFechafin(new SimpleDateFormat("yyyy-MM-dd").parse(fechaFinPSt));
+					this.triggerGuardiaColegiadoAID(beanGuardiasColegiado, 1);
+				} catch (Exception e) {
+					LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+				}					
+			}
+		}else if(origen.equalsIgnoreCase("Asistencias")) {
+			scsCabeceraGuardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+			scsCabeceraGuardias.setPosicion((short) (scsCabeceraGuardias.getPosicion().shortValue() + 1));
+			scsCabeceraGuardias.setFechamodificacion(new Date());
+			// scsCabeceraguardias.setValidado("1");
+			// scsCabeceraguardias.setFechavalidacion(new Date());
+			scsCabeceraGuardias.setUsumodificacion(0);
+
+			return scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraGuardias);
+		}else if (origen.equalsIgnoreCase("AsistenciasExpres")) {
+			// Recorremos para setear el idPersona del colegiado que tentemos que
+			// insertar(el que hace la asistencia)
+			for (ScsGuardiascolegiado scsGuardiascolegiado : guardiascolegiados) {
+				// Para cada guardia colegiado accedemos a sus cabeceras de guardia, a las que
+				// luego habra que setear del idPersona y ponerlo en la ultima posicion(por eso
+				// se ha obtenido el ultimo de la fila)
+
+				scsGuardiascolegiado.setObservaciones("Inclusión en guardia por refuerzo");
+				scsGuardiascolegiado.setFacturado("N");
+				scsGuardiascolegiado.setIdfacturacion(null);
+				scsGuardiascolegiado.setPagado("N");
+				scsGuardiascolegiado
+						.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+				scsGuardiascolegiado.setFechamodificacion(new Date());
+				scsGuardiascolegiado.setUsumodificacion(0);
+
+			}
+
+			scsCabeceraGuardias.setIdpersona(Long.valueOf(tarjetaAsistenciaResponseItem.getIdLetradoGuardia()));
+			scsCabeceraGuardias.setPosicion((short) (scsCabeceraGuardias.getPosicion().shortValue() + 1));
+			scsCabeceraGuardias.setFechamodificacion(new Date());
+//			scsCabeceraguardias.setValidado("1");
+//			scsCabeceraguardias.setFechavalidacion(new Date());
+			scsCabeceraGuardias.setUsumodificacion(0);
+			scsCabeceraGuardias.setFacturado(null);
+			scsCabeceraGuardias.setIdfacturacion(null);
+			scsCabeceraGuardias.setComensustitucion("Inclusión en guardia por refuerzo");
+			int affectedRows = scsCabeceraguardiasExtendsMapper.insertSelective(scsCabeceraGuardias);
+			guardiascolegiados.stream().forEach(scsGuardiascolegiado -> {
+				scsGuardiascolegiadoExtendsMapper.insertSelective(scsGuardiascolegiado);
+				try {
+					triggerGuardiaColegiadoAID(scsGuardiascolegiado, 1);
+				} catch (Exception e) {
+					LOGGER.info("No se ha podido ejecutar el triggerGuardiaColegiadoAID - accion 1 (insert)");
+				}
+			});
+			return affectedRows;
+		}
+		return 0;
+		
 	}
 	
 	private void almacenarAsignacionGuardia3(GuardiasCalendarioItem guardiasCalendarioItem,  GuardiasTurnoItem guardiasTurnoItem, ArrayList arrayLetrados, //(L) El letrado y el periodo(getPeriodoGuardias o periodoDiasGuardia) van en arrayLetrados
@@ -11596,10 +11752,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.info("Se comprueba si para ese periodo existe una guardia para el letrado");
 				// Se comprueba si para ese periodo existe una guardia para el letrado
 				try {
-					if (validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(),
-							beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(),
-							beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo)) // TODO: (L) 
-						throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
+					if(separarGuardia) {
+						if (validaGuardiaLetradoPeriodo(beanCabeceraGuardias.getIdinstitucion(),
+								beanCabeceraGuardias.getIdturno(), beanCabeceraGuardias.getIdguardia(),
+								beanCabeceraGuardias.getIdpersona(), fechaInicioPeriodo, fechaFinPeriodo)) // TODO: (L) 
+							throw new Exception("gratuita.calendarios.guardias.mensaje.existe");
+					}
+					
 					
 					// Cuando en el front el checkbox esta activo, en el back se guarda como "0"
 					//boolean separarGuardia = separarGuardias(guardiasTurnoItem);
@@ -12784,7 +12943,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 					if (guardiasTurno != null && guardiasTurno.size() > 0) {
 						guardiasTurno = guardiasTurno.stream().map(it -> {
-							it.setTipoDia(("Selección: Labor. " + it.getSeleccionLaborables() + ", Fest. "
+							it.setTipoDia((guardiaCol.getCantidadDias() + " días: Labor. " + it.getSeleccionLaborables() + ", Fest. "
 									+ it.getSeleccionFestivos()).replace("null", ""));
 							return it;
 						}).collect(Collectors.toList());

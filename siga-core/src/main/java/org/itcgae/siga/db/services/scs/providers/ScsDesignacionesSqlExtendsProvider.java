@@ -187,7 +187,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		try {
 			sql =   "select distinct F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) AS validada , des.art27, des.idpretension,"
 						+ " F_SIGA_GETRECURSO(SP.DESCRIPCION, 1) AS procedimiento, SP2.nombre as modulo, SP2.IDPROCEDIMIENTO as IDMODULO, des.idjuzgado, des.FECHAOFICIOJUZGADO, des.DELITOS, des.FECHARECEPCIONCOLEGIO, des.OBSERVACIONES, des.FECHAJUICIO, des.DEFENSAJURIDICA,"
-						+ " des.nig, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
+						+ " des.nig, des.resumenasunto, des.numprocedimiento,des.idprocedimiento, des.estado estado, des.anio anio, des.numero numero, des.IDTIPODESIGNACOLEGIO, des.fechaalta fechaalta,"
 						+ " des.fechaentrada fechaentrada,des.idturno idturno, des.codigo codigo, des.sufijo sufijo, des.fechafin, des.idinstitucion idinstitucion,"
 						+ "  des.fechaestado fechaestado,juzgado.nombre as nombrejuzgado,  turno.nombre,";
 			sql +=  " colegiado.ncolegiado, persona.idpersona, persona.nombre as nombrepersona, persona.APELLIDOS1 as apellido1persona, persona.APELLIDOS2 as apellido2persona";
@@ -1226,6 +1226,488 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		return sql.toString();
 	}
 	
+	public String busquedaTotalRegistrosDesignaciones(DesignaItem designaItem, Short idInstitucion) throws Exception {
+		SQL sql = new SQL();
+		
+		SQL sqlDefendidos = new SQL();
+
+		Hashtable codigosBind = new Hashtable();
+		int contador = 0;
+		// Acceso a BBDD
+		
+		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
+		sqlDefendidos.FROM("scs_defendidosdesigna ded");
+		sqlDefendidos.JOIN("scs_personajg per ON ded.idinstitucion = per.idinstitucion	AND ded.idpersona = per.idpersona");
+		sqlDefendidos.WHERE("calidad IS NOT NULL");
+		sqlDefendidos.WHERE("ded.anio = des.anio");
+		sqlDefendidos.WHERE("ded.numero = des.numero");
+		sqlDefendidos.WHERE("ded.idinstitucion = des.idinstitucion");
+		sqlDefendidos.WHERE("ded.idturno = des.idturno");
+		sqlDefendidos.WHERE("rownum < 2");
+
+		// aalg. INC_06694_SIGA. Se modifica la query para hacerla más eficiente
+		try {
+			sql.SELECT_DISTINCT("COUNT(*) AS TOTAL");
+			
+			sql.FROM("scs_designa des"); 
+
+			boolean tiene_juzg = designaItem.getIdJuzgadoActu() != null
+					&& designaItem.getIdJuzgadoActu().length >0;
+			boolean tiene_asunto = designaItem.getAsunto() != null && !designaItem.getAsunto().equalsIgnoreCase("");
+			boolean tiene_acreditacion = designaItem.getIdAcreditacion() != null
+					&& (designaItem.getIdAcreditacion().length != 0);
+			boolean tiene_modulo = designaItem.getIdModuloActuaciones() != null && designaItem.getIdModuloActuaciones().length >0;
+			boolean tiene_documentacion = designaItem.getDocumentacionActuacion()!= null && designaItem.getDocumentacionActuacion().length() >0;
+			boolean tiene_procActuacion = designaItem.getIdProcedimientoActuaciones()!=null && designaItem.getIdProcedimientoActuaciones().length>0;
+			boolean tiene_fechaJustificacionDesde = designaItem.getFechaJustificacionDesde() != null
+					&& designaItem.getFechaJustificacionDesde().toString() != null
+					&& !designaItem.getFechaJustificacionDesde().toString().equalsIgnoreCase("");
+			boolean tiene_fechaJustificacionHasta = designaItem.getFechaJustificacionHasta() != null
+					&& designaItem.getFechaJustificacionHasta().toString() != null
+					&& !designaItem.getFechaJustificacionHasta().toString().equalsIgnoreCase("");
+			boolean tiene_origen = designaItem.getIdOrigen() != null && !designaItem.getIdOrigen().equalsIgnoreCase("");
+			boolean tiene_actuacionesV = designaItem.getIdActuacionesV() != null
+					&& !designaItem.getIdActuacionesV().equalsIgnoreCase("");
+			boolean tiene_moduloDesignacion = (designaItem.getIdModulos() != null
+					&& designaItem.getIdModulos().length > 0);
+			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimientos() != null
+					&& designaItem.getIdProcedimientos().length > 0);
+
+			if(tiene_modulo||tiene_documentacion||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta||tiene_juzg||tiene_acreditacion||tiene_origen) {
+				sql.JOIN("scs_actuaciondesigna act ON act.idturno = des.idturno" +
+												" and act.idinstitucion = des.idinstitucion " +
+												" and act.anio = des.anio " +
+												" and act.numero = des.numero ");
+			}
+			
+			boolean tiene_interesado = false;
+			if ((designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase(""))
+					|| (designaItem.getNombreInteresado() != null
+							&& !designaItem.getNombreInteresado().equalsIgnoreCase(""))
+					|| (designaItem.getApellidosInteresado() != null
+							&& !designaItem.getApellidosInteresado().equalsIgnoreCase(""))) {
+				tiene_interesado = true;
+			}
+
+
+//			if (tienePretensionesDesignacion) {
+//				sql.JOIN("SCS_PRETENSION pret ON des.idinstitucion = pret.idinstitucion AND des.idpretension = pret.idpretension");
+//			}
+
+			if (idInstitucion != null) {
+				sql.WHERE("des.IDINSTITUCION = " + idInstitucion );
+			}
+
+			
+
+			//if (designaItem.getNumColegiado() != null && !(String.valueOf(designaItem.getNumColegiado())).equals("")) {
+				
+
+//				sql += " and l.idpersona = " + String.valueOf(designaItem.getNumColegiado()) + " ";
+			//}
+			if (designaItem.getNumColegiado() != null && !(String.valueOf(designaItem.getNumColegiado())).equals("")) {
+				sql.LEFT_OUTER_JOIN("scs_designasletrado l ON l.anio = des.anio" + 
+														" AND l.numero = des.numero" + 
+														" AND l.idinstitucion = des.idinstitucion" + 
+														" AND l.idturno = des.idturno"); 
+				sql.LEFT_OUTER_JOIN("cen_colegiado colegiado ON colegiado.idinstitucion = l.idinstitucion" + 
+														" AND colegiado.idpersona = l.idpersona"); 
+				sql.LEFT_OUTER_JOIN("cen_persona persona ON l.idpersona = persona.idpersona");
+				sql.WHERE(" (l.Fechadesigna is null or" +
+							" l.Fechadesigna = (SELECT MAX(LET2.Fechadesigna) FROM SCS_DESIGNASLETRADO LET2" +
+												" WHERE l.IDINSTITUCION = LET2.IDINSTITUCION AND l.IDTURNO = LET2.IDTURNO" +
+												" AND l.ANIO = LET2.ANIO AND l.NUMERO = LET2.NUMERO" +
+												" AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE)))");
+				sql.WHERE(" colegiado.ncolegiado = " + String.valueOf(designaItem.getNumColegiado()));
+			}
+
+			if (designaItem.getIdTurnos() != null
+					&& (String.valueOf(designaItem.getIdTurnos()) != "-1" && designaItem.getIdTurnos().length != 0)
+					&& !String.valueOf(designaItem.getIdTurnos()).equals("")) {
+				
+				if (designaItem.getIdTurnos().length == 1) {
+					sql.WHERE("des.idTurno = " + designaItem.getIdTurnos()[0]);
+				} else {
+					String turnoIN = "";
+					for (int i = 0; i < designaItem.getIdTurnos().length; i++) {
+						String turno = designaItem.getIdTurnos()[i];
+						if (i == designaItem.getIdTurnos().length - 1) {
+							turnoIN = turnoIN + turno;
+						} else {
+							turnoIN = turnoIN + turno + " ,";
+						}
+					}
+					sql.WHERE("des.idTurno IN (" + turnoIN + " )");
+				}
+			}
+
+			if (designaItem.getAno() != 0 && String.valueOf(designaItem.getAno()) != null
+					&& !String.valueOf(designaItem.getAno()).equalsIgnoreCase("")) {
+
+				if (String.valueOf(designaItem.getAno()).indexOf('*') >= 0) {
+
+					contador++;
+					sql.WHERE(prepararSentenciaCompletaBind(String.valueOf(designaItem.getAno()).trim(),
+							"des.anio", contador, codigosBind));
+
+				} else if (designaItem.getAno() != 0) {
+					contador++;
+					sql.WHERE("des.anio = " + String.valueOf(designaItem.getAno()));
+				}
+			}
+
+			if (designaItem.getCodigo() != null && !designaItem.getCodigo().equalsIgnoreCase("")) {
+
+				if ((designaItem.getCodigo().indexOf(',') != -1) && (designaItem.getCodigo().indexOf('-') == -1)) {
+					String[] parts = designaItem.getCodigo().split(",");
+					String whereCodigo = " (des.codigo = ";
+					for (int i = 0; i < parts.length; i++) {
+						if (i == parts.length - 1) {
+							whereCodigo += parts[i].trim() + ")";
+						} else {
+							whereCodigo += parts[i].trim() + " OR des.codigo = ";
+						}
+					}
+					sql.WHERE(whereCodigo);
+				} else if ((designaItem.getCodigo().indexOf('-') != -1)
+						&& (designaItem.getCodigo().indexOf(',') == -1)) {
+					String[] parts = designaItem.getCodigo().split("-");
+					if (parts.length == 2) {
+						sql.WHERE(" des.codigo BETWEEN " + parts[0] + " AND " + parts[1]);
+					}
+				} else if ((designaItem.getCodigo().indexOf('-') == -1)
+						&& (designaItem.getCodigo().indexOf(',') == -1)) {
+					sql.WHERE(" ltrim(des.codigo,'0') = ltrim(" + designaItem.getCodigo() + ",'0')");
+				}
+			}
+			if (designaItem.getIdJuzgados() != null && designaItem.getIdJuzgados().length > 0) {
+				if (designaItem.getIdJuzgados().length == 1) {
+					sql.WHERE(" des.idjuzgado = " + designaItem.getIdJuzgados()[0]);
+				} else {
+					String juzgadoIN = "";
+					for (int i = 0; i < designaItem.getIdJuzgados().length; i++) {
+						String juzgado = designaItem.getIdJuzgados()[i];
+						if (i == designaItem.getIdJuzgados().length - 1) {
+							juzgadoIN = juzgadoIN + juzgado;
+						} else {
+							juzgadoIN = juzgadoIN + juzgado + " ,";
+						}
+					}
+					sql.WHERE(" des.idjuzgado IN (" + juzgadoIN + " )");
+				}
+			}
+			
+			if (designaItem.getIdModulos() != null && designaItem.getIdModulos().length > 0) {
+				if (designaItem.getIdModulos().length == 1) {
+					sql.WHERE(" des.IDPROCEDIMIENTO = '" + designaItem.getIdModulos()[0] + "'");
+				} else {
+					String estadoIN = "";
+					for (int i = 0; i < designaItem.getIdModulos().length; i++) {
+						String estado = designaItem.getIdModulos()[i];
+						if (i == designaItem.getIdModulos().length - 1) {
+							estadoIN = estadoIN + "'" + estado + "'";
+						} else {
+							estadoIN = estadoIN + "'" + estado + "'" + " ,";
+						}
+					}
+					sql.WHERE(" des.IDPROCEDIMIENTO IN (" + estadoIN + " )");
+				}
+
+			}
+			
+			if (tiene_asunto) {
+				contador++;
+				codigosBind.put(new Integer(contador), designaItem.getAsunto().trim());
+				sql.WHERE(" regexp_like(des.resumenasunto,'" + designaItem.getAsunto() + "')");
+			}
+
+			if (designaItem.getIdModuloActuaciones() != null && designaItem.getIdModuloActuaciones().length > 0) {
+				if (designaItem.getIdModuloActuaciones().length == 1) {
+					sql.WHERE(" act.IDPROCEDIMIENTO = '" + designaItem.getIdModuloActuaciones()[0] + "'");
+				} else {
+					String estadoIN = "";
+					for (int i = 0; i < designaItem.getIdModuloActuaciones().length; i++) {
+						String estado = designaItem.getIdModuloActuaciones()[i];
+						if (i == designaItem.getIdModuloActuaciones().length - 1) {
+							estadoIN = estadoIN + "'" + estado + "'";
+						} else {
+							estadoIN = estadoIN + "'" + estado + "'" + " ,";
+						}
+					}
+					sql.WHERE(" act.IDPROCEDIMIENTO IN (" + estadoIN + " )");
+				}
+
+			}
+
+			if (designaItem.getEstados() != null && designaItem.getEstados().length > 0) {
+				if (designaItem.getEstados().length == 1) {
+					sql.WHERE("des.estado = '" + designaItem.getEstados()[0] + "'");
+				} else {
+					String estadoIN = "";
+					for (int i = 0; i < designaItem.getEstados().length; i++) {
+						String estado = designaItem.getEstados()[i];
+						if (i == designaItem.getEstados().length - 1) {
+							estadoIN = estadoIN + "'" + estado + "'";
+						} else {
+							estadoIN = estadoIN + "'" + estado + "'" + " ,";
+						}
+					}
+					sql.WHERE(" des.estado IN (" + estadoIN + " )");
+				}
+
+			}
+			if (designaItem.getNumProcedimiento() != null && !designaItem.getNumProcedimiento().equalsIgnoreCase("")) {
+				contador++;
+				codigosBind.put(new Integer(contador), designaItem.getNumProcedimiento().trim());
+				sql.WHERE(" regexp_like(des.numprocedimiento,'" + designaItem.getNumProcedimiento() + "') ");
+			}
+			if (designaItem.getNig() != null && !designaItem.getNig().equalsIgnoreCase("")) {
+				contador++;
+				codigosBind.put(new Integer(contador), designaItem.getNig().trim());
+				sql.WHERE(" des.nig = '" + designaItem.getNig() + "'");
+			}
+			if (tienePretensionesDesignacion) {
+				if (designaItem.getIdProcedimientos() != null && designaItem.getIdProcedimientos().length > 0) {
+					if (designaItem.getIdProcedimientos().length == 1) {
+						sql.WHERE("des.IDPRETENSION = '" + designaItem.getIdProcedimientos()[0] + "'");
+					} else {
+						String estadoIN = "";
+						for (int i = 0; i < designaItem.getIdProcedimientos().length; i++) {
+							String estado = designaItem.getIdProcedimientos()[i];
+							if (i == designaItem.getIdProcedimientos().length - 1) {
+								estadoIN = estadoIN + "'" + estado + "'";
+							} else {
+								estadoIN = estadoIN + "'" + estado + "'" + " ,";
+							}
+						}
+						sql.WHERE("des.IDPRETENSION IN (" + estadoIN + " )");
+					}
+
+				}
+			}
+			
+			if(designaItem.getIdActuacionesV()!=null && !designaItem.getIdActuacionesV().trim().isEmpty()){
+				if("SINACTUACIONES".equalsIgnoreCase(designaItem.getIdActuacionesV().trim())){
+					sql.WHERE(" F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO) IS NULL ");
+				}else{
+				    sql.WHERE(" UPPER(F_SIGA_ACTUACIONESDESIG(des.IDINSTITUCION,des.IDTURNO,des.ANIO,des.NUMERO))=UPPER('"+designaItem.getIdActuacionesV()+"')");
+				}
+			}
+
+			if (designaItem.getDocumentacionActuacion() != null
+					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
+				if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("TODAS")) {
+					sql.WHERE("not exists (select 1 from scs_actuaciondesigna act "
+							+ "and act.docjustificacion IS NULL or act.docjustificacion = 0) ");
+				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("ALGUNAS")) {
+					sql.WHERE(" exists (select 1 from scs_actuaciondesigna act "
+							+ "and act.docjustificacion = 1) ");
+				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA")) {
+					sql.WHERE("not exists (select 1 from scs_actuaciondesigna act "
+							+ "and act.docjustificacion = 1) ");
+				}
+			}
+
+			// Mostrar ART 27
+			String mostarArt27 = designaItem.getIdArt27();
+			if (mostarArt27 != null && !mostarArt27.equalsIgnoreCase("") && !mostarArt27.equalsIgnoreCase("T")) {
+				if (mostarArt27.equalsIgnoreCase("S")) {
+					sql.WHERE(" des.art27 = 1");
+				} else if (mostarArt27.equalsIgnoreCase("N")) {
+					sql.WHERE(" des.art27 = 0");
+				}
+			}
+
+			if (designaItem.getIdCalidad() != null && designaItem.getIdCalidad().length > 0) {
+				sql.JOIN("scs_defendidosdesigna defen on defen.anio = des.anio" +
+													" AND defen.numero = des.numero" +
+													" AND defen.idinstitucion = des.idinstitucion" +
+													" AND defen.idturno = des.idturno");
+				if (designaItem.getIdCalidad().length == 1) {
+					sql.WHERE(" defen.idtipoencalidad= " + designaItem.getIdCalidad()[0]);
+				} else {
+					String calidadIN = "";
+					for (int i = 0; i < designaItem.getIdCalidad().length; i++) {
+						String calidad = designaItem.getIdCalidad()[i];
+						if (i == designaItem.getIdCalidad().length - 1) {
+							calidadIN = calidadIN + "'" + calidad + "'";
+						} else {
+							calidadIN = calidadIN + calidad + " ,";
+						}
+					}
+					sql.WHERE(" defen.idtipoencalidad IN (" + calidadIN + " )");
+				}
+
+			}
+
+			if ((designaItem.getFechaEntradaInicio() != null
+					&& !designaItem.getFechaEntradaInicio().toString().equalsIgnoreCase(""))
+					|| (designaItem.getFechaEntradaFin() != null
+							&& !designaItem.getFechaEntradaFin().toString().equalsIgnoreCase(""))) {
+
+				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaEntradaInicio ="";
+				String fechaEntradaFin =""; 
+				if(designaItem.getFechaEntradaInicio()!= null)
+					fechaEntradaInicio = formatter1.format(designaItem.getFechaEntradaInicio());
+				if(designaItem.getFechaEntradaFin()!= null)
+					fechaEntradaFin = formatter1.format(designaItem.getFechaEntradaFin());
+				if(designaItem.getFechaEntradaInicio()!= null && designaItem.getFechaEntradaFin()!= null) {
+					sql.WHERE(" des.fechaentrada between TO_DATE('" + fechaEntradaInicio + "','DD/MM/RRRR') and TO_DATE('" + fechaEntradaFin +"','DD/MM/RRRR') ");
+				}else if(designaItem.getFechaEntradaInicio()!= null) {
+					sql.WHERE(" des.fechaentrada >=  TO_DATE('" + fechaEntradaInicio +"','DD/MM/RRRR') ");
+				}else {
+					sql.WHERE(" des.fechaentrada <=  TO_DATE('" + fechaEntradaFin +"','DD/MM/RRRR') ");
+				}
+				
+
+			}
+			if ((designaItem.getFechaJustificacionDesde() != null
+					&& designaItem.getFechaJustificacionDesde().toString() != null
+					&& !designaItem.getFechaJustificacionDesde().toString().equalsIgnoreCase(""))
+					|| (designaItem.getFechaJustificacionHasta() != null
+							&& designaItem.getFechaJustificacionHasta().toString() != null
+							&& !designaItem.getFechaJustificacionHasta().toString().equalsIgnoreCase(""))) {
+				DateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaJustificacionDesde ="";
+				String fechaJustificacionHasta =""; 
+				if(designaItem.getFechaJustificacionDesde()!= null)
+					fechaJustificacionDesde = formatter1.format(designaItem.getFechaJustificacionDesde());
+				if(designaItem.getFechaJustificacionHasta()!= null)
+					fechaJustificacionHasta = formatter1.format(designaItem.getFechaJustificacionHasta());
+				if(designaItem.getFechaJustificacionDesde()!= null && designaItem.getFechaJustificacionHasta()!= null) {
+					sql.WHERE(" act.fechaJustificacion between TO_DATE('" + fechaJustificacionDesde + "','DD/MM/RRRR') and TO_DATE('" + fechaJustificacionHasta +"','DD/MM/RRRR') ");
+				}else if(designaItem.getFechaJustificacionDesde()!= null) {
+					sql.WHERE(" act.fechaJustificacion >=  TO_DATE('" + fechaJustificacionDesde +"','DD/MM/RRRR') ");
+				}else {
+					sql.WHERE(" act.fechaJustificacion <=  TO_DATE('" + fechaJustificacionHasta +"','DD/MM/RRRR') ");
+				}
+
+			}
+			if (designaItem.getIdTipoDesignaColegios() != null
+					&& (!String.valueOf(designaItem.getIdTipoDesignaColegios()).equalsIgnoreCase(""))
+					&& designaItem.getIdTipoDesignaColegios().length > 0) {
+				if (designaItem.getIdTipoDesignaColegios().length == 1) {
+					sql.WHERE(" des.IDTIPODESIGNACOLEGIO = " + designaItem.getIdTipoDesignaColegios()[0]);
+				} else {
+					String turnoIN = "";
+					for (int i = 0; i < designaItem.getIdTipoDesignaColegios().length; i++) {
+						String turno = designaItem.getIdTipoDesignaColegios()[i];
+						if (i == designaItem.getIdTipoDesignaColegios().length - 1) {
+							turnoIN = turnoIN + turno;
+						} else {
+							turnoIN = turnoIN + turno + " ,";
+						}
+					}
+					sql.WHERE(" des.IDTIPODESIGNACOLEGIO IN (" + turnoIN + " )");
+				}
+			}
+
+			if (tiene_interesado) {
+
+				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
+				}
+				if (designaItem.getNombreInteresado() != null
+						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NOMBRE) like UPPER('%"+designaItem.getNombreInteresado()+"%') AND IDINSTITUCION = "+idInstitucion+"))");
+				}
+				if (designaItem.getApellidosInteresado() != null
+						&& !designaItem.getApellidosInteresado().equalsIgnoreCase("")) {
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.APELLIDO1 || ' ' ||sp.APELLIDO2) LIKE UPPER('%"+designaItem.getApellidosInteresado()+"%') AND sp.IDINSTITUCION = "+idInstitucion+"))");
+				}
+			}
+
+			if (tiene_juzg || tiene_asunto || tiene_acreditacion || tiene_modulo || tiene_fechaJustificacionDesde
+					|| tiene_fechaJustificacionHasta || tiene_origen) {
+				
+				if (tiene_juzg) {
+					String a[] = (String.valueOf(designaItem.getIdJuzgadoActu())).split(",");
+					if (designaItem.getIdJuzgadoActu().length == 1) {
+						sql.WHERE(" act.idjuzgado = " + designaItem.getIdJuzgadoActu()[0]);
+					} else {
+						String turnoIN = "";
+						for (int i = 0; i < designaItem.getIdJuzgadoActu().length; i++) {
+							String turno = designaItem.getIdJuzgadoActu()[i];
+							if (i == designaItem.getIdJuzgadoActu().length - 1) {
+								turnoIN = turnoIN + turno;
+							} else {
+								turnoIN = turnoIN + turno + " ,";
+							}
+						}
+						sql.WHERE(" act.idjuzgado IN (" + turnoIN + " )");
+					}
+				}
+				/*if (tiene_asunto) {
+					sql += " AND des.RESUMENASUNTO = '" + designaItem.getAsunto().trim() + "' ";
+				}*/
+				if (tiene_acreditacion) {
+					if (designaItem.getIdAcreditacion().toString().indexOf(',') != -1) {
+						sql.WHERE(" act.idacreditacion = " + designaItem.getIdAcreditacion()[0]);
+					} else {
+						String turnoIN = "";
+						for (int i = 0; i < designaItem.getIdAcreditacion().length; i++) {
+							String turno = designaItem.getIdAcreditacion()[i];
+
+							if (i == designaItem.getIdAcreditacion().length - 1) {
+								turnoIN = turnoIN + turno;
+							} else {
+								turnoIN = turnoIN + turno + " ,";
+							}
+						}
+						sql.WHERE(" act.idacreditacion IN (" + turnoIN + " )");
+					}
+				}
+
+				if (designaItem.getIdProcedimientoActuaciones() != null
+						&& designaItem.getIdProcedimientoActuaciones().length > 0) {
+					if (designaItem.getIdProcedimientoActuaciones().length == 1) {
+						sql.WHERE(" act.IDPRETENSION = '" + designaItem.getIdProcedimientoActuaciones()[0] + "'");
+					} else {
+						String estadoIN = "";
+						for (int i = 0; i < designaItem.getIdProcedimientoActuaciones().length; i++) {
+							String estado = designaItem.getIdProcedimientoActuaciones()[i];
+							if (i == designaItem.getIdProcedimientoActuaciones().length - 1) {
+								estadoIN = estadoIN + "'" + estado + "'";
+							} else {
+								estadoIN = estadoIN + "'" + estado + "'" + " ,";
+							}
+						}
+						sql.WHERE(" act.IDPRETENSION IN (" + estadoIN + " )");
+					}
+
+				}
+				if (tiene_origen) {
+					if (designaItem.getIdOrigen().equalsIgnoreCase("COLEGIO")) {
+						sql.WHERE(" act.USUCREACION <> ");
+					} else {
+						sql.WHERE(" act.USUCREACION = ");
+					}
+					sql.WHERE("  (SELECT U.IDUSUARIO " + "    FROM CEN_PERSONA P,  ADM_USUARIOS U " + "    WHERE      "
+							+ "       U.NIF = P.NIFCIF " + "       AND U.IDINSTITUCION = act.IDINSTITUCION "
+							+ "       AND P.IDPERSONA = act.IDPERSONACOLEGIADO) ");
+
+				}
+			}
+			// jbd // inc7744 // Cambiamos el order by porque parece que afecta a la query
+			// cuando se busca por colegiado
+			//sql += " order by des.anio desc, des.NUMERO desc";
+			
+			sql.ORDER_BY("des.anio desc, des.codigo desc ");
+			
+			// No utilizamos la clase Paginador para la busqueda de letrados porque al
+			// filtrar por residencia la sql no devolvia bien los
+			// datos que eran de tipo varchar (devolvía n veces el mismo resultado),
+			// utilizamos el paginador PaginadorCaseSensitive
+			// y hacemos a parte el tratamiento de mayusculas y signos de acentuación
+		} catch (Exception e) {
+			throw e;
+		}
+
+		//LOGGER.info("+++++ [SIGA TEST] - query busquedaDesignaciones() --> " + sql.toString());
+		return sql.toString();
+	}
+	
 	public String busquedaDesignacionesFinal(List<String> ids, Short idInstitucion, Integer tamMaximo) throws Exception {
 		SQL sql = new SQL();
 		
@@ -1236,7 +1718,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sqlDefendidos.SELECT("NVL(PER.APELLIDO1, '') || ' ' || NVL(PER.APELLIDO2, '') || ', ' || NVL(PER.NOMBRE, '')");
 		sqlDefendidos.FROM("scs_defendidosdesigna ded");
 		sqlDefendidos.JOIN("scs_personajg per ON ded.idinstitucion = per.idinstitucion	AND ded.idpersona = per.idpersona");
-		sqlDefendidos.WHERE("calidad IS NOT NULL");
+		//sqlDefendidos.WHERE("calidad IS NOT NULL");
 		sqlDefendidos.WHERE("ded.anio = des.anio");
 		sqlDefendidos.WHERE("ded.numero = des.numero");
 		sqlDefendidos.WHERE("ded.idinstitucion = des.idinstitucion");
@@ -2078,7 +2560,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		}else {
-			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO ");
+			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO, DL.IDPERSONA ");
 		
 		}
 		
@@ -2101,6 +2583,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		if(item.getNumEJG()!=null && !item.getNumEJG().isEmpty()) {
 			sql.append(" AND ejg.numejg = "+item.getNumEJG());
+		}
+		if (imprimir) {
+			if(item.isMuestraPendiente()) {
+				sql.append(" AND D.ESTADO <> 'F' ");
+				sql.append(" AND D.ESTADO <> 'A' ");
+	
+			}
 		}
 		
 		if(item.getAnioEJG()!=null && !item.getAnioEJG().isEmpty()) {
@@ -3045,7 +3534,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("FECHAVALIDACION = SYSDATE");
 			sql.SET("USUVALIDACION = '" + usuario.getIdusuario() + "'");
 			
-			if (UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
+			if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getFechaJustificacion())) {
 				sql.SET("FECHAJUSTIFICACION = TO_DATE('" +  actuacionDesignaItem.getFechaJustificacion() + "', 'DD/MM/RRRR')");
 				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
@@ -3371,7 +3860,8 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}else{
 			sql.WHERE("IDJUZGADO = ''");
 		}
-		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");								
+		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		
 		return sql.toString();
 	}
@@ -3823,6 +4313,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.WHERE(" IDGUARDIA IS NULL ");
 		sql.WHERE(" SALTOOCOMPENSACION = 'C' ");
 		sql.WHERE(" FECHACUMPLIMIENTO is NULL ");
+		sql.WHERE(" FECHA_ANULACION is NULL ");
 		sql.WHERE(" FECHA <= SYSDATE ");
 		sql.ORDER_BY("FECHA, IDSALTOSTURNO");
 
@@ -3844,8 +4335,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 							+ " Per.Apellidos1 || Decode(Per.Apellidos2, Null, '', ' ' || Per.Apellidos2) ALFABETICOAPELLIDOS,  Decode(Col.Comunitario, '1', Col.Ncomunitario, Col.Ncolegiado) NUMEROCOLEGIADO, Per.Fechanacimiento FECHANACIMIENTO,"
 							+ "  Ins.Fechavalidacion AS ANTIGUEDADCOLA ");
 
-			sql.FROM(
-					" Scs_Turno              Tur, Cen_Colegiado          Col, Cen_Persona            Per,Scs_Inscripcionturno   Ins");
+            sql.FROM("Scs_Inscripcionturno Ins");    
+            sql.JOIN("Scs_Turno Tur ON ins.IDINSTITUCION = tur.IDINSTITUCION AND ins.IDTURNO = tur.IDTURNO"); 
+            sql.JOIN("Cen_Colegiado Col ON ins.IDINSTITUCION = col.IDINSTITUCION AND ins.IDPERSONA = col.IDPERSONA"); 
+            sql.JOIN("Cen_Persona Per ON col.IDPERSONA = per.IDPERSONA"); 
 			sql.WHERE(" Ins.Fechavalidacion Is Not Null ");
 			sql.WHERE(" Tur.Idinstitucion ='" + idInstitucion + "'");
 			sql.WHERE(" Tur.Idturno ='" + idTurno + "'");
@@ -3884,83 +4377,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("IDTURNO = '" + idTurno + "'");
-
-		return sql.toString();
-	}
-
-	public String marcarSaltoCompensacion(ScsSaltoscompensaciones saltoCompensacion, AdmUsuarios usuario)
-			throws Exception {
-		SQL sql = new SQL();
-
-		try {
-			String s_idinstitucion = saltoCompensacion.getIdinstitucion().toString();
-			String s_idturno = null;
-			if (saltoCompensacion.getIdturno() != null) {
-				s_idturno = saltoCompensacion.getIdturno().toString();
-			}
-			String s_idguardia = null;
-			if (saltoCompensacion.getIdguardia() != null) {
-				s_idguardia = saltoCompensacion.getIdguardia().toString();
-			}
-			String s_idpersona = null;
-			if (saltoCompensacion.getIdpersona() != null) {
-				s_idpersona = saltoCompensacion.getIdpersona().toString();
-			}
-			String s_saltocompensacion = null;
-			if (saltoCompensacion.getSaltoocompensacion() != null) {
-				s_saltocompensacion = saltoCompensacion.getSaltoocompensacion();
-				if (s_saltocompensacion.equals(""))
-					s_saltocompensacion = " ";
-			}
-
-			Format formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			String fechaBBDD2 = formatter.format(saltoCompensacion.getFechacumplimiento());
-
-			sql.UPDATE("SCS_SALTOSCOMPENSACIONES");
-
-			sql.SET("FECHACUMPLIMIENTO = TO_DATE('" + fechaBBDD2 + "' , 'YYYY/MM/DD HH24:MI:SS') ");
-			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
-			sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
-			if (saltoCompensacion.getIdguardia() != null) {
-				sql.SET("IDCALENDARIOGUARDIAS = '" + saltoCompensacion.getIdcalendarioguardias() + "'");
-			}
-			if (saltoCompensacion.getMotivos() != null && !saltoCompensacion.getMotivos().equals("")) {
-
-				sql.SET("MOTIVOS = '" + saltoCompensacion.getMotivos() + "'");
-			}
-
-			sql.WHERE("IDINSTITUCION = '" + s_idinstitucion + "'");
-
-			if (s_idturno != null && !s_idturno.equals("")) {
-				sql.WHERE("IDTURNO = '" + s_idturno + "'");
-
-			}
-			if (s_idguardia != null && !s_idguardia.equals("")) {
-				sql.WHERE("IDGUARDIA = '" + s_idguardia + "'");
-			} else {
-				sql.WHERE("IDGUARDIA IS NULL");
-			}
-
-			if (s_idpersona != null && !s_idpersona.equals("")) {
-				sql.WHERE("IDPERSONA = '" + s_idpersona + "'");
-			}
-
-			if (s_saltocompensacion != " ") {
-				sql.WHERE("SALTOOCOMPENSACION = '" + s_saltocompensacion + "'");
-			}
-
-			sql.WHERE("FECHACUMPLIMIENTO IS NULL");
-
-			if (saltoCompensacion.getIdsaltosturno() != null) {
-
-				sql.WHERE("IDSALTOSTURNO = '" + saltoCompensacion.getIdsaltosturno() + "'");
-			}
-
-			// sql.append(" AND rownum=1");
-
-		} catch (Exception e) {
-			throw new Exception("Excepcion en marcarSaltoCompensacionBBDD.", e);
-		}
 
 		return sql.toString();
 	}

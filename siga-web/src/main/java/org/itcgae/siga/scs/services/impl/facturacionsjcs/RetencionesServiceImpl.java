@@ -265,6 +265,9 @@ public class RetencionesServiceImpl implements IRetencionesService {
                         retencion.setIdretencion(newId);
                         insertResponseDTO.setId(newId.toString());
                         retencion.setFechaalta(new Date());
+                        if(retencion.getIdpersona() == null) {
+                        	retencion.setEsdeturno("1");
+                        }
                         LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.getNewId() -> Fin consulta para obtener nuevo id de retencion");
 
                         LOGGER.info("RetencionesServiceImpl.saveOrUpdateRetencion() -> fcsRetencionesJudicialesExtendsMapper.insertSelective() -> Inicio inserccion de la retencion");

@@ -7,14 +7,17 @@ public class ScsRenunciaSqlExtendsProvider extends ScsRenunciaSqlProvider{
 	
 	public String comboRenuncia(String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
+		SQL sqlfinal = new SQL();
 		
 		sql.SELECT("renuncia.IDRENUNCIA");
-		sql.SELECT("catalogoRenuncia.DESCRIPCION");
-
+		sql.SELECT("f_siga_getrecurso(renuncia.descripcion,"+idLenguaje+") DESCRIPCION");
+		
 		sql.FROM("scs_renuncia renuncia");
-		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoRenuncia on catalogoRenuncia.idrecurso = renuncia.DESCRIPCION and catalogoRenuncia.idlenguaje ="+idLenguaje);
 		sql.WHERE("renuncia.fecha_baja is null");
-		sql.ORDER_BY("descripcion");
-		return sql.toString();
+
+		sqlfinal.SELECT("*");
+		sqlfinal.FROM("(" + sql.toString() + ") consulta");
+		sqlfinal.ORDER_BY("consulta.DESCRIPCION");
+		return sqlfinal.toString();
 	}
 }

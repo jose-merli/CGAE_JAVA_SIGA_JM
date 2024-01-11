@@ -9,7 +9,14 @@ public class DeleteCalendariosProgDatosEntradaItem {
 	private String idInstitucion;
 	private String fechaDesde;
 	private String fechaHasta;
+	private int contadorGenerados;
 
+	public int getContadorGenerados() {
+		return contadorGenerados;
+	}
+	public void setContadorGenerados(int contadorGenerados) {
+		this.contadorGenerados = contadorGenerados;
+	}
 	public String getIdTurno() {
 		return idTurno;
 	}

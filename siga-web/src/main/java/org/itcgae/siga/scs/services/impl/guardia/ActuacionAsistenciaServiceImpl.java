@@ -396,6 +396,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         if(letrado.equals("S") && isTurnoAutovalidable(idInstitucion,scsAsistencia.getIdturno())){
                             newActuacion.setValidada("1");
                             newActuacion.setFechajustificacion(new Date());
+                            newActuacion.setFechavalidacion(new Date());
+                            newActuacion.setUsuvalidacion(usuarios.get(0).getIdusuario());
                         }else {
                             newActuacion.setValidada("0");
                         }
@@ -413,11 +415,6 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
 								.andIdtipoactuacionEqualTo(newActuacion.getIdtipoactuacion());
 						
                         List<ScsTipoactuacion> tipoActList = scsTipoactuacionMapper.selectByExample(scsTipoactuacionExample);
-                        
-                        // Se valida la actuación de  la asistencia
-                        newActuacion.setFechavalidacion(new Date());
-                        newActuacion.setValidada("1");
-                        newActuacion.setUsuvalidacion(usuarios.get(0).getIdusuario());
                         
                         if(tipoActList != null && tipoActList.isEmpty()) {
                         	ScsTipoactuacion scsTipoactuacionRecord = new ScsTipoactuacion();

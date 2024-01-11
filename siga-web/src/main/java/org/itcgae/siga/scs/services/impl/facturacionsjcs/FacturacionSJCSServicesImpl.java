@@ -78,6 +78,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoSJCSExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActuacionasistenciaExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
@@ -342,7 +343,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 								"ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
 						try {
 							response = limpiafacturacion(facturacion, true, usuario);
-						} catch (Exception e) {
+						}catch (BusinessException e1) {
+                            LOGGER.debug(
+                                    "FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
+                            facturacionesDelete.setStatus(SigaConstants.KO);
+                            error.setDescription(e1.getMessage());
+                            error.setMessage(facturacionItem.getNombre());
+                        } catch (Exception e) {
 							LOGGER.debug(
 									"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
 							facturacionesDelete.setStatus(SigaConstants.KO);
@@ -371,12 +378,17 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 						facturacionesDelete.setStatus(SigaConstants.OK);
 					} else {
 						facturacionesDelete.setStatus(SigaConstants.KO);
+						if (error.getDescription() == null) {
+                            error.setDescription(
+                                    "facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+                            error.setMessage(facturacionItem.getNombre());
+                        }
 					}
 				} else {
 					LOGGER.debug(
 							"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> No se cumplen las restricciones para poder eliminar la facturación");
 					facturacionesDelete.setStatus(SigaConstants.KO);
-					error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
+					error.setDescription("factSJCS.facturacion.error.borrarFact.noCerrada");
 					error.setMessage(facturacionItem.getNombre());
 				}
 				LOGGER.debug(
@@ -1055,8 +1067,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 				response = -1;
 			}
 		}else {
-			String mensajeError = utilidadesFacturacionSJCS.getMensajeIdioma(usuario.getIdlenguaje(), "factSJCS.facturacion.error.borrarFact.mov");
-			throw new Exception(mensajeError);
+			String mensajeError = "factSJCS.facturacion.error.borrarFact.mov";
+			throw new BusinessException(mensajeError);
 		}
 		return response;
 	}

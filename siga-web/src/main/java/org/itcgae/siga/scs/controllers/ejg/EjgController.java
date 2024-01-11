@@ -11,10 +11,12 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboFundamentosCalifDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
@@ -36,6 +38,7 @@ import org.itcgae.siga.DTOs.scs.ResolucionEJGItem;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.ScsContrariosejg;
 import org.itcgae.siga.db.entities.ScsEjgPrestacionRechazada;
@@ -207,6 +210,12 @@ public class EjgController {
 	ResponseEntity<EjgDTO> busquedaEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
 		EjgDTO response = busquedaEJG.busquedaEJG(ejgItem, request);
 		return new ResponseEntity<EjgDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/busquedaTotalRegistrosEJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> busquedaTotalRegistrosEJG(@RequestBody EjgItem ejgItem, HttpServletRequest request) {
+		StringDTO response = busquedaEJG.busquedaTotalRegistrosEJG(ejgItem, request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 
 	// Prestaciones Rechazadas
@@ -399,9 +408,15 @@ public class EjgController {
 	// descargarEEJ
 	@RequestMapping(value = "/gestion-ejg/descargarExpedientesJG", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InputStreamResource> descargarExpedientesJG(@RequestBody List<EjgItem> datos,
-			HttpServletRequest request) {
-		ResponseEntity<InputStreamResource> response = gestionEJG.descargarExpedientesJG(datos, request);
-
+			HttpServletRequest request) throws BusinessException{
+		ResponseEntity<InputStreamResource> response = null;	
+		try {
+			response = gestionEJG.descargarExpedientesJG(datos, request);	
+		}catch (BusinessException e){
+			LOGGER.error(
+					"No se han encontrado archivos");
+			response = new ResponseEntity<InputStreamResource>(null,null, HttpStatus.NOT_FOUND);
+		}
 		return response;
 	}
 
@@ -891,8 +906,13 @@ public class EjgController {
 	@RequestMapping(value = "/gestion-ejg/insertCollectionEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<String> insertCollectionEjg(@RequestBody EjgItem ejgItem, HttpServletRequest request)
 			throws Exception {
-		String response = gestionEJG.insertCollectionEjg(ejgItem, request);
-		return new ResponseEntity<String>(response, HttpStatus.OK);
+		try {
+			String response = gestionEJG.insertCollectionEjg(ejgItem, request);
+	        return new ResponseEntity<String>(response, HttpStatus.OK);
+		}catch(Exception ex) {
+			String response = ex.getMessage();
+			return new ResponseEntity<String>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(value = "/gestion-ejg/searchListDirEjg", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

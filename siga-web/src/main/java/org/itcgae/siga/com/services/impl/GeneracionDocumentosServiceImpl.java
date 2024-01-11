@@ -68,6 +68,8 @@ import org.xml.sax.InputSource;
 
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
+import com.aspose.words.Field;
+import com.aspose.words.FieldCollection;
 import com.aspose.words.MailMergeCleanupOptions;
 import com.lowagie.text.pdf.hyphenation.TernaryTree.Iterator;
 
@@ -148,32 +150,45 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 
 		try {
 			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS);
-			Set<String> claves = dato.keySet();
-
-			DocumentBuilder builder = new DocumentBuilder(doc);
-
-			   if (!dato.isEmpty()) {
-				   for (Map.Entry<String, Object> entry : dato.entrySet()) {
-		                Object o = entry.getValue();
-		                String clave = entry.getKey();
-		                String valueToWrite = (o != null) ? o.toString().trim() : ""; // Si el valor es nulo, utilizamos una cadena vacía.
-
-		                while (builder.moveToMergeField(clave)) {
-		                    try {
-		                        builder.write(valueToWrite);
-		                    } catch (Exception e) {
-		                        e.printStackTrace();
-		                    }
-		                }
-		            }
-		        } else {
-		            doc = null;
-		        }
-
 			
-			//doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS
-			//		| MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS
-			//		| MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
+		   if (!dato.isEmpty()) {
+			   
+			   Set<String> claves=dato.keySet();
+			   DocumentBuilder builder=new DocumentBuilder(doc);
+			   for(String clave : claves) {
+				 while(builder.moveToMergeField(clave))
+			     {
+			       Object o = dato.get(clave);
+			       try {
+			         if(o != null) {
+			    	   builder.write(o.toString().trim());
+			         }
+			       } catch (Exception e) {
+			         LOGGER.error("ERROR - MasterWords.sustituyeDocumento() Error al sustituir campo " + clave + ". Continua...: " + e.getMessage());
+			         LOGGER.error("ERROR al sustituir campo " + clave + ". continua...");
+			       }
+			     }
+			   }
+			   
+/*			   // Metodo que recorre el documento para sustituir cada campo por su valor o si es null por un blank
+				FieldCollection fieldColl = doc.getRange().getFields();
+				for (Field field : fieldColl) {
+					String resultField = field.getResult();
+					String fieldCode = field.getFieldCode().trim();
+					if (fieldCode.startsWith("MERGEFIELD")) {
+						String code = fieldCode.split("\\s+")[1];
+						if (dato.get(code) != null) {
+							field.setResult(dato.get(code).toString().trim());
+						} else {
+							if (!resultField.startsWith("«Table")) {
+								field.setResult("");	
+							}
+						}
+					}
+				}*/
+	        } else {
+	            doc = null;
+	        }
 
 		} catch (Exception e) {
 			LOGGER.error(e);
