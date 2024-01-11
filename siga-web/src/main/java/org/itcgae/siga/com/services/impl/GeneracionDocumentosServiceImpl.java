@@ -1027,6 +1027,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	
 	private static String corregirFO(String foContent) throws Exception {
 	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	        dbf.setNamespaceAware(true);
 	        javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
 	        InputSource is = new InputSource(new StringReader(foContent));
@@ -1066,6 +1068,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	        }
 
 	        TransformerFactory tf = TransformerFactory.newInstance();
+	        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	        Transformer t = tf.newTransformer();
 	        StringWriter writer = new StringWriter();
 	        t.transform(new DOMSource(doc), new StreamResult(writer));
