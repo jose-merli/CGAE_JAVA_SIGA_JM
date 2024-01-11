@@ -2285,7 +2285,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					ScsEjgExample paramejg = new ScsEjgExample();
 
 					paramejg.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumejgEqualTo(itemEjg.get(1));
+							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumeroEqualTo(Long.valueOf(itemEjg.get(1)))
+							.andIdtipoejgEqualTo(Short.valueOf(itemEjg.get(2)));
 
 					List<ScsEjgWithBLOBs> ejg = scsEjgMapper.selectByExampleWithBLOBs(paramejg);
 					
