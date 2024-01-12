@@ -1829,6 +1829,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				"		WHEN (" + sqlTurno.toString() + ") IS NOT NULL THEN (" + sqlTurno.toString() + ") \r\n" + 
 				"		ELSE (" + sqlTurnoGuardia.toString() + ")" + 
 				"	END) AS TURNOGUARDIA");
+		sql.SELECT("EJG.GUARDIATURNO_IDGUARDIA AS IDGUARDIA");
+		sql.SELECT("EJG.IDTIPOEJGCOLEGIO AS IDTIPOEJGCOLEGIO");
+		sql.SELECT(
+				"(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA and ejg.idinstitucion = CEN_COLEGIADO.idinstitucion) AS NCOLEGIADO");
 		sql.SELECT("(CASE WHEN TURNO.ABREVIATURA IS NULL THEN '' " + 
 				"	ELSE TURNO.ABREVIATURA || ' / ' || GUARDIA.NOMBRE " + 
 				"	END) AS TURNO");
@@ -1851,7 +1855,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		
 		// from
 		sql.FROM("scs_ejg ejg"); 
-
+		sql.LEFT_OUTER_JOIN("cen_persona per on per.idpersona = ejg.idpersona");
 		// joins
 		sql.LEFT_OUTER_JOIN("scs_personajg perjg on perjg.idpersona = ejg.idpersonajg AND perjg.IDINSTITUCION = EJG.IDINSTITUCION");
         sql.LEFT_OUTER_JOIN("SCS_TURNO  TURNO ON TURNO.IDINSTITUCION = ejg.IDINSTITUCION AND TURNO.IDTURNO = EJG.GUARDIATURNO_IDTURNO");
