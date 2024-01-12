@@ -1617,11 +1617,11 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				ejg.setNig(designa.getNig());
 				ejg.setObservaciones(designa.getObservaciones());
 				if(designa.getIdpretension() != null) {
-                    ejg.setIdpretension(designa.getIdpretension().longValue());
-                }else {
-                    ejg.setIdpretension(null);
-                }
-                
+					ejg.setIdpretension(designa.getIdpretension().longValue());
+				}else {
+					ejg.setIdpretension(null);
+				}
+				
 				ejg.setJuzgado(designa.getIdjuzgado());
 
 				ejg.setUsumodificacion(usuarios.get(0).getIdusuario());
@@ -1941,7 +1941,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			designaItem.setIdTurno(Integer.parseInt(item.get(3)));
 		} else {
 			TurnosItem turnosItem = new TurnosItem();
-			turnosItem.setAbreviatura(item.get(3));
+			turnosItem.setIdturno(item.get(3).toString());
 			List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuario.getIdlenguaje());
 			designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 		}

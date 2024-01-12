@@ -146,16 +146,57 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		SQL sql = new SQL();
 
-		sql.SELECT("COUNT(FAC.IDFACTURACION) AS NUMERO");
-
-		sql.FROM("FCS_FACTURACIONJG FAC");
-		sql.INNER_JOIN(
-				"FCS_FACT_ESTADOSFACTURACION EST ON FAC.IDINSTITUCION = EST.IDINSTITUCION AND FAC.IDFACTURACION = EST.IDFACTURACION");
-
-		sql.WHERE("EST.IDESTADOFACTURACION <> 30");
-		sql.WHERE("EST.IDFACTURACION = '" + facturacionItem.getIdFacturacion() + "'");
-		sql.WHERE("EST.IDINSTITUCION = " + idInstitucion);
-		sql.WHERE("EST.FECHAESTADO > TO_DATE('" + fecha + "' , 'DD/MM/YYYY HH24:MI:SS')");
+		sql.SELECT(" Decode((SELECT Count(*)  "
+				+ "                            FROM Fcs_Facturacionjg Facpos, "
+				+ "                            Fcs_Fact_Grupofact_Hito Grupos, "
+				+ "                            Fcs_Fact_Grupofact_Hito Gru  "
+				+ "                            WHERE Fac.Idinstitucion = Gru.Idinstitucion "
+				+ "                            AND Fac.Idfacturacion = Gru.Idfacturacion "
+				+ "                            AND Facpos.Idinstitucion = Grupos.Idinstitucion "
+				+ "                            AND Facpos.Idfacturacion = Grupos.Idfacturacion "
+				+ "                            AND Facpos.Idinstitucion = Fac.Idinstitucion "
+				+ "                            AND Facpos.prevision = Fac.prevision "
+				+ "                            AND Facpos.Fechadesde > Fac.Fechadesde "
+				+ "                            AND Grupos.Idgrupofacturacion = Gru.Idgrupofacturacion "
+				+ "                            AND Grupos.Idhitogeneral = Gru.Idhitogeneral), 0, '1', '0') BORRAPORGRUPO,"
+				+ "	("
+				+ "	SELECT"
+				+ "		Decode(Est.Idestadofacturacion, 10, '1', 20, '1', 60, '1', '0')"
+				+ "	FROM"
+				+ "		Fcs_Fact_Estadosfacturacion Est"
+				+ "	WHERE"
+				+ "		Fac.Idinstitucion = Est.Idinstitucion"
+				+ "		AND Fac.Idfacturacion = Est.Idfacturacion"
+				+ "		AND Est.Idordenestado =   "
+				+ "                               ("
+				+ "		SELECT"
+				+ "			Max(Est2.Idordenestado)"
+				+ "		FROM"
+				+ "			Fcs_Fact_Estadosfacturacion Est2"
+				+ "		WHERE"
+				+ "			Est2.Idinstitucion = Est.Idinstitucion"
+				+ "			AND Est2.Idfacturacion = Est.Idfacturacion)"
+				+ "		AND Rownum = 1) BORRARPORESTADO"
+				+ " FROM"
+				+ "	FCS_FACTURACIONJG FAC,"
+				+ "	FCS_FACT_ESTADOSFACTURACION EST,"
+				+ "	CEN_INSTITUCION INS"
+				+ " WHERE"
+				+ "	fac.IDINSTITUCION = EST.IDINSTITUCION"
+				+ "	AND fac.IDFACTURACION = EST.IDFACTURACION"
+				+ "	AND est.IDORDENESTADO ="
+				+ "                         ("
+				+ "	SELECT"
+				+ "		Max(est2.IDORDENESTADO)"
+				+ "	FROM"
+				+ "		FCS_FACT_ESTADOSFACTURACION EST2"
+				+ "	WHERE"
+				+ "		est2.IDINSTITUCION = est.IDINSTITUCION"
+				+ "		AND est2.IDFACTURACION = est.IDFACTURACION  "
+				+ "                       )"
+				+ "	AND fac.IDINSTITUCION = ins.IDINSTITUCION"
+				+ "	AND fac.IDFACTURACION = '" + facturacionItem.getIdFacturacion() + "'"
+				+ "	AND fac.IDINSTITUCION = " + idInstitucion);
 
 		return sql.toString();
 	}

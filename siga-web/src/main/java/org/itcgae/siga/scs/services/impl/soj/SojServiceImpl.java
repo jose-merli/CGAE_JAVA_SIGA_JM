@@ -261,7 +261,7 @@ public class SojServiceImpl implements ISojService {
 					ScsEjgExample exampleEJG = new ScsEjgExample();
 					exampleEJG.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andAnioEqualTo(Short.valueOf(datos.get(5)))
-                            .andNumeroEqualTo(Long.valueOf(datos.get(6)))
+							.andNumeroEqualTo(Long.valueOf(datos.get(6)))
 							.andIdtipoejgEqualTo(Short.valueOf(datos.get(4)));
 					List<ScsEjg> ejg = scsEjgExtendsMapper.selectByExample(exampleEJG);
 					

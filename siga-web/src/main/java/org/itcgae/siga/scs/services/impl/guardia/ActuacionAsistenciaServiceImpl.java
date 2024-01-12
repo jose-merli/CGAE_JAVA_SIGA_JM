@@ -505,7 +505,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                             
                             // Se valida la actuación de  la asistencia
                             scsActuacionasistencia.setFechavalidacion(new Date());
-                            scsActuacionasistencia.setValidada("1");
+                            //scsActuacionasistencia.setValidada("1");
                             scsActuacionasistencia.setUsuvalidacion(usuarios.get(0).getIdusuario());
                             
                             scsActuacionasistencia.setDescripcionbreve(datosGenerales.getDescripcion());

@@ -1826,7 +1826,9 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					recordGruposCriterios.setNombre(conConsulta.getDescripcion());
 
 					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder builder = factory.newDocumentBuilder();
+					factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		            DocumentBuilder builder = factory.newDocumentBuilder();
 					Document doc = builder.parse(new ByteArrayInputStream(
 							("<root>" + conConsulta.getSentencia() + "</root>").getBytes(StandardCharsets.UTF_8)));
 
