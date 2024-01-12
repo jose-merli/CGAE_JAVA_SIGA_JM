@@ -1941,7 +1941,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			designaItem.setIdTurno(Integer.parseInt(item.get(3)));
 		} else {
 			TurnosItem turnosItem = new TurnosItem();
-			turnosItem.setAbreviatura(item.get(3));
+			turnosItem.setIdturno(item.get(3).toString());
 			List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuario.getIdlenguaje());
 			designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 		}
