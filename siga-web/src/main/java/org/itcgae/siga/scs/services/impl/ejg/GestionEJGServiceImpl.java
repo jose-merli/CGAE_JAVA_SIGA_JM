@@ -1733,15 +1733,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
 				
 				response = scsEjgMapper.insert(record);
-				
-				List<EjgItem> ejgItems = scsEjgExtendsMapper.datosEJG(datos, idInstitucion.toString(),
-						usuarios.get(0).getIdlenguaje().toString());
-
-				
-				if(!ejgItems.isEmpty()) {
-					datos.setEstadoEJG(ejgItems.get(0).getEstadoEJG());
-				}
-						
 				if (response == 0)
 					throw (new Exception("Error al insertar los datos generales del EJG"));
 				
@@ -1801,8 +1792,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					item.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 					item.setTipoEJGColegio(datos.getTipoEJGColegio());
 					item.setIdTipoExpInsos(datos.getIdTipoExpInsos());
-					item.setEstadoEJG(datos.getEstadoEJG());
-					
+
 					list.add(item);
 
 					ejgdto.setEjgItems(list);
