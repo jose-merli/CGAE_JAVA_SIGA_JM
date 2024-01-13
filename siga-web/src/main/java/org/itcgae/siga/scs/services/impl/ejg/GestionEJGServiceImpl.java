@@ -1731,11 +1731,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
 				if (datos.getTipoEJGColegio() != null)
 					record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
-				
-				response = scsEjgMapper.insert(record);
-				if (response == 0)
-					throw (new Exception("Error al insertar los datos generales del EJG"));
-				
+
 				// Campo de prestaciones
 				if (datos.getPrestacionesRechazadas() != null) {
 					ScsEjgPrestacionRechazada preRe = new ScsEjgPrestacionRechazada();
@@ -1746,6 +1742,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
 					preRe.setUsumodificacion(usuarios.get(0).getIdusuario());
 					preRe.setFechamodificacion(new Date());
+					preRe.setIdtipoejg(Short.parseShort(datos.getTipoEJG()));
 
 					for (String idprestacion : datos.getPrestacionesRechazadas()) {
 						preRe.setIdprestacion(Short.parseShort(idprestacion));
@@ -1756,7 +1753,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					}
 				}
 
-				
+				response = scsEjgMapper.insert(record);
+				if (response == 0)
+					throw (new Exception("Error al insertar los datos generales del EJG"));
 
 				// Se ejecuta de forma parametrizada este método que sustituye los triggers de la base de datos
 				// al insertar una nueva fila en la tabla SCS_EJG por codigo java.
