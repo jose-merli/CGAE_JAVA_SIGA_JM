@@ -77,10 +77,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			// Comprobamos si se realiza busqueda utilizando el campo prevision o no, en
 			// cuyo caso vendran separados por guion "-"
 			if (facturacionItem.getIdEstado().contains("-")) {
-				// Separamos estados de previsión para averiguar si son estados simulados o
-				// generados
+				// Separamos estados de previsión para averiguar si son estados simulados o generados
 				String[] estadosPrevision = facturacionItem.getIdEstado().split(",");
 				StringBuilder sb = new StringBuilder();
+				sb.append("(");
 				int cantidadEstados = estadosPrevision.length;
 
 				IntStream.range(0, cantidadEstados).forEach(i -> {
@@ -94,6 +94,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 						sb.append(" OR ");
 					}
 				});
+				
+				sb.append(")");
 				sql2.WHERE(sb.toString());
 			} else {
 				sql2.WHERE("EST.IDESTADOFACTURACION IN ( " + facturacionItem.getIdEstado() + " )");
