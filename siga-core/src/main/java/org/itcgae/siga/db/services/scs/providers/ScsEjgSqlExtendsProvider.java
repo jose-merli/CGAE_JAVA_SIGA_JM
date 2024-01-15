@@ -1833,6 +1833,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		sql.SELECT("EJG.IDTIPOEJGCOLEGIO AS IDTIPOEJGCOLEGIO");
 		sql.SELECT(
 				"(SELECT NCOLEGIADO FROM CEN_COLEGIADO WHERE PER.IDPERSONA = CEN_COLEGIADO.IDPERSONA and ejg.idinstitucion = CEN_COLEGIADO.idinstitucion) AS NCOLEGIADO");
+		sql.SELECT("ejg.fechapresentacion");
+		sql.SELECT("ejg.fechalimitepresentacion");
 		sql.SELECT("(CASE WHEN TURNO.ABREVIATURA IS NULL THEN '' " + 
 				"	ELSE TURNO.ABREVIATURA || ' / ' || GUARDIA.NOMBRE " + 
 				"	END) AS TURNO");
