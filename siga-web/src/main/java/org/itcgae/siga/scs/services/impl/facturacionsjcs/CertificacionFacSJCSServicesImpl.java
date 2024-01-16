@@ -235,7 +235,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
 				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo(); // Comprobar- Estado Cerrada.
 				for (FacturacionItem facturacionItem : listaFacturaciones) {
-					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada);
+					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada, facturacionItem.getPrevision());
 				}
 			}else {
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_NO_VALIDADA.getCodigo()), usuario.getIdusuario());
@@ -254,7 +254,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
 				actualizaEstadoCertificacion(idCertificacion, idInstitucion, Short.valueOf(SigaConstants.ESTADO_CERTIFICACION.ESTADO_CERTIFICACION_CERRADA.getCodigo()), usuario.getIdusuario());
 				int estadoFacturacionCerrada =  SigaConstants.ESTADO_FACTURACION.ESTADO_FACTURACION_LISTA_CONSEJO.getCodigo(); // Comprobar- Estado Cerrada.
 				for (FacturacionItem facturacionItem : listaFacturaciones) {
-					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada);
+					actualizarEstadoFacturacion(usuario, idInstitucion, facturacionItem.getIdFacturacion(), estadoFacturacionCerrada, facturacionItem.getPrevision());
 				}
 			}
 			break;
@@ -471,7 +471,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         LOGGER.info("CertificacionFacSJCSServicesImpl.actualizaEstadoCertificacion() -> fcsCertificacionesExtendsMapper.updateByPrimaryKeySelective() -> FIN de la query para aztualizar la certificacion");
     }
 
-    private void actualizarEstadoFacturacion(AdmUsuarios usuario, Short idInstitucion, String idFacturacion, int estadoFuturo) {
+    private void actualizarEstadoFacturacion(AdmUsuarios usuario, Short idInstitucion, String idFacturacion, int estadoFuturo, String prevision) {
         String idOrdenEstado = fcsFactEstadosfacturacionExtendsMapper.getIdordenestadoMaximo(idInstitucion, idFacturacion);
         FcsFactEstadosfacturacion fcsFactEstadosfacturacion = new FcsFactEstadosfacturacion();
         fcsFactEstadosfacturacion.setIdinstitucion(idInstitucion);
@@ -481,6 +481,7 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         fcsFactEstadosfacturacion.setFechaestado(new Date());
         fcsFactEstadosfacturacion.setFechamodificacion(new Date());
         fcsFactEstadosfacturacion.setUsumodificacion(usuario.getIdusuario());
+        fcsFactEstadosfacturacion.setPrevision(prevision);
         fcsFactEstadosfacturacionExtendsMapper.insert(fcsFactEstadosfacturacion);
     }
 
@@ -1524,8 +1525,15 @@ public class CertificacionFacSJCSServicesImpl implements ICertificacionFacSJCSSe
         NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdOrdenEstado(Short.valueOf(idInstitucion), String.valueOf(idFacturacion));
         Integer idOrdenEstado = (Integer.parseInt(idP.getNewId()) + 1);
         Short idEstado = codigoEstado.shortValue();
-
+        
+        //Saco la facturación
+        FcsFacturacionjgKey key = new FcsFacturacionjgKey();
+        key.setIdfacturacion(idFacturacion);
+        key.setIdinstitucion(idInstitucion);
+        FcsFacturacionjg fact = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
+        
         FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
+        record.setPrevision(fact.getPrevision());
         record.setIdinstitucion(Short.valueOf(idInstitucion));
         record.setIdestadofacturacion(idEstado);
         record.setIdfacturacion(Integer.valueOf(idFacturacion));

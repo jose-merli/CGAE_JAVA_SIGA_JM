@@ -2523,7 +2523,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
 						
-						if (scsDesigna.getIdpretension() == 0) {
+						if (scsDesigna.getIdpretension() == null || scsDesigna.getIdpretension() == 0) {
 							scsDesigna.setIdpretension(null);
 					      }
 
