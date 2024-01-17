@@ -2070,7 +2070,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				}
 
 				// Actualizamos la entrada en la BBDD
-				response = scsEjgMapper.updateByPrimaryKeySelective(ejg);
+				response = scsEjgMapper.updateByPrimaryKey(ejg);
 				if (response == 0)
 					throw (new Exception("Error al actualizar los datos generales del EJG"));
 
