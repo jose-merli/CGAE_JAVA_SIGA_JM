@@ -88,7 +88,7 @@ public interface IGestionEJG {
 	
 	List<ScsEjgPrestacionRechazada> searchPrestacionesRechazadas(EjgItem ejgItem, HttpServletRequest request);
 
-	UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request);
+//	UpdateResponseDTO guardarServiciosTramitacion(EjgItem datos, HttpServletRequest request);
 
 	EjgDesignaDTO getEjgDesigna(EjgItem datos, HttpServletRequest request); 
 	
