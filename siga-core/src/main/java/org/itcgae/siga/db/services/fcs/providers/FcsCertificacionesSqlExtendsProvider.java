@@ -192,9 +192,11 @@ public class FcsCertificacionesSqlExtendsProvider extends FcsCertificacionesSqlP
 		sql.SELECT("PARTIDAPRESUPUESTARIA");
 		sql.SELECT("GUARDIA");
 		sql.SELECT("TURNO");
+		sql.SELECT("PREVISION");
 		sql.SELECT("IMPORTESOJ");
 		sql.SELECT("IMPORTEEJG");
-
+		
+		sql2.SELECT("FAC.PREVISION");
 		sql2.SELECT("FAC.IDINSTITUCION");
 		sql2.SELECT("INS.ABREVIATURA");
 		sql2.SELECT("FAC.IDFACTURACION");

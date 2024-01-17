@@ -2338,7 +2338,12 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura, tamMaximo);
 
 			facturaDTO.setFacturasItems(items);
+			if (facturaDTO.getFacturasItems().size() == tamMaximo) {
+				facturaDTO.setError(UtilidadesString.creaInfoResultados());
+			}
 		}
+		
+		
 
 		LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
