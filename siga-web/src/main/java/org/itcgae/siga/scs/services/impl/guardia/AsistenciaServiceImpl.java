@@ -5937,12 +5937,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			scsDesignasletrado.setNumero(scsAsistencia.getDesignaNumero());
 			scsDesignasletrado.setIdturno(scsAsistencia.getDesignaTurno());
 			scsDesignasletrado.setIdpersona(scsAsistencia.getIdpersonacolegiado());
-			scsDesignasletrado.setFechadesigna(scsAsistencia.getFechahora());
+			if(scsAsistencia.getFechahora().before(new Date()))
+				scsDesignasletrado.setFechadesigna(scsAsistencia.getFechahora());
+			else
+				scsDesignasletrado.setFechadesigna(new Date());
 			scsDesignasletrado.setIdinstitucion(scsAsistencia.getIdinstitucion());
 			scsDesignasletrado.setManual((short) 0);
 			scsDesignasletrado.setLetradodelturno("S");
 			scsDesignasletrado.setFechamodificacion(new Date());
-			scsDesignasletrado.setUsumodificacion(1);
+			scsDesignasletrado.setUsumodificacion(usuarios.get(0).getIdusuario());
 			affectedRows += scsDesignasLetradoExtendsMapper.insertSelective(scsDesignasletrado);
 		}
 		ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
