@@ -7,6 +7,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +16,8 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
+import org.itcgae.siga.DTOs.com.FichaPlantillaDocumentoDTO;
+import org.itcgae.siga.DTOs.com.FichasPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
@@ -738,6 +741,100 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 		LOGGER.info("obtenerInformes() -> Salida del servicio para obtener los informes de un modelo de comunicación");
 		return respuesta;
+	}
+	
+	
+	@Override
+	public FichasPlantillaDocumentoDTO obtenerFichasPlantillaDocumento(HttpServletRequest request, String idInstitucion,
+			String idModeloComunicacion) {
+		LOGGER.info("obtenerInformes() -> Entrada al servicio para obtener los informes de un modelo de comunicación");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		FichasPlantillaDocumentoDTO respuesta = new FichasPlantillaDocumentoDTO();
+		List<PlantillaModeloDocumentoDTO> informesItem = new ArrayList<PlantillaModeloDocumentoDTO>();
+		List<FichaPlantillaDocumentoDTO> fichasItem = new ArrayList<FichaPlantillaDocumentoDTO>();
+
+		if (null != idInstitucionUser) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni)
+					.andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				try {
+					AdmUsuarios usuario = usuarios.get(0);
+
+					if (idInstitucion != null && idInstitucion.equals(SigaConstants.IDINSTITUCION_0)) {
+						idInstitucion = String.valueOf(SigaConstants.IDINSTITUCION_2000);
+					}
+
+					informesItem = modModeloPlantillaDocumentoExtendsMapper.selectInformes(
+							Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion),
+							usuario.getIdlenguaje());
+					if (informesItem != null && informesItem.size() > 0) {
+						for (PlantillaModeloDocumentoDTO informeItem : informesItem) {
+							FichaPlantillaDocumentoDTO ficha= procesaInformeItem(informeItem, usuario, idInstitucion, idModeloComunicacion);
+							fichasItem.add(ficha);
+							
+						}
+
+						respuesta.setFichasPlantillaDocumento(fichasItem);
+					}
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+
+		LOGGER.info("obtenerFichasPlantillaDocumento() -> Salida del servicio para obtener las plantillas de documento de un modelo de comunicación");
+		return respuesta;
+	}
+
+	private FichaPlantillaDocumentoDTO procesaInformeItem(PlantillaModeloDocumentoDTO informeItem, AdmUsuarios usuario, String idInstitucion, String idModeloComunicacion) {
+		FichaPlantillaDocumentoDTO ficha = new FichaPlantillaDocumentoDTO();
+		
+		ficha.setIdInforme(informeItem.getIdInforme());
+		ficha.setIdIdioma(informeItem.getIdioma());
+		
+		ficha.setFormatoSalida(informeItem.getFormatoSalida());
+		ficha.setIdModeloComunicacion(informeItem.getIdModeloComunicacion());
+		ficha.setNombreFicheroSalida(informeItem.getNombreFicheroSalida());	
+		ficha.setIdPlantillaDocumento(informeItem.getIdPlantillaDocumento());
+		ficha.setPlantillas(informeItem.getPlantillasDocumentos());
+		
+		
+		String idPlantillaDocumento = "0";
+		if (informeItem.getIdPlantillas() != null) {
+			String[] idsPlantillas = informeItem.getIdPlantillas().split(",");
+			if (idsPlantillas[0] != null) {
+				// Todas las plantillas tienen asociadas las mismas consultas, con coger una nos
+				// vale
+				idPlantillaDocumento = idsPlantillas[0];
+			}
+		}
+
+		ficha.setIdPlantillaDocumento(idPlantillaDocumento);
+		
+		// Recuperamos Sufijo
+		List<SufijoItem> sufijos = modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(
+				Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()),
+				usuario.getIdlenguaje());
+		
+		ficha.setSufijos(sufijos);
+		if(sufijos!=null) {
+			ficha.setIdSufijo(sufijos.stream().map(SufijoItem::getIdSufijo).collect(Collectors.toList()));
+		}
+
+		
+		return ficha;
 	}
 
 	@Override
