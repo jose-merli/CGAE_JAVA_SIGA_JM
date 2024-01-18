@@ -41,7 +41,61 @@ import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.FcsAplicaMovimientosvariosExample;
+import org.itcgae.siga.db.entities.FcsFactActuaciondesignaExample;
+import org.itcgae.siga.db.entities.FcsFactApunteExample;
+import org.itcgae.siga.db.entities.FcsFactEjgExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
+import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.FcsFactSojExample;
+import org.itcgae.siga.db.entities.FcsFacturacionEstadoEnvioExample;
+import org.itcgae.siga.db.entities.FcsFacturacionjg;
+import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.entities.FcsHistoAcreditacionprocExample;
+import org.itcgae.siga.db.entities.FcsHistoTipoactcostefijoExample;
+import org.itcgae.siga.db.entities.FcsHistoricoAcreditacionExample;
+import org.itcgae.siga.db.entities.FcsHistoricoHitofactExample;
+import org.itcgae.siga.db.entities.FcsHistoricoProcedimientosExample;
+import org.itcgae.siga.db.entities.FcsHistoricoTipoactuacionExample;
+import org.itcgae.siga.db.entities.FcsHistoricoTipoasistcolegioExample;
+import org.itcgae.siga.db.entities.FcsMovimientosvarios;
+import org.itcgae.siga.db.entities.FcsMovimientosvariosExample;
+import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
+import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucion;
+import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucionExample;
+import org.itcgae.siga.db.entities.GenDiccionarioKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ScsActuacionasistencia;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaExample;
+import org.itcgae.siga.db.entities.ScsAsistenciaKey;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgExample;
+import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsFactActuaciondesignaMapper;
@@ -82,6 +136,7 @@ import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -96,6 +151,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     private static final String TEXTO_REINTENTO = "Se ha perdido la ejecución de la facturación. Reintentamos la ejecución.";
 
 	private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
+	
+    @Autowired
+    private CgaeAuthenticationProvider authenticationProvider;
 
 	@Autowired
 	ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
@@ -409,6 +467,60 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 		return facturacionesDelete;
 	}
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO archivarFacturacion(List<FacturacionItem> facturacionItems, HttpServletRequest request, boolean archivar) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("archivarFacturaciones() -> Entrada al servicio para archivar/desarchivar facturaciones programadas");
+
+		// Conseguimos información del usuario logeado
+		try {
+			usuario = authenticationProvider.checkAuthentication(request);
+
+			if (usuario != null) {
+				LOGGER.info("archivarFacturaciones() / facFacturacionprogramadaExtendsMapper.archivarFacturacion() -> Entrada a facFacturacionprogramadaExtendsMapper para archivar/desarchivar facturaciones programadas");
+	
+				try {
+					// Logica
+					for (FacturacionItem item : facturacionItems) {
+						FcsFacturacionjgKey key = new FcsFacturacionjgKey();
+						key.setIdfacturacion(Integer.valueOf(item.getIdFacturacion()));
+						key.setIdinstitucion(Short.valueOf(item.getIdInstitucion()));
+		
+						FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
+						
+						if(archivar) {
+							facturacion.setArchivada(1);
+						} else {
+							facturacion.setArchivada(0);
+						}
+						fcsFacturacionJGExtendsMapper.updateByPrimaryKey(facturacion);
+					}
+					
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					
+				} catch (Exception e) {
+					LOGGER.debug("FacturacionSJCSServicesImpl.archivarFacturacion() -> No se cumplen las restricciones para poder eliminar la facturación");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorArchivar");
+					//error.setMessage(facturacionItem.getNombre());
+				}
+			}
+		
+		} catch (Exception e) {
+			updateResponseDTO.setStatus("403");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("archivarFacturaciones() -> Salida del servicio para archivar/desarchivar facturaciones programadas");
+
+		return updateResponseDTO;
+	}
 
     private int eliminaTablasFacturacion(int idFactura, String idInstitucion) {
         try {
@@ -620,7 +732,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        FacturacionDTO facturaciones = new FacturacionDTO();
+        FacturacionDTO facturacion = new FacturacionDTO();
 
         if (null != idInstitucion) {
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -635,17 +747,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
 
-                LOGGER.debug(
-                        "datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
-                List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.datosFacturacion(idFacturacion,
-                        idInstitucion.toString());
-                facturaciones.setFacturacionItem(facturacionItem);
-                LOGGER.debug(
-                        "datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los datos de la facturación");
+                LOGGER.debug("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
+                
+                List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.datosFacturacion(idFacturacion, idInstitucion.toString());
+                facturacion.setFacturacionItem(facturacionItem);
+                
+                LOGGER.debug("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los datos de la facturación");
             } else {
-                LOGGER.warn(
-                        "getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-                                + dni + " e idInstitucion = " + idInstitucion);
+                LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
             }
         } else {
             LOGGER.warn("getLabel() -> idInstitucion del token nula");
@@ -653,7 +762,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         LOGGER.debug("getLabel() -> Salida del servicio para obtener los datos de las facturaciones");
 
-        return facturaciones;
+        return facturacion;
     }
 
     @Override

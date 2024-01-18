@@ -10,12 +10,14 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.FcsFacturacionjgSqlProvider;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.stream.IntStream;
 
 public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvider {
 
 	private Logger LOGGER = Logger.getLogger(FcsFacturacionJGSqlExtendsProvider.class);
 
-	
 	public String buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax) {
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -25,10 +27,9 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("IDFACTURACION");
 		sql.SELECT("FECHADESDE");
 		sql.SELECT("FECHAHASTA");
+		sql.SELECT("PREVISION");
 		sql.SELECT("NOMBRE");
-		//SIGARNV-2815@DTT.JAMARTIN@06/07/2022@INICIO
 		sql.SELECT("LISTAGG(IDGRUPOFACTURACION, ', ') WITHIN GROUP (ORDER BY IDGRUPOFACTURACION) AS IDGRUPOFACTURACION");
-		//SIGARNV-2815@DTT.JAMARTIN@06/07/2022@FIN 
 		sql.SELECT("REGULARIZACION");
 		sql.SELECT("DESESTADO");
 		sql.SELECT("IDESTADO");
@@ -36,12 +37,14 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("IMPORTETOTAL");
 		sql.SELECT("IMPORTEPAGADO");
 		sql.SELECT("IMPORTETOTAL-IMPORTEPAGADO AS IMPORTEPENDIENTE");
+		sql.SELECT("ARCHIVADA");
 
 		sql2.SELECT("FAC.IDINSTITUCION");
 		sql2.SELECT("INS.ABREVIATURA");
 		sql2.SELECT("FAC.IDFACTURACION");
 		sql2.SELECT("FAC.FECHADESDE");
 		sql2.SELECT("FAC.FECHAHASTA");
+		sql2.SELECT("FAC.PREVISION");
 		sql2.SELECT("FAC.NOMBRE");
 		sql2.SELECT("F_SIGA_GETRECURSO(sg.NOMBRE,1) IDGRUPOFACTURACION");
 		sql2.SELECT("DECODE(FAC.REGULARIZACION, '1', 'Si', 'No') AS REGULARIZACION");
@@ -54,6 +57,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql2.SELECT("NVL(DECODE(EST.IDESTADOFACTURACION, 20, 0, " + "(SELECT SUM(P.IMPORTEPAGADO) "
 				+ "FROM FCS_PAGOSJG P "
 				+ "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
+		sql2.SELECT("FAC.ARCHIVADA");
+		
 		sql2.FROM(
 				"FCS_FACTURACIONJG FAC LEFT JOIN FCS_FACT_GRUPOFACT_HITO ffgh ON (ffgh.IDFACTURACION = FAC.IDFACTURACION AND ffgh.IDINSTITUCION = FAC.IDINSTITUCION) LEFT JOIN SCS_GRUPOFACTURACION sg ON (sg.IDGRUPOFACTURACION = ffgh.IDGRUPOFACTURACION AND sg.IDINSTITUCION = ffgh.IDINSTITUCION) ");
 		sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
@@ -68,7 +73,35 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 				+ "WHERE EST2.IDINSTITUCION = EST.IDINSTITUCION AND EST2.IDFACTURACION = EST.IDFACTURACION)");
 		// FILTRO ESTADOS FACTURACIÓN
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdEstado())) {
-			sql2.WHERE("EST.IDESTADOFACTURACION IN ( " + facturacionItem.getIdEstado() + " )");
+
+			// Comprobamos si se realiza busqueda utilizando el campo prevision o no, en
+			// cuyo caso vendran separados por guion "-"
+			if (facturacionItem.getIdEstado().contains("-")) {
+				// Separamos estados de previsión para averiguar si son estados simulados o generados
+				String[] estadosPrevision = facturacionItem.getIdEstado().split(",");
+				StringBuilder sb = new StringBuilder();
+				sb.append("(");
+				int cantidadEstados = estadosPrevision.length;
+
+				IntStream.range(0, cantidadEstados).forEach(i -> {
+					String estadoPrevision = estadosPrevision[i];
+					String[] partes = estadoPrevision.split("-");
+
+					sb.append("(EST.IDESTADOFACTURACION = " + partes[0] + " AND EST.PREVISION = '" + partes[1] + "')");
+
+					// Añadir OR si no es el último elemento
+					if (i < cantidadEstados - 1) {
+						sb.append(" OR ");
+					}
+				});
+				
+				sb.append(")");
+				sql2.WHERE(sb.toString());
+			} else {
+				sql2.WHERE("EST.IDESTADOFACTURACION IN ( " + facturacionItem.getIdEstado() + " )");
+
+			}
+
 		}
 
 		// FILTRO NOMBRE
@@ -104,6 +137,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 			sql2.WHERE("EXISTS (" + sql3.toString() + ")");
 		}
+		
+		if(!facturacionItem.isArchivada()) {
+			sql2.WHERE("ARCHIVADA = 0");
+		}
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
@@ -120,9 +157,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		}
 
 		sql.FROM("(" + sql2.toString() + ") busqueda");
-		//SIGARNV-2815@DTT.JAMARTIN@06/07/2022@INICIO
-		sql.GROUP_BY("IDINSTITUCION, ABREVIATURA, IDFACTURACION, FECHADESDE, FECHAHASTA, NOMBRE, REGULARIZACION, DESESTADO, IDESTADO, FECHAESTADO, IMPORTETOTAL, IMPORTEPAGADO");
-		//SIGARNV-2815@DTT.JAMARTIN@06/07/2022@FIN
+		// SIGARNV-2815@DTT.JAMARTIN@06/07/2022@INICIO
+		sql.GROUP_BY(
+				"IDINSTITUCION, ABREVIATURA, IDFACTURACION, FECHADESDE, FECHAHASTA, PREVISION, NOMBRE, REGULARIZACION, DESESTADO, IDESTADO, FECHAESTADO, IMPORTETOTAL, IMPORTEPAGADO, ARCHIVADA");
+		// SIGARNV-2815@DTT.JAMARTIN@06/07/2022@FIN
 		sql.ORDER_BY("busqueda.FECHADESDE DESC");
 		sql.ORDER_BY("busqueda.FECHAHASTA DESC");
 		// sql.ORDER_BY("busqueda.FECHAESTADO DESC");
@@ -146,8 +184,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		SQL sql = new SQL();
 
-		sql.SELECT(" Decode((SELECT Count(*)  "
-				+ "                            FROM Fcs_Facturacionjg Facpos, "
+		sql.SELECT(" Decode((SELECT Count(*)  " + "                            FROM Fcs_Facturacionjg Facpos, "
 				+ "                            Fcs_Fact_Grupofact_Hito Grupos, "
 				+ "                            Fcs_Fact_Grupofact_Hito Gru  "
 				+ "                            WHERE Fac.Idinstitucion = Gru.Idinstitucion "
@@ -159,42 +196,19 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 				+ "                            AND Facpos.Fechadesde > Fac.Fechadesde "
 				+ "                            AND Grupos.Idgrupofacturacion = Gru.Idgrupofacturacion "
 				+ "                            AND Grupos.Idhitogeneral = Gru.Idhitogeneral), 0, '1', '0') BORRAPORGRUPO,"
-				+ "	("
-				+ "	SELECT"
-				+ "		Decode(Est.Idestadofacturacion, 10, '1', 20, '1', 60, '1', '0')"
-				+ "	FROM"
-				+ "		Fcs_Fact_Estadosfacturacion Est"
-				+ "	WHERE"
-				+ "		Fac.Idinstitucion = Est.Idinstitucion"
-				+ "		AND Fac.Idfacturacion = Est.Idfacturacion"
-				+ "		AND Est.Idordenestado =   "
-				+ "                               ("
-				+ "		SELECT"
-				+ "			Max(Est2.Idordenestado)"
-				+ "		FROM"
-				+ "			Fcs_Fact_Estadosfacturacion Est2"
-				+ "		WHERE"
-				+ "			Est2.Idinstitucion = Est.Idinstitucion"
-				+ "			AND Est2.Idfacturacion = Est.Idfacturacion)"
-				+ "		AND Rownum = 1) BORRARPORESTADO"
-				+ " FROM"
-				+ "	FCS_FACTURACIONJG FAC,"
-				+ "	FCS_FACT_ESTADOSFACTURACION EST,"
-				+ "	CEN_INSTITUCION INS"
-				+ " WHERE"
-				+ "	fac.IDINSTITUCION = EST.IDINSTITUCION"
-				+ "	AND fac.IDFACTURACION = EST.IDFACTURACION"
-				+ "	AND est.IDORDENESTADO ="
-				+ "                         ("
-				+ "	SELECT"
-				+ "		Max(est2.IDORDENESTADO)"
-				+ "	FROM"
-				+ "		FCS_FACT_ESTADOSFACTURACION EST2"
-				+ "	WHERE"
-				+ "		est2.IDINSTITUCION = est.IDINSTITUCION"
-				+ "		AND est2.IDFACTURACION = est.IDFACTURACION  "
-				+ "                       )"
-				+ "	AND fac.IDINSTITUCION = ins.IDINSTITUCION"
+				+ "	(" + "	SELECT" + "		Decode(Est.Idestadofacturacion, 10, '1', 20, '1', 60, '1', '0')"
+				+ "	FROM" + "		Fcs_Fact_Estadosfacturacion Est" + "	WHERE"
+				+ "		Fac.Idinstitucion = Est.Idinstitucion" + "		AND Fac.Idfacturacion = Est.Idfacturacion"
+				+ "		AND Est.Idordenestado =   " + "                               (" + "		SELECT"
+				+ "			Max(Est2.Idordenestado)" + "		FROM" + "			Fcs_Fact_Estadosfacturacion Est2"
+				+ "		WHERE" + "			Est2.Idinstitucion = Est.Idinstitucion"
+				+ "			AND Est2.Idfacturacion = Est.Idfacturacion)" + "		AND Rownum = 1) BORRARPORESTADO"
+				+ " FROM" + "	FCS_FACTURACIONJG FAC," + "	FCS_FACT_ESTADOSFACTURACION EST," + "	CEN_INSTITUCION INS"
+				+ " WHERE" + "	fac.IDINSTITUCION = EST.IDINSTITUCION" + "	AND fac.IDFACTURACION = EST.IDFACTURACION"
+				+ "	AND est.IDORDENESTADO =" + "                         (" + "	SELECT" + "		Max(est2.IDORDENESTADO)"
+				+ "	FROM" + "		FCS_FACT_ESTADOSFACTURACION EST2" + "	WHERE"
+				+ "		est2.IDINSTITUCION = est.IDINSTITUCION" + "		AND est2.IDFACTURACION = est.IDFACTURACION  "
+				+ "                       )" + "	AND fac.IDINSTITUCION = ins.IDINSTITUCION"
 				+ "	AND fac.IDFACTURACION = '" + facturacionItem.getIdFacturacion() + "'"
 				+ "	AND fac.IDINSTITUCION = " + idInstitucion);
 
@@ -214,6 +228,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("fac.importeejg");
 		sql.SELECT("fac.prevision");
 		sql.SELECT("fac.visible");
+		sql.SELECT("fac.archivada");
 		sql.FROM("fcs_facturacionjg fac");
 		sql.WHERE("fac.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("fac.idfacturacion =  '" + idFacturacion + "'");
@@ -427,9 +442,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		query.SELECT("IMPORTETOTAL - SUM(IMPORTEPENDIENTE) AS IMPORTEPENDIENTE");
 		query.SELECT("IDPARTIDAPRESUPUESTARIA");
 		query.FROM("( " + sql.toString() + " )");
-		query.GROUP_BY("IDINSTITUCION, IDFACTURACION, DESCGRUPO, DESCCONCEPTO, IDGRUPO, IDCONCEPTO, IMPORTETOTAL, IDPARTIDAPRESUPUESTARIA");
-		
-		//LOGGER.info("++++ [SIGA TEST] Query conceptosFacturacion() -> " + query.toString());
+		query.GROUP_BY(
+				"IDINSTITUCION, IDFACTURACION, DESCGRUPO, DESCCONCEPTO, IDGRUPO, IDCONCEPTO, IMPORTETOTAL, IDPARTIDAPRESUPUESTARIA");
+
+		// LOGGER.info("++++ [SIGA TEST] Query conceptosFacturacion() -> " +
+		// query.toString());
 		return query.toString();
 	}
 
@@ -1141,7 +1158,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
-	
+
 	public String getDatosPagoAsuntoPorFacturacionActuacionDesignas(Short idInstitucion, String idFacturacion,
 			String literal) {
 
@@ -1173,7 +1190,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
-	
+
 	public String getDatosPagoAsuntoPorFacturacionActuacionesAsistencia(Short idInstitucion, String idFacturacion,
 			String literal) {
 
@@ -1189,9 +1206,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
-	
-	public String getDatosPagoAsuntoPorFacturacionEjgs(Short idInstitucion, String idFacturacion,
-			String literal) {
+
+	public String getDatosPagoAsuntoPorFacturacionEjgs(Short idInstitucion, String idFacturacion, String literal) {
 
 		SQL sql = new SQL();
 		sql.SELECT("IDPAGOSJG");
@@ -1205,7 +1221,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 		return sql.toString();
 	}
-	
+
 	public String getDatosPagoAsuntoPorFacturacionGuardiasColegiado(Short idInstitucion, String idFacturacion,
 			String literal) {
 
