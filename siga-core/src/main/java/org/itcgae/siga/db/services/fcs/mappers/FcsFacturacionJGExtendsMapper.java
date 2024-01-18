@@ -197,6 +197,24 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idpartidapresupuestaria", jdbcType = JdbcType.VARCHAR)})
     List<FcsFacturacionjg> facturacionesPorEstadoProgramadas(String idInstitucion);
+    
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFacturacionesPendientesEliminar")
+    @Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDFACTURACION", property = "idFacturacion", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.TIMESTAMP),
+        @Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.TIMESTAMP),
+        @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "REGULARIZACION", property = "regularizacion", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "DESESTADO", property = "desEstado", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.TIMESTAMP),
+        @Result(column = "IMPORTETOTAL", property = "importeTotal", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDGRUPOFACTURACION", property = "descGrupo", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR)})
+    List<FacturacionItem> getFacturacionesPendientesEliminar();
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "ultimoEstadoFacturacion")
     @Results({@Result(column = "idestadofacturacion", property = "idestadofacturacion", jdbcType = JdbcType.VARCHAR),
@@ -300,7 +318,11 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR)})
     List<DatosPagoAsuntoDTO> getDatosPagoAsuntoPorMovimientoVario(Short idInstitucion, String idMovimiento, String literal);
-
+    
+    @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getFactEnProceso")
+    @Results({@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),})
+    Integer getFactEnProceso();
+    
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "facturacionesPorEstadoEjecucionTiempoLimite")
     @Results({@Result(column = "IDFACTURACION", property = "idfacturacion", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),

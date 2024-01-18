@@ -5,5 +5,7 @@ public interface IScheduledFacturacionService {
     public void ejecutaFacturacionSJCS();
 
     public void ejecutaFacturacionesSJCSBloqueadas();
+    
+    public void eliminarFacturacionesPendientes();
 
 }
