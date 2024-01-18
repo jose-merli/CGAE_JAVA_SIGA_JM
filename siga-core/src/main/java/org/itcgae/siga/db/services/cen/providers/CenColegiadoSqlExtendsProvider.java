@@ -385,6 +385,23 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		
 	}
 	
+	
+	public String selectTipoCliente(Short idInstitucion, ColegiadoItem colegiadoItem) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("CASE\r\n"
+				+ "			WHEN cc.IDPERSONA IS NULL AND SUBSTR(cp.NIFCIF , 1) BETWEEN 'A' AND 'Z' THEN 'Es una sociedad'\r\n"
+				+ "		    WHEN cc.IDPERSONA IS NULL THEN 'No es colegiado'\r\n"
+				+ "		    ELSE 'Es colegiado'\r\n"
+				+ "		  END AS TIPOCLIENTE");
+		sql.FROM("CEN_PERSONA cp");
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO cc ON cp.IDPERSONA = cc.IDPERSONA AND cc.IDINSTITUCION = " + idInstitucion);
+
+		sql.WHERE("cp.IDPERSONA = " + colegiadoItem.getIdPersona());
+		
+		return sql.toString();
+	}
+	
 	public String selectColegiado(Short idInstitucion, ColegiadoItem colegiadoItem) {
 
 		SQL sql = new SQL();
