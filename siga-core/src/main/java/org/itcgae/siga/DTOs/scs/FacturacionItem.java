@@ -36,7 +36,16 @@ public class FacturacionItem {
 	private String importeEjg;
 	private String borrarPorGrupo;
 	private String borrarPorEstado;
+	private boolean archivada;
 
+	@JsonProperty("archivada")
+	public boolean isArchivada() {
+		return archivada;
+	}
+
+	public void setArchivada(boolean archivada) {
+		this.archivada = archivada;
+	}
 
 	@JsonProperty("idGrupo")
 	public String getIdGrupo() {
@@ -507,8 +516,12 @@ public class FacturacionItem {
 		if (borrarPorEstado == null) {
 			if (other.borrarPorEstado != null)
 				return false;
-		} else if (!borrarPorEstado.equals(other.borrarPorEstado))
+		} else if (!borrarPorEstado.equals(other.borrarPorEstado)) {
 			return false;
+		}
+		if(archivada != other.archivada) {
+			return false;
+		}
 		return true;
 	}
 
@@ -528,6 +541,6 @@ public class FacturacionItem {
 				+ ", importeSoj=" + importeSoj
 				+ ", importeEjg=" + importeEjg
 				+ ", borrarPorGrupo=" + borrarPorGrupo
-				+ ", borrarPorEstado=" + borrarPorEstado+"]";
+				+ ", borrarPorEstado=" + borrarPorEstado+", archivada=" + (archivada ? "true": "false") + "]";
 	}
 }

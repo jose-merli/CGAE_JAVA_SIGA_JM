@@ -35,7 +35,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "IMPORTEPAGADO", property = "importePagado", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDPARTIDAPRESUPUESTARIA", property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IDGRUPOFACTURACION", property = "descGrupo", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR)})
+            @Result(column = "IMPORTEPENDIENTE", property = "importePendiente", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "ARCHIVADA",  property = "archivada", jdbcType = JdbcType.BOOLEAN)})
     List<FacturacionItem> buscarFacturaciones(FacturacionItem facturacionItem, String idInstitucion, Integer tamMax);
 
     @SelectProvider(type = FcsFacturacionJGSqlExtendsProvider.class, method = "getNumeroFacturacionesNoCerradas")
@@ -53,7 +54,8 @@ public interface FcsFacturacionJGExtendsMapper extends FcsFacturacionjgMapper {
             @Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
             @Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
     		@Result(column = "IDPARTIDAPRESUPUESTARIA",  property = "idPartidaPresupuestaria", jdbcType = JdbcType.VARCHAR),
-    		@Result(column = "IMPORTEEJG",  property = "importeEjg", jdbcType = JdbcType.VARCHAR)
+    		@Result(column = "IMPORTEEJG",  property = "importeEjg", jdbcType = JdbcType.VARCHAR),
+    		@Result(column = "ARCHIVADA",  property = "archivada", jdbcType = JdbcType.BOOLEAN)
     		})
     List<FacturacionItem> datosFacturacion(String idFacturacion, String idInstitucion);
 

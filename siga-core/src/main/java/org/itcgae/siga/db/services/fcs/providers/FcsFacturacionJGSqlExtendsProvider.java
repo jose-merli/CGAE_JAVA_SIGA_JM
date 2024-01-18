@@ -29,10 +29,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("FECHAHASTA");
 		sql.SELECT("PREVISION");
 		sql.SELECT("NOMBRE");
-		// SIGARNV-2815@DTT.JAMARTIN@06/07/2022@INICIO
-		sql.SELECT(
-				"LISTAGG(IDGRUPOFACTURACION, ', ') WITHIN GROUP (ORDER BY IDGRUPOFACTURACION) AS IDGRUPOFACTURACION");
-		// SIGARNV-2815@DTT.JAMARTIN@06/07/2022@FIN
+		sql.SELECT("LISTAGG(IDGRUPOFACTURACION, ', ') WITHIN GROUP (ORDER BY IDGRUPOFACTURACION) AS IDGRUPOFACTURACION");
 		sql.SELECT("REGULARIZACION");
 		sql.SELECT("DESESTADO");
 		sql.SELECT("IDESTADO");
@@ -40,6 +37,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("IMPORTETOTAL");
 		sql.SELECT("IMPORTEPAGADO");
 		sql.SELECT("IMPORTETOTAL-IMPORTEPAGADO AS IMPORTEPENDIENTE");
+		sql.SELECT("ARCHIVADA");
 
 		sql2.SELECT("FAC.IDINSTITUCION");
 		sql2.SELECT("INS.ABREVIATURA");
@@ -59,6 +57,8 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql2.SELECT("NVL(DECODE(EST.IDESTADOFACTURACION, 20, 0, " + "(SELECT SUM(P.IMPORTEPAGADO) "
 				+ "FROM FCS_PAGOSJG P "
 				+ "WHERE P.IDFACTURACION = FAC.IDFACTURACION AND P.IDINSTITUCION = FAC.IDINSTITUCION)),0) AS IMPORTEPAGADO");
+		sql2.SELECT("FAC.ARCHIVADA");
+		
 		sql2.FROM(
 				"FCS_FACTURACIONJG FAC LEFT JOIN FCS_FACT_GRUPOFACT_HITO ffgh ON (ffgh.IDFACTURACION = FAC.IDFACTURACION AND ffgh.IDINSTITUCION = FAC.IDINSTITUCION) LEFT JOIN SCS_GRUPOFACTURACION sg ON (sg.IDGRUPOFACTURACION = ffgh.IDGRUPOFACTURACION AND sg.IDINSTITUCION = ffgh.IDINSTITUCION) ");
 		sql2.INNER_JOIN("CEN_INSTITUCION INS ON (FAC.IDINSTITUCION = INS.IDINSTITUCION)");
@@ -137,6 +137,10 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 
 			sql2.WHERE("EXISTS (" + sql3.toString() + ")");
 		}
+		
+		if(!facturacionItem.isArchivada()) {
+			sql2.WHERE("ARCHIVADA = 0");
+		}
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
@@ -155,7 +159,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.FROM("(" + sql2.toString() + ") busqueda");
 		// SIGARNV-2815@DTT.JAMARTIN@06/07/2022@INICIO
 		sql.GROUP_BY(
-				"IDINSTITUCION, ABREVIATURA, IDFACTURACION, FECHADESDE, FECHAHASTA, PREVISION, NOMBRE, REGULARIZACION, DESESTADO, IDESTADO, FECHAESTADO, IMPORTETOTAL, IMPORTEPAGADO");
+				"IDINSTITUCION, ABREVIATURA, IDFACTURACION, FECHADESDE, FECHAHASTA, PREVISION, NOMBRE, REGULARIZACION, DESESTADO, IDESTADO, FECHAESTADO, IMPORTETOTAL, IMPORTEPAGADO, ARCHIVADA");
 		// SIGARNV-2815@DTT.JAMARTIN@06/07/2022@FIN
 		sql.ORDER_BY("busqueda.FECHADESDE DESC");
 		sql.ORDER_BY("busqueda.FECHAHASTA DESC");
@@ -224,6 +228,7 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 		sql.SELECT("fac.importeejg");
 		sql.SELECT("fac.prevision");
 		sql.SELECT("fac.visible");
+		sql.SELECT("fac.archivada");
 		sql.FROM("fcs_facturacionjg fac");
 		sql.WHERE("fac.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("fac.idfacturacion =  '" + idFacturacion + "'");

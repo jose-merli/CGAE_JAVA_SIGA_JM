@@ -470,7 +470,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public UpdateResponseDTO archivarFacturacion(List<FacturacionItem> facturacionItems, HttpServletRequest request) {
+	public UpdateResponseDTO archivarFacturacion(List<FacturacionItem> facturacionItems, HttpServletRequest request, boolean archivar) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -492,8 +492,12 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 						key.setIdinstitucion(Short.valueOf(item.getIdInstitucion()));
 		
 						FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
-		
-						facturacion.setArchivada(1);
+						
+						if(archivar) {
+							facturacion.setArchivada(1);
+						} else {
+							facturacion.setArchivada(0);
+						}
 						fcsFacturacionJGExtendsMapper.updateByPrimaryKey(facturacion);
 					}
 					
@@ -728,7 +732,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        FacturacionDTO facturaciones = new FacturacionDTO();
+        FacturacionDTO facturacion = new FacturacionDTO();
 
         if (null != idInstitucion) {
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -743,17 +747,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
 
-                LOGGER.debug(
-                        "datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
-                List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.datosFacturacion(idFacturacion,
-                        idInstitucion.toString());
-                facturaciones.setFacturacionItem(facturacionItem);
-                LOGGER.debug(
-                        "datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los datos de la facturación");
+                LOGGER.debug("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
+                
+                List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.datosFacturacion(idFacturacion, idInstitucion.toString());
+                facturacion.setFacturacionItem(facturacionItem);
+                
+                LOGGER.debug("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los datos de la facturación");
             } else {
-                LOGGER.warn(
-                        "getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-                                + dni + " e idInstitucion = " + idInstitucion);
+                LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
             }
         } else {
             LOGGER.warn("getLabel() -> idInstitucion del token nula");
@@ -761,7 +762,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         LOGGER.debug("getLabel() -> Salida del servicio para obtener los datos de las facturaciones");
 
-        return facturaciones;
+        return facturacion;
     }
 
     @Override
