@@ -398,10 +398,9 @@ public class FcsMovimientosvariosSqlExtendsProvider extends FcsMovimientosvarios
 
         SQL sql = new SQL();
 
-        sql.SELECT("p.importepagado importeaplicado");
+        sql.SELECT("a.importeaplicado importeaplicado");
         sql.SELECT("p.fechamodificacion fechamodificacion");
         sql.SELECT("p.nombre nombrepago");
-        sql.SELECT("(p.importerepartir - p.importepagado) importerestante");
         sql.FROM("FCS_MOVIMIENTOSVARIOS m");
         sql.INNER_JOIN("FCS_APLICA_MOVIMIENTOSVARIOS a ON m.IDINSTITUCION = a.IDINSTITUCION AND m.IDMOVIMIENTO = a.IDMOVIMIENTO");
         sql.INNER_JOIN("FCS_PAGO_COLEGIADO c ON a.IDPAGOSJG = c.IDPAGOSJG AND a.IDINSTITUCION = c.IDINSTITUCION AND a.IDPERSONA = c.IDPERORIGEN");
