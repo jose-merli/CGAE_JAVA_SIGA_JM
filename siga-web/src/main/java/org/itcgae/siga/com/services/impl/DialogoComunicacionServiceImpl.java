@@ -2913,6 +2913,18 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 	}
 	
+	private String getRutaFuentesPDF() {
+		
+		GenPropertiesKey key = new GenPropertiesKey();
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.parametroRutaFuentesPdf);
+		
+		GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+		
+		return rutaFicherosSalida.getValor();
+		
+	}
+	
 	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, 
 			Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas, boolean esFO, List<List<String>> listaKeyFiltros, DestinatarioItem destinatario , List<DestinatarioItem> destinatarios, CamposPlantillaEnvio camposEnvio) {
 		
@@ -3080,7 +3092,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					//FontSettings.getDefaultInstance().setFontsSources(
 					//		new FontSourceBase[] { new SystemFontSource(), new FolderFontSource("C:\\Datos\\fonts\\", true) });
 					
-					FontSettings.getDefaultInstance().setFontsSources(new FontSourceBase[] {new FolderFontSource("\\Datos\\fonts\\", true)});
+					FontSettings.getDefaultInstance().setFontsSources(new FontSourceBase[] {new FolderFontSource(this.getRutaFuentesPDF(), true)});
 					
 					
 					doc = new Document(rutaPlantilla + nombrePlantilla);
