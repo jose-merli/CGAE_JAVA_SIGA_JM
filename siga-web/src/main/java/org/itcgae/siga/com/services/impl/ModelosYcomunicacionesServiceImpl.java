@@ -802,7 +802,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		FichaPlantillaDocumentoDTO ficha = new FichaPlantillaDocumentoDTO();
 		
 		ficha.setIdInforme(informeItem.getIdInforme());
-		ficha.setIdIdioma(informeItem.getIdioma());
+		ficha.setIdIdioma(informeItem.getIdIdioma());
 		
 		ficha.setFormatoSalida(informeItem.getFormatoSalida());
 		ficha.setIdModeloComunicacion(informeItem.getIdModeloComunicacion());

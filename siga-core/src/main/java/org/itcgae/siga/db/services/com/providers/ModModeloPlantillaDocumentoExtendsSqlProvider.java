@@ -11,6 +11,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		sql.SELECT("modeloPlantillaDocumento.FORMATOSALIDA");
 		sql.SELECT("modeloPlantillaDocumento.NOMBREFICHEROSALIDA");
 		sql.SELECT("modeloPlantillaDocumento.IDINFORME");
+		sql.SELECT("plantillaDocumento.Idioma idIdioma"); 
 		sql.SELECT("LISTAGG(C.DESCRIPCION, ',') WITHIN GROUP (ORDER BY C.DESCRIPCION) idioma");
 		sql.SELECT("LISTAGG(plantillaDocumento.Idplantilladocumento, ',') WITHIN GROUP (ORDER BY plantillaDocumento.Idplantilladocumento) idPlantillas");
 		sql.SELECT("rec.descripcion AS NOMBREFORMATO");
@@ -25,7 +26,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		sql.WHERE("modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
 		sql.WHERE("C.IDLENGUAJE = '" + idLenguaje + "' AND CODIGOEJIS is not null AND lenguajes.FECHA_BAJA is null");
 		sql.WHERE("modeloPlantillaDocumento.FECHABAJA IS NULL");
-		sql.GROUP_BY("modeloPlantillaDocumento.FORMATOSALIDA, modeloPlantillaDocumento.NOMBREFICHEROSALIDA, modeloPlantillaDocumento.IDINFORME, rec.DESCRIPCION");
+		sql.GROUP_BY("modeloPlantillaDocumento.FORMATOSALIDA, modeloPlantillaDocumento.NOMBREFICHEROSALIDA, modeloPlantillaDocumento.IDINFORME, rec.DESCRIPCION, plantillaDocumento.Idioma");
 		
 		return sql.toString();
 	}
