@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.FacFacturaSqlProvider;
 
 import java.text.SimpleDateFormat;
@@ -14,18 +15,18 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 	
 	private Logger LOGGER = Logger.getLogger(this.getClass());
 
-	public String getFacturas(FacturaItem item, String idInstitucion, String idLenguaje, boolean filtrosSoloAbono, boolean filtrosSoloFactura, Integer tamMaximo) {
+	public String getFacturas(FacturaItem item, AdmUsuarios usuario, boolean filtrosSoloAbono, boolean filtrosSoloFactura, Integer tamMaximo) {
         SQL sqlFacturas = new SQL();
         SQL sqlFinal = new SQL();
         String queryFacturas = "";
         String queryAbonos = "";
 
         if (!(filtrosSoloAbono && !filtrosSoloFactura)) {
-			queryFacturas = getQueryFacturas(item, idInstitucion, idLenguaje);
+			queryFacturas = getQueryFacturas(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 		}
 		
 		if (!(!filtrosSoloAbono && filtrosSoloFactura)) {
-			queryAbonos = getQueryAbonos(item, idInstitucion, idLenguaje);	
+			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());	
 		}
 
         //query completa facturas

@@ -1023,7 +1023,7 @@ public class FacturacionPySExportacionesServiceImpl implements IFacturacionPySEx
             FacturaItem filtros = new FacturaItem();
             filtros.setIdentificadorDevolucion(ficherosDevolucionesItem.getIdDisqueteDevoluciones());
             Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
-            List<FacturaItem> facturasDisquete = facFacturaExtendsMapper.getFacturas(filtros, usuario.getIdinstitucion().toString(),usuario.getIdlenguaje(), false, true, tamMaximo);
+            List<FacturaItem> facturasDisquete = facFacturaExtendsMapper.getFacturas(filtros, usuario, false, true, tamMaximo);
 
             //Devolver las factruas no devueltas
             if(facturasDisquete.size() > 0){
