@@ -622,6 +622,10 @@ public class FacturacionPySController {
 		try {
 			response = facturacionService.getFacturas(item, request);
 
+			if (response.getFacturasItems().size() == 200) {
+				response.setError(UtilidadesString.creaInfoResultados());
+			}
+
 			return new ResponseEntity<FacturaDTO>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			response.setError(UtilidadesString.creaError(e.getMessage()));
