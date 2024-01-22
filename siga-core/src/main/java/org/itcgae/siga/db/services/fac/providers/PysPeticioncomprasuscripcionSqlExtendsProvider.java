@@ -488,7 +488,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 				for(String producto : filtro.getIdTipoProducto()) {
 					categoriasConProducto.add(producto.split("-")[0]);
 					//Creamos las condiciones por pares para los servicios especificos seleccionados
-					condTipoProd += ("(prodSol.idProductoInstitucion = "+producto.split("-")[1]+" AND prodSol.idTipoProducto = "+producto.split("-")[0]+" ) OR ");
+					condTipoProd += ("(prodSol.idProducto = "+producto.split("-")[1]+" AND prodSol.idTipoProducto = "+producto.split("-")[0]+" ) OR ");
 				}
 
 				condTipoProd = condTipoProd.substring(0, condTipoProd.length() - 3)+")";
