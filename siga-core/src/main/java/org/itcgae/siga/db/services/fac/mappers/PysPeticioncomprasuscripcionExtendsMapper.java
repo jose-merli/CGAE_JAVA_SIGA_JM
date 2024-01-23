@@ -8,27 +8,20 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.fac.CargaMasivaComprasBusquedaItem;
 import org.itcgae.siga.DTO.fac.CargaMasivaComprasItem;
 import org.itcgae.siga.DTO.fac.FichaCompraSuscripcionItem;
 import org.itcgae.siga.DTO.fac.FiltroCargaMasivaCompras;
-import org.itcgae.siga.DTO.fac.FiltroProductoItem;
 import org.itcgae.siga.DTO.fac.FiltrosCompraProductosItem;
 import org.itcgae.siga.DTO.fac.FiltrosSuscripcionesItem;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaProductosCompraItem;
-import org.itcgae.siga.DTO.fac.ListaProductosItem;
-import org.itcgae.siga.DTO.fac.ListaServiciosItem;
 import org.itcgae.siga.DTO.fac.ListaServiciosSuscripcionItem;
 import org.itcgae.siga.DTO.fac.ListaSuscripcionesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
-import org.itcgae.siga.db.entities.PysSuscripcion;
 import org.itcgae.siga.db.mappers.PysPeticioncomprasuscripcionMapper;
-import org.itcgae.siga.db.services.fac.providers.PySTipoIvaSqlExtendsProvider;
-import org.itcgae.siga.db.services.fac.providers.PySTiposProductosSqlExtendsProvider;
 import org.itcgae.siga.db.services.fac.providers.PysPeticioncomprasuscripcionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -149,32 +142,29 @@ public interface PysPeticioncomprasuscripcionExtendsMapper extends PysPeticionco
 	
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaSuscripciones")
 	@Results({
-			@Result(column = "fechaSolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
-			@Result(column = "idPersona", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "fechaEfectiva", property = "fechaEfectiva", jdbcType = JdbcType.DATE),
-			@Result(column = "fechaDenegada", property = "fechaDenegada", jdbcType = JdbcType.DATE),
-			@Result(column = "fechaSolicitadaAnulacion", property = "fechaSolicitadaAnulacion", jdbcType = JdbcType.DATE),
-			@Result(column = "fechaAnulada", property = "fechaAnulada", jdbcType = JdbcType.DATE),
-			@Result(column = "nSolicitud", property = "nSolicitud", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "nIdentificacion", property = "nIdentificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "nColegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "apellidosNombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "concepto", property = "concepto", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idFormaPago", property = "idFormaPago", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "desFormaPago", property = "desFormaPago", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "importe", property = "importe", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "precioPerio", property = "precioPerio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "fechaSuscripcion", property = "fechaSuscripcion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "estadoFactura", property = "idEstadoFactura", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "precioServicioDesc", property = "precioServicioDesc", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "facturas", property = "facturas", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idTipoServicios", property = "idTipoServicios", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idServicio", property = "idServicio", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idServiciosInstitucion", property = "idServiciosInstitucion", jdbcType = JdbcType.VARCHAR)
-		})
+		@Result(column = "fechaSolicitud", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
+		@Result(column = "nSolicitud", property = "nSolicitud", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nIdentificacion", property = "nIdentificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "nColegiado", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "apellidosNombre", property = "apellidosNombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "concepto", property = "concepto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idFormaPago", property = "idFormaPago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "desFormaPago", property = "desFormaPago", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaDenegada", property = "fechaDenegada", jdbcType = JdbcType.DATE),
+		@Result(column = "fechaSolicitadaAnulacion", property = "fechaSolicitadaAnulacion", jdbcType = JdbcType.DATE),
+		@Result(column = "fechaEfectiva", property = "fechaEfectiva", jdbcType = JdbcType.DATE),
+		@Result(column = "fechaAnulada", property = "fechaAnulada", jdbcType = JdbcType.DATE),			
+		@Result(column = "idEstadoSolicitud", property = "idEstadoSolicitud", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "precioPerio", property = "precioPerio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "facturas", property = "facturas", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaEfectiva", property = "fechaSuscripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaAnulada", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "solicitarBaja", property = "solicitarBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "automatico", property = "automatico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idTipoServicios", property = "idTipoServicios", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idServicio", property = "idServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idServiciosInstitucion", property = "idServiciosInstitucion", jdbcType = JdbcType.VARCHAR)
+	})
 	List<ListaSuscripcionesItem> getListaSuscripciones(FiltrosSuscripcionesItem filtro, Short idInstitucion, String idioma, Integer tamMaximo);
 
 	@SelectProvider(type = PysPeticioncomprasuscripcionSqlExtendsProvider.class, method = "getListaServiciosSuscripcion")
