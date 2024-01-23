@@ -104,7 +104,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOEJG", property = "estadoEJG", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numeroprocedimiento", property = "procedimiento", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idpersonajg", property = "idPersona", jdbcType = JdbcType.INTEGER),
+			@Result(column = "idpersonajg", property = "idPersonajg", jdbcType = JdbcType.INTEGER),
 			@Result(column = "fechapresentacion", property = "fechapresentacion", jdbcType = JdbcType.DATE),
 			@Result(column = "fechalimitepresentacion", property = "fechalimitepresentacion", jdbcType = JdbcType.DATE),
 
