@@ -401,7 +401,6 @@ public class FcsRetencionesJudicialesSqlExtendsProvider extends FcsRetencionesJu
         queryPrincipal.WHERE("COB.IDRETENCION = RET.IDRETENCION");
         queryPrincipal.WHERE("COB.IDINSTITUCION = " + idInstitucion);
         queryPrincipal.WHERE("COB.IDPERSONA = " + aplicacionRetencionRequestDTO.getIdPersona());
-        queryPrincipal.WHERE("RET.TIPORETENCION = 'L'");
         queryPrincipal.WHERE("TO_DATE('01' || LPAD(COB.MES, 2, '0') || COB.ANIO, 'DDMMYYYY') BETWEEN TO_DATE('01' || TO_CHAR(TO_DATE('" + aplicacionRetencionRequestDTO.getFechaPagoDesde() + "', 'DD/MM/YYYY'), 'MMYYYY'), 'DDMMYYYY')");
         queryPrincipal.WHERE("TO_DATE('01' || TO_CHAR(TO_DATE('" + aplicacionRetencionRequestDTO.getFechaPagoHasta() + "', 'DD/MM/YYYY'), 'MMYYYY'), 'DDMMYYYY')");
         queryPrincipal.ORDER_BY("COB.ANIO");
