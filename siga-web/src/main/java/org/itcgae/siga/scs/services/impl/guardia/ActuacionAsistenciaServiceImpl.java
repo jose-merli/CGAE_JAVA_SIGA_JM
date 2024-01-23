@@ -735,6 +735,8 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                                 Date fechaJusticiacion = formato.parse(tarjeta.getFechaJustificacion());
                                 scsActuacionasistencia.setFechajustificacion(fechaJusticiacion);
                                 scsActuacionasistencia.setUsuvalidacion(usuarios.get(0).getIdusuario());
+                            }else {
+                            	scsActuacionasistencia.setFechajustificacion(null);
                             }
                         }else if(!UtilidadesString.esCadenaVacia(tarjeta.getAnulada())){
 
