@@ -434,6 +434,40 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		return colegiadosDTO;
 	}
+	
+	@Override
+	public ColegiadoDTO searchTipoPersona(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+
+		LOGGER.info("searchTipoPersona() -> Entrada al servicio para obtener colegiados");
+
+		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
+
+		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			if (null != colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
+				colegiadoItem.setNif(dni);
+			}
+			colegiadoItemList = cenColegiadoExtendsMapper.selectTipoCliente(idInstitucion, colegiadoItem);
+			colegiadosDTO.setColegiadoItem(colegiadoItemList);
+
+			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
+
+				LOGGER.warn(
+						"searchTipoPersona() / cenColegiadoExtendsMapper.searchTipoPersona() -> No existen colegiados con las condiciones recibidas en la Institucion = "
+								+ idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("searchTipoPersona() -> idInstitucion del token nula");
+		}
+
+		return colegiadosDTO;
+	}
 
 	@Override
 	public ResponseFileDTO generateExcel(ColegiadoItem colegiadoItem, HttpServletRequest request) {

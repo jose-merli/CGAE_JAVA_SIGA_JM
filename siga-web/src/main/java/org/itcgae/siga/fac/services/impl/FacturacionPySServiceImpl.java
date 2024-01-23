@@ -1,13 +1,19 @@
 package org.itcgae.siga.fac.services.impl;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -23,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.naming.NamingException;
@@ -30,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
@@ -158,6 +166,7 @@ import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacHistoricofacturaMapper;
 import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
@@ -192,7 +201,6 @@ import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
@@ -2310,8 +2318,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception {
 		FacturaDTO facturaDTO = new FacturaDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
-		List<FacturaItem> items = new ArrayList<>();
-
+		
 		LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Entrada al servicio para obtener las facturas");
 
 		// Conseguimos información del usuario logeado
@@ -2334,18 +2341,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
 			
-			items = facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
-						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura, tamMaximo);
+			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item, usuario, filtrosSoloAbono, filtrosSoloFactura, tamMaximo);
+			
+			LOGGER.debug("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 			facturaDTO.setFacturasItems(items);
-			if (facturaDTO.getFacturasItems().size() == tamMaximo) {
-				facturaDTO.setError(UtilidadesString.creaInfoResultados());
-			}
+            if (facturaDTO.getFacturasItems().size() >= tamMaximo) {
+                facturaDTO.setError(UtilidadesString.creaInfoResultados());
+            }
 		}
-		
-		
-
-		LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 		return facturaDTO;
 	}

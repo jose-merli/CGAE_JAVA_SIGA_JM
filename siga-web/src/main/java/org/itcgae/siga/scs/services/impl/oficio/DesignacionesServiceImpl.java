@@ -3345,7 +3345,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setIdturno(designaItem.getIdTurno());
 
 					Calendar cal = Calendar.getInstance();
-					short year = (short) cal.get(Calendar.YEAR);
+					short year = (short) designaItem.getAno();
 					designa.setAnio(year);
 
 					// CALCULO CAMPO CODIGO (NUMERO EN FRONT)

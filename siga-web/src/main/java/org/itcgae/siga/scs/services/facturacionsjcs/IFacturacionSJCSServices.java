@@ -69,6 +69,8 @@ public interface IFacturacionSJCSServices {
     public FacturacionesAsuntoDTO getFacturacionesPorEJG(ScsEjg ejg, HttpServletRequest request);
 
     public void ejecutaFacturacionesSJCSBloqueadas();
+    
+    public void eliminarFacturacionesPendientes();
 
     public StringDTO getAgrupacionDeTurnosPorTurno(String idTurno, HttpServletRequest request);
 

@@ -1910,22 +1910,24 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 			// recorriendo lista de periodos para anhadir en cada periodo
 			// las fechas de dias de guardia en formato corto
-			for (int i = 0; i < arrayDiasGuardiaCGAE.size(); i++) {
-				periodoEfectivo = (PeriodoEfectivoItem) arrayDiasGuardiaCGAE.get(i);
-
-				// obteniendo los dis por cada periodo
-				arrayDias = new ArrayList<String>();
-				iter = periodoEfectivo.iterator();
-				while (iter.hasNext()) {
-					fecha = (Date) iter.next();
-					sFecha = datef.format(fecha);
-					arrayDias.add(sFecha);
+			if(arrayDiasGuardiaCGAE != null) {
+				for (int i = 0; i < arrayDiasGuardiaCGAE.size(); i++) {
+					periodoEfectivo = (PeriodoEfectivoItem) arrayDiasGuardiaCGAE.get(i);
+	
+					// obteniendo los dis por cada periodo
+					arrayDias = new ArrayList<String>();
+					iter = periodoEfectivo.iterator();
+					while (iter.hasNext()) {
+						fecha = (Date) iter.next();
+						sFecha = datef.format(fecha);
+						arrayDias.add(sFecha);
+					}
+	
+					// insertando lista de dias (en formato corto) para el generador posterior
+					// Nota: no se insertan los arrays de periodos vacios que si guarda el CGAE
+					if (!arrayDias.isEmpty())
+						listaFinal.add(arrayDias);
 				}
-
-				// insertando lista de dias (en formato corto) para el generador posterior
-				// Nota: no se insertan los arrays de periodos vacios que si guarda el CGAE
-				if (!arrayDias.isEmpty())
-					listaFinal.add(arrayDias);
 			}
 
 			return listaFinal;
@@ -5937,12 +5939,15 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			scsDesignasletrado.setNumero(scsAsistencia.getDesignaNumero());
 			scsDesignasletrado.setIdturno(scsAsistencia.getDesignaTurno());
 			scsDesignasletrado.setIdpersona(scsAsistencia.getIdpersonacolegiado());
-			scsDesignasletrado.setFechadesigna(scsAsistencia.getFechahora());
+			if(scsAsistencia.getFechahora().before(new Date()))
+				scsDesignasletrado.setFechadesigna(scsAsistencia.getFechahora());
+			else
+				scsDesignasletrado.setFechadesigna(new Date());
 			scsDesignasletrado.setIdinstitucion(scsAsistencia.getIdinstitucion());
 			scsDesignasletrado.setManual((short) 0);
 			scsDesignasletrado.setLetradodelturno("S");
 			scsDesignasletrado.setFechamodificacion(new Date());
-			scsDesignasletrado.setUsumodificacion(1);
+			scsDesignasletrado.setUsumodificacion(usuarios.get(0).getIdusuario());
 			affectedRows += scsDesignasLetradoExtendsMapper.insertSelective(scsDesignasletrado);
 		}
 		ScsContrariosasistenciaExample scsContrariosasistenciaExample = new ScsContrariosasistenciaExample();
@@ -6145,7 +6150,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			record.setIdpersona(scsAsistencia.getIdpersonajg());
 			record.setIdtipoejg(scsEjg.getIdtipoejg());
 			record.setNumero(scsEjg.getNumero());
-			record.setObservaciones("Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
+			//record.setObservaciones("Copiado desde la asistencia: " + scsAsistencia.getAnio() + "/" + scsAsistencia.getNumero());
 			record.setSolicitante(new Short("1"));
 			record.setUsumodificacion(usuario);
 			

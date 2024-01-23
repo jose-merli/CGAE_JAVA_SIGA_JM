@@ -22,6 +22,8 @@ public interface IBusquedaColegiadosService {
 	
 	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException;
 	
+	public ColegiadoDTO searchTipoPersona( ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException;
+	
 	public ComboInstitucionDTO getLabel(HttpServletRequest request);
 
 	public ColegiadoDTO searchColegiadoFicha(ColegiadoItem colegiadoItem, HttpServletRequest request);
