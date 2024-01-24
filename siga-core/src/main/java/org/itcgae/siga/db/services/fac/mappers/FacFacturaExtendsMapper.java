@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.ComunicacionesMorososDTO;
 import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
@@ -191,4 +192,13 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 
 	@UpdateProvider(type = FacFacturaExtendsSqlProvider.class, method = "updateImportesFactura")
 	int updateImportesFactura(String idFactura, Short idInstitucion, Integer idUsuario);
+	
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getComunicacionesMorosos")
+	@Results({
+			@Result(column = "numcomunicaciones", property = "comunicacionesFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ultcomunicacion", property = "ultimaComunicacion", jdbcType = JdbcType.VARCHAR),
+			
+	})
+	ComunicacionesMorososDTO getComunicacionesMorosos(String idFactura, String idInstitucion, String idPersona);
+
 }
