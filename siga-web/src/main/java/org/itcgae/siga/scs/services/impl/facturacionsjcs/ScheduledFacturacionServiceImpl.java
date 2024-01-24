@@ -31,4 +31,12 @@ public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionSer
         LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE ejecutaFacturacionesSJCSBloqueadas");
     }
 
+  //COMENTAR SCHEDULED PARA USAR EN LOCAL
+    @Scheduled(cron = "${cron.pattern.scheduled.procesoEliminarFacturacionesPendientes}")
+    @Override
+    public void eliminarFacturacionesPendientes() {
+        LOGGER.debug("ScheduledFacturacionServiceImpl --> ENTRA eliminarFacturacionesPendientes");
+        facturacionServices.eliminarFacturacionesPendientes();
+        LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE eliminarFacturacionesPendientes");
+    }
 }

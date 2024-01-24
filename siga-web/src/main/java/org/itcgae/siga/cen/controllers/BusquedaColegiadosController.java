@@ -104,6 +104,12 @@ public class BusquedaColegiadosController {
 		ColegiadoDTO response = busquedaColegiadosService.searchColegiadoFicha(colegiadoItem, request);
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/busquedaColegiado/tipoPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadoDTO> searchTipoPersona(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
+		ColegiadoDTO response = busquedaColegiadosService.searchTipoPersona(colegiadoItem, request);
+		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/busquedaColegiado/getSituacionGlobalColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> searchColegiado(@RequestBody String idPersona, HttpServletRequest request) {

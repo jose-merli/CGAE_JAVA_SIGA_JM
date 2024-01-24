@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Context;
@@ -41,7 +42,61 @@ import org.itcgae.siga.DTOs.scs.PagosjgItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_FACTURACION;
 import org.itcgae.siga.commons.utils.UtilidadesString;
-import org.itcgae.siga.db.entities.*;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.FcsAplicaMovimientosvariosExample;
+import org.itcgae.siga.db.entities.FcsFactActuaciondesignaExample;
+import org.itcgae.siga.db.entities.FcsFactApunteExample;
+import org.itcgae.siga.db.entities.FcsFactEjgExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacion;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionExample;
+import org.itcgae.siga.db.entities.FcsFactEstadosfacturacionKey;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHito;
+import org.itcgae.siga.db.entities.FcsFactGrupofactHitoExample;
+import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.FcsFactSojExample;
+import org.itcgae.siga.db.entities.FcsFacturacionEstadoEnvioExample;
+import org.itcgae.siga.db.entities.FcsFacturacionjg;
+import org.itcgae.siga.db.entities.FcsFacturacionjgExample;
+import org.itcgae.siga.db.entities.FcsFacturacionjgKey;
+import org.itcgae.siga.db.entities.FcsHistoAcreditacionprocExample;
+import org.itcgae.siga.db.entities.FcsHistoTipoactcostefijoExample;
+import org.itcgae.siga.db.entities.FcsHistoricoAcreditacionExample;
+import org.itcgae.siga.db.entities.FcsHistoricoHitofactExample;
+import org.itcgae.siga.db.entities.FcsHistoricoProcedimientosExample;
+import org.itcgae.siga.db.entities.FcsHistoricoTipoactuacionExample;
+import org.itcgae.siga.db.entities.FcsHistoricoTipoasistcolegioExample;
+import org.itcgae.siga.db.entities.FcsMovimientosvarios;
+import org.itcgae.siga.db.entities.FcsMovimientosvariosExample;
+import org.itcgae.siga.db.entities.FcsMovimientosvariosKey;
+import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucion;
+import org.itcgae.siga.db.entities.FcsTrazaErrorEjecucionExample;
+import org.itcgae.siga.db.entities.GenDiccionarioKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ScsActuacionasistencia;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
+import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
+import org.itcgae.siga.db.entities.ScsActuaciondesigna;
+import org.itcgae.siga.db.entities.ScsActuaciondesignaKey;
+import org.itcgae.siga.db.entities.ScsAsistencia;
+import org.itcgae.siga.db.entities.ScsAsistenciaExample;
+import org.itcgae.siga.db.entities.ScsAsistenciaKey;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.entities.ScsCabeceraguardiasKey;
+import org.itcgae.siga.db.entities.ScsEjg;
+import org.itcgae.siga.db.entities.ScsEjgExample;
+import org.itcgae.siga.db.entities.ScsEjgKey;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiado;
+import org.itcgae.siga.db.entities.ScsGuardiascolegiadoExample;
+import org.itcgae.siga.db.entities.ScsSoj;
+import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.FcsAplicaMovimientosvariosMapper;
 import org.itcgae.siga.db.mappers.FcsFactActuaciondesignaMapper;
@@ -76,12 +131,14 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoSJCSExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsFactEstadosfacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsActuacionasistenciaExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSServices;
 import org.itcgae.siga.scs.services.facturacionsjcs.IFacturacionSJCSZombiService;
+import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -96,6 +153,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     private static final String TEXTO_REINTENTO = "Se ha perdido la ejecución de la facturación. Reintentamos la ejecución.";
 
 	private Logger LOGGER = Logger.getLogger(FacturacionSJCSServicesImpl.class);
+	
+    @Autowired
+    private CgaeAuthenticationProvider authenticationProvider;
 
 	@Autowired
 	ScsActuacionasistenciaExtendsMapper scsActuacionasistenciaExtendsMapper;
@@ -110,6 +170,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     @Autowired
     private FcsFactEstadosfacturacionMapper fcsFactEstadosfacturacionMapper;
+    
+    @Autowired
+    private FcsFactEstadosfacturacionExtendsMapper fcsFactEstadosfacturacionExtendsMapper;
 
     @Autowired
     private FcsFactGrupofactHitoMapper fcsFactGrupofactHitoMapper;
@@ -307,9 +370,19 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 	@Override
 	@Transactional(timeout=24000)
 	public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = "";
+		Short idInstitucion;
+		
+		if(request != null) {
+			String token = request.getHeader("Authorization");
+			dni = UserTokenUtils.getDniFromJWTToken(token);
+			idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		}
+		else {
+			idInstitucion = Short.valueOf(facturacionItem.getIdInstitucion());
+			dni = "44149718E";
+			
+		}
 		FacturacionDeleteDTO facturacionesDelete = new FacturacionDeleteDTO();
 		Error error = new Error();
 		int response = 1;
@@ -326,7 +399,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				//usuario.setIdinstitucion(idInstitucion);
-
+				
 				if (checkDeleteFacturacion(facturacionItem, idInstitucion)) {
 
 					int idFactura = Integer.valueOf(facturacionItem.getIdFacturacion());
@@ -408,6 +481,60 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 				"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida del servicio para eliminar las facturaciones");
 
 		return facturacionesDelete;
+	}
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public UpdateResponseDTO archivarFacturacion(List<FacturacionItem> facturacionItems, HttpServletRequest request, boolean archivar) {
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		LOGGER.info("archivarFacturaciones() -> Entrada al servicio para archivar/desarchivar facturaciones programadas");
+
+		// Conseguimos información del usuario logeado
+		try {
+			usuario = authenticationProvider.checkAuthentication(request);
+
+			if (usuario != null) {
+				LOGGER.info("archivarFacturaciones() / facFacturacionprogramadaExtendsMapper.archivarFacturacion() -> Entrada a facFacturacionprogramadaExtendsMapper para archivar/desarchivar facturaciones programadas");
+	
+				try {
+					// Logica
+					for (FacturacionItem item : facturacionItems) {
+						FcsFacturacionjgKey key = new FcsFacturacionjgKey();
+						key.setIdfacturacion(Integer.valueOf(item.getIdFacturacion()));
+						key.setIdinstitucion(Short.valueOf(item.getIdInstitucion()));
+		
+						FcsFacturacionjg facturacion = fcsFacturacionJGExtendsMapper.selectByPrimaryKey(key);
+						
+						if(archivar) {
+							facturacion.setArchivada(1);
+						} else {
+							facturacion.setArchivada(0);
+						}
+						fcsFacturacionJGExtendsMapper.updateByPrimaryKey(facturacion);
+					}
+					
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					
+				} catch (Exception e) {
+					LOGGER.debug("FacturacionSJCSServicesImpl.archivarFacturacion() -> No se cumplen las restricciones para poder eliminar la facturación");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					error.setDescription("facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorArchivar");
+					//error.setMessage(facturacionItem.getNombre());
+				}
+			}
+		
+		} catch (Exception e) {
+			updateResponseDTO.setStatus("403");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("archivarFacturaciones() -> Salida del servicio para archivar/desarchivar facturaciones programadas");
+
+		return updateResponseDTO;
 	}
 
     private int eliminaTablasFacturacion(int idFactura, String idInstitucion) {
@@ -614,13 +741,41 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         return response;
     }
+    
+    private boolean checkFactEnProceso() {
+
+        LOGGER.debug("Inicio de checkFactEnProceso() -> Se comprueba si la facturación se puede eliminar");
+
+        boolean response = false;
+
+        try {
+        	
+        	// Comprobamos si existen facturaciones EN EJECUCION (40) o PROGRAMADAS (50),
+        	// Si es el caso, no se debe poder eliminar otra facturación
+        	
+            Integer numero = fcsFacturacionJGExtendsMapper.getFactEnProceso();
+            
+            if ( null == numero || numero > 0 ) {
+                response = true;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Se ha producido un error al realizar los comprobaciones de eliminación de la facturación: ");
+            response = true;
+        }
+
+        LOGGER.debug("Inicio de checkFactEnProceso() -> La facturación se puede eliminar: " + response);
+
+        return response;
+    }
+    
+ 
 
     @Override
     public FacturacionDTO datosFacturacion(String idFacturacion, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         String dni = UserTokenUtils.getDniFromJWTToken(token);
         Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-        FacturacionDTO facturaciones = new FacturacionDTO();
+        FacturacionDTO facturacion = new FacturacionDTO();
 
         if (null != idInstitucion) {
             AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -635,17 +790,14 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 AdmUsuarios usuario = usuarios.get(0);
                 usuario.setIdinstitucion(idInstitucion);
 
-                LOGGER.debug(
-                        "datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
-                List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.datosFacturacion(idFacturacion,
-                        idInstitucion.toString());
-                facturaciones.setFacturacionItem(facturacionItem);
-                LOGGER.debug(
-                        "datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los datos de la facturación");
+                LOGGER.debug("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Entrada a fcsFacturacionJGExtendsMapper para obtener los datos de la facturacón");
+                
+                List<FacturacionItem> facturacionItem = fcsFacturacionJGExtendsMapper.datosFacturacion(idFacturacion, idInstitucion.toString());
+                facturacion.setFacturacionItem(facturacionItem);
+                
+                LOGGER.debug("datosFacturacion() / fcsFacturacionJGExtendsMapper.datosFacturacion() -> Salida a fcsFacturacionJGExtendsMapper para obtener los datos de la facturación");
             } else {
-                LOGGER.warn(
-                        "getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-                                + dni + " e idInstitucion = " + idInstitucion);
+                LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
             }
         } else {
             LOGGER.warn("getLabel() -> idInstitucion del token nula");
@@ -653,7 +805,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
         LOGGER.debug("getLabel() -> Salida del servicio para obtener los datos de las facturaciones");
 
-        return facturaciones;
+        return facturacion;
     }
 
     @Override
@@ -775,8 +927,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                             "saveFacturacion() / fcsFacturacionJGExtendsMapper.saveFacturacion() -> Guardar datos en fcsFacturacionjg");
                     NewIdDTO idP = fcsFacturacionJGExtendsMapper.getIdFacturacion(idInstitucion);
                     idFacturacion = Integer.parseInt(idP.getNewId()) + 1;
-
-                    int idPartida = Integer.parseInt(facturacionItem.getIdPartidaPresupuestaria());
+                    
+                    //int idPartida = Integer.parseInt(facturacionItem.getIdPartidaPresupuestaria());
                     Short idEstado = 10;
 
                     // SETEAMOS LOS DATOS Y GUARDAMOS LA FACTURA
@@ -790,7 +942,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     record.setVisible(facturacionItem.getVisible());
                     record.setFechamodificacion(new Date());
                     record.setUsumodificacion(usuario.getIdusuario());
-                    record.setIdpartidapresupuestaria(idPartida);
+                    //record.setIdpartidapresupuestaria(idPartida);
 
                     response = fcsFacturacionJGExtendsMapper.insert(record);
 
@@ -810,7 +962,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                     record2.setFechamodificacion(new Date());
                     record2.setUsumodificacion(usuario.getIdusuario());
                     record2.setIdordenestado(idOrdenEstado);
-
+                    record2.setPrevision(facturacionItem.getPrevision());
+                    
                     response = fcsFactEstadosfacturacionMapper.insert(record2);
 
                     LOGGER.debug(
@@ -1052,21 +1205,33 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         	.andIdfacturacionEqualTo(facturacion.getIdfacturacion());
 		List <FcsMovimientosvarios> mvList = fcsMovimientosvariosMapper.selectByExample(exampleMV );
 		if(mvList==null || mvList.size()==0) {
-	
-	        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
-	        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
-	
-	        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
-	            File ficheroFisico = new File(facturacion.getNombrefisico());
-	
-	            if (ficheroFisico.exists()) {
-	                ficheroFisico.delete();
-	            }
-	        }
-	
-	        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
-			if("".equals(resPL)) {
-				response = -1;
+			
+			boolean factEnProceso = checkFactEnProceso();
+			
+			if (factEnProceso == false) {
+		        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
+		        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
+		
+		        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
+		            File ficheroFisico = new File(facturacion.getNombrefisico());
+		
+		            if (ficheroFisico.exists()) {
+		                ficheroFisico.delete();
+		            }
+		        }
+		
+		        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
+				if("".equals(resPL)) {
+					response = -1;
+				}
+			}else {
+				LOGGER.debug(
+						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Hay facturaciones en ejecucion o programadas, no se puede eliminar ahora");
+				String mensajeError = "factSJCS.facturacion.error.borrarFact.pendienteEliminar";
+				// Insertamos una nueva fila en la tabla de historicos de estados facturacion
+				// con el estado ELIMINACION PDTE  para que se pueda eliminar con el Scheduled
+				insertFacturacionesPendientes(facturacion, facturacion.getIdinstitucion(), usuario);
+				throw new BusinessException(mensajeError);
 			}
 		}else {
 			String mensajeError = "factSJCS.facturacion.error.borrarFact.mov";
@@ -2783,6 +2948,64 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             throw e;
         } finally {
             setNadieEjecutando();
+        }
+    }
+    
+    public void eliminarFacturacionesPendientes() {
+    	
+        LOGGER.debug("Inicio de eliminarFacturacionesPendientes() -> Se comprueba si la facturación se puede eliminar");
+    	
+        List<FacturacionItem> ListfactPendientesEliminar = fcsFacturacionJGExtendsMapper.getFacturacionesPendientesEliminar();
+		
+        for (int i = 0; i < ListfactPendientesEliminar.size(); i++) {
+        	
+        	FacturacionItem factPendienteEliminar = ListfactPendientesEliminar.get(i);	
+        	
+        	eliminarFacturaciones(factPendienteEliminar, null);
+			
+			LOGGER.debug(
+					"eliminarFacturaciones() -> Terminado el proceso de eliminacion de la facturacion");
+		}
+    }
+    
+    public void insertFacturacionesPendientes(FcsFacturacionjg facturacion, Short idInstitucion, AdmUsuarios usuario) {
+        FcsFactEstadosfacturacion record = new FcsFactEstadosfacturacion();
+        int response = 1;
+
+        try {
+        	// GUARDAMOS EL NUEVO ESTADO DE LA FACTURACION
+        	LOGGER.debug(
+                    "insertFacturacionesPendientes()  -> Entrada para guardar los estados de la facturacion en fcsFactEstadosFacturacion");
+			
+        	String idEstadoAct = fcsFactEstadosfacturacionExtendsMapper.getIdEstadoFacturacion(
+        			idInstitucion, Integer.toString(facturacion.getIdfacturacion()));
+        	// Si idEstado ya es igual a 95 no hacemos el insert
+        	if(!("95").equals(idEstadoAct)) {
+	        	
+				Short idEstado = 95;
+				int idOrdenEstadoActual = Integer.parseInt(fcsFactEstadosfacturacionExtendsMapper.getIdordenestadoMaximo(
+						idInstitucion, Integer.toString(facturacion.getIdfacturacion())));
+				idOrdenEstadoActual++;
+	            Short idOrdenEstadoNuevo = (short)idOrdenEstadoActual;
+	
+	            record.setIdfacturacion(facturacion.getIdfacturacion());
+	            record.setIdinstitucion(idInstitucion);
+	            record.setIdestadofacturacion(idEstado);
+	            record.setFechaestado(new Date());
+	            record.setFechamodificacion(new Date());
+	            record.setUsumodificacion(usuario.getIdusuario());
+	            record.setIdordenestado(idOrdenEstadoNuevo);
+	            record.setPrevision(facturacion.getPrevision());
+	            
+	            response = fcsFactEstadosfacturacionMapper.insert(record);
+	
+	            LOGGER.debug(
+	                    "insertFacturacionesPendientes() -> Salida guardar los estados de la facturacion en fcsFactEstadosFacturacion");
+        	}
+        } catch (Exception e) {
+            LOGGER.error(
+                    "ERROR: FacturacionServicesImpl.insertFacturacionesPendientes > al guardar los datos de la facturacion.",
+                    e);
         }
     }
 

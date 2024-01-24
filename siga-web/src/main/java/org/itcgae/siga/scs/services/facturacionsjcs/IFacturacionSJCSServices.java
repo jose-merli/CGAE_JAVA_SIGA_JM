@@ -27,6 +27,8 @@ public interface IFacturacionSJCSServices {
     public FacturacionDTO buscarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request);
 
     public FacturacionDeleteDTO eliminarFacturaciones(FacturacionItem facturacionItem, HttpServletRequest request);
+    
+    public UpdateResponseDTO archivarFacturacion(List<FacturacionItem> facturacionItems, HttpServletRequest request, boolean archivar);
 
     public FacturacionDTO datosFacturacion(String idFacturacion, HttpServletRequest request);
 
@@ -67,6 +69,8 @@ public interface IFacturacionSJCSServices {
     public FacturacionesAsuntoDTO getFacturacionesPorEJG(ScsEjg ejg, HttpServletRequest request);
 
     public void ejecutaFacturacionesSJCSBloqueadas();
+    
+    public void eliminarFacturacionesPendientes();
 
     public StringDTO getAgrupacionDeTurnosPorTurno(String idTurno, HttpServletRequest request);
 

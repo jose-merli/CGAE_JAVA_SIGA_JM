@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -168,11 +169,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import com.aspose.words.Document;
+import com.aspose.words.DocumentBuilder;
 import com.aspose.words.FolderFontSource;
 import com.aspose.words.FontInfo;
 import com.aspose.words.FontInfoCollection;
+import com.aspose.words.FontSavingArgs;
 import com.aspose.words.FontSettings;
 import com.aspose.words.FontSourceBase;
+import com.aspose.words.PhysicalFontInfo;
 import com.aspose.words.SystemFontSource;
 import com.google.common.io.Files;
 
@@ -2909,6 +2913,18 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 	}
 	
+	private String getRutaFuentesPDF() {
+		
+		GenPropertiesKey key = new GenPropertiesKey();
+		key.setFichero(SigaConstants.FICHERO_SIGA);
+		key.setParametro(SigaConstants.parametroRutaFuentesPdf);
+		
+		GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+		
+		return rutaFicherosSalida.getValor();
+		
+	}
+	
 	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, 
 			Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario, boolean consultasDestinatarioEjecutadas, boolean esFO, List<List<String>> listaKeyFiltros, DestinatarioItem destinatario , List<DestinatarioItem> destinatarios, CamposPlantillaEnvio camposEnvio) {
 		
@@ -3044,7 +3060,41 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}else{
 				existePlantilla(filePlantilla);
 				
+				
+				//obtenemos todos los fondos
+				//FontSettings fontSettings = new FontSettings();
+				//FontSourceBase[] fontSources = fontSettings.getFontsSources();
+
+				
+				// Fuente que Aspose usara por defecto si no se puede usar la de la plantilla
+				//String fontName = FontSettings.getDefaultFontName();
+				//LOGGER.info("Default Font Name: " + fontName + ", Font Source: " + fontSource);
+				
+				/*FontSettings.getDefaultInstance().setFontsSources(
+				        new FontSourceBase[] {
+				            new FolderFontSource("C:\\Datos\\fonts", true, 1),
+				            new SystemFontSource(0)
+				        }
+				);
+				*/
+/*				ArrayList<FolderFontSource> fontSources = new ArrayList(Arrays.asList(FontSettings.getDefaultInstance().getFontsSources()));
+				FolderFontSource folderFontSource = new FolderFontSource("C:\\Datos\\fonts\\", true);
+
+				fontSources.add(folderFontSource);
+				FontSourceBase[] updatedFontSources = (FontSourceBase[]) fontSources.toArray(new FontSourceBase[fontSources.size()]);
+				FontSettings.getDefaultInstance().setFontsSources(updatedFontSources); 
+				
+				
+*/
+				
 				try {
+					
+					//FontSettings.getDefaultInstance().setFontsSources(
+					//		new FontSourceBase[] { new SystemFontSource(), new FolderFontSource("C:\\Datos\\fonts\\", true) });
+					
+					FontSettings.getDefaultInstance().setFontsSources(new FontSourceBase[] {new FolderFontSource(this.getRutaFuentesPDF(), true)});
+					
+					
 					doc = new Document(rutaPlantilla + nombrePlantilla);
 				
 					if(modelosComunicacionItem.getIdClaseComunicacion().equals("9")) { //Carta de Acreditación de Oficio
@@ -3066,19 +3116,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					docGenerado = _generacionDocService.grabaDocumento(doc, rutaTmp, nombreFicheroSalida, firmado);
 					
 					// Fuente que ha obtenido de la plantilla, mas las que trae por defecto Aspose (La que tiene la plantilla suele estar en penultima posicion)
-					FontInfoCollection fontsInfo = doc.getFontInfos();
+					/*FontInfoCollection fontsInfo = doc.getFontInfos();
 					for (FontInfo info : fontsInfo) {
 						LOGGER.info("Font Name: " + info.getName() + ", Type: " + info.isTrueType());
-					}
+					}*/
 					
 					// Linea de codigo para elegir el directorio de Fuentes manualmente de donde leera las fuentes Aspose
 					// para usarlas en la generacion del documento (Por defecto es C:\\Windows\\Fonts)
 					//FontSettings.setFontsSources(new FontSourceBase[] {new SystemFontSource(), new FolderFontSource("C:\\Windows\\Fonts", true) });
 					
 					// Linea de codigo para ver de donde esta recogiendo las fuentes Aspose para usarlas en el nuevo documento (Por defecto es C:\\Windows\\Fonts)
-					FontSourceBase[] fontSource = FontSettings.getFontsSources();
+					//FontSourceBase[] fontSource = FontSettings.getFontsSources();
 					// Fuente que Aspose usara por defecto si no se puede usar la de la plantilla
-					String fontName = FontSettings.getDefaultFontName();
+					//String fontName = FontSettings.getDefaultFontName();
 					//LOGGER.info("Default Font Name: " + fontName + ", Font Source: " + fontSource);
 
 

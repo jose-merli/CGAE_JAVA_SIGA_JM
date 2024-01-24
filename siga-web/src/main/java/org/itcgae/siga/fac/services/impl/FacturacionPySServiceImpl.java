@@ -50,9 +50,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
-import org.itcgae.siga.DTO.fac.AbonoContabilidadItem;
-import org.itcgae.siga.DTO.fac.AltaAnticipoItem;
-import org.itcgae.siga.DTO.fac.AnticiposPySItem;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
@@ -61,33 +58,18 @@ import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
 import org.itcgae.siga.DTO.fac.CuentasBancariasItem;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesDTO;
 import org.itcgae.siga.DTO.fac.DestinatariosSeriesItem;
-import org.itcgae.siga.DTO.fac.DevolucionesItem;
-import org.itcgae.siga.DTO.fac.EstadosAbonosDTO;
-import org.itcgae.siga.DTO.fac.EstadosAbonosItem;
-import org.itcgae.siga.DTO.fac.EstadosPagosDTO;
-import org.itcgae.siga.DTO.fac.EstadosPagosItem;
-import org.itcgae.siga.DTO.fac.FacEstadosFacturacion;
 import org.itcgae.siga.DTO.fac.FacFacturacionEliminarItem;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaDTO;
 import org.itcgae.siga.DTO.fac.FacFacturacionprogramadaItem;
-import org.itcgae.siga.DTO.fac.FacRegistroFichConta;
-import org.itcgae.siga.DTO.fac.FacRegistroFichContaDTO;
 import org.itcgae.siga.DTO.fac.FacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturaLineaDTO;
 import org.itcgae.siga.DTO.fac.FacturaLineaItem;
-import org.itcgae.siga.DTO.fac.FacturasContabilidadItem;
 import org.itcgae.siga.DTO.fac.FacturasIncluidasDTO;
 import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FaseFacturacionProgramadaItem;
-import org.itcgae.siga.DTO.fac.FicherosAdeudosItem;
 import org.itcgae.siga.DTO.fac.InformeFacturacionDTO;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
-import org.itcgae.siga.DTO.fac.LiquidacionAnticipoColegioItem;
-import org.itcgae.siga.DTO.fac.PagoPorBancoAbonoItem;
-import org.itcgae.siga.DTO.fac.PagoPorBancoItem;
-import org.itcgae.siga.DTO.fac.PagoPorCajaItem;
-import org.itcgae.siga.DTO.fac.PagoPorTarjetaItem;
 import org.itcgae.siga.DTO.fac.SerieFacturacionItem;
 import org.itcgae.siga.DTO.fac.SeriesFacturacionDTO;
 import org.itcgae.siga.DTO.fac.TarjetaPickListSerieDTO;
@@ -97,7 +79,6 @@ import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
@@ -105,27 +86,19 @@ import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.cen.services.FicherosService;
-import org.itcgae.siga.cen.services.IFicherosService;
-import org.itcgae.siga.cen.services.impl.CargasMasivasGFServiceImpl;
-import org.itcgae.siga.DTOs.scs.EstadoCertificacionItem;
 import org.itcgae.siga.DTOs.scs.FacAbonoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
-import org.itcgae.siga.commons.utils.UtilidadesNumeros;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
-import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenBancosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenGruposcriterios;
 import org.itcgae.siga.db.entities.CenGruposcriteriosExample;
 import org.itcgae.siga.db.entities.CenGruposcriteriosKey;
@@ -136,46 +109,27 @@ import org.itcgae.siga.db.entities.EnvComunicacionmorosos;
 import org.itcgae.siga.db.entities.EnvComunicacionmorososExample;
 import org.itcgae.siga.db.entities.FacAbono;
 import org.itcgae.siga.db.entities.FacAbonoKey;
-import org.itcgae.siga.db.entities.FacAbonoincluidoendisquete;
 import org.itcgae.siga.db.entities.FacBancoinstitucion;
 import org.itcgae.siga.db.entities.FacBancoinstitucionExample;
 import org.itcgae.siga.db.entities.FacBancoinstitucionKey;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefactur;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturExample;
 import org.itcgae.siga.db.entities.FacClienincluidoenseriefacturKey;
-import org.itcgae.siga.db.entities.FacDisqueteabonos;
-import org.itcgae.siga.db.entities.FacEstadofactura;
-import org.itcgae.siga.db.entities.FacEstadofacturaExample;
 import org.itcgae.siga.db.entities.FacFactura;
-import org.itcgae.siga.db.entities.FacFacturaDevolucion;
 import org.itcgae.siga.db.entities.FacFacturaKey;
 import org.itcgae.siga.db.entities.FacFacturacionprogramada;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaExample;
 import org.itcgae.siga.db.entities.FacFacturacionprogramadaKey;
-import org.itcgae.siga.db.entities.FacFacturaincluidaendisquete;
-import org.itcgae.siga.db.entities.FacFacturaincluidaendisqueteKey;
 import org.itcgae.siga.db.entities.FacFormapagoserie;
 import org.itcgae.siga.db.entities.FacFormapagoserieExample;
 import org.itcgae.siga.db.entities.FacGrupcritincluidosenserie;
 import org.itcgae.siga.db.entities.FacGrupcritincluidosenserieExample;
 import org.itcgae.siga.db.entities.FacHistoricofactura;
 import org.itcgae.siga.db.entities.FacHistoricofacturaExample;
-import org.itcgae.siga.db.entities.FacHistoricofacturaKey;
 import org.itcgae.siga.db.entities.FacLineaabono;
 import org.itcgae.siga.db.entities.FacLineaabonoKey;
-import org.itcgae.siga.db.entities.FacLineadevoludisqbanco;
-import org.itcgae.siga.db.entities.FacLineadevoludisqbancoKey;
 import org.itcgae.siga.db.entities.FacLineafactura;
-import org.itcgae.siga.db.entities.FacLineafacturaExample;
 import org.itcgae.siga.db.entities.FacLineafacturaKey;
-import org.itcgae.siga.db.entities.FacPagoabonoefectivo;
-import org.itcgae.siga.db.entities.FacPagoabonoefectivoExample;
-import org.itcgae.siga.db.entities.FacPagoabonoefectivoKey;
-import org.itcgae.siga.db.entities.FacPagosporcaja;
-import org.itcgae.siga.db.entities.FacPagosporcajaExample;
-import org.itcgae.siga.db.entities.FacRegistrofichconta;
-import org.itcgae.siga.db.entities.FacRenegociacion;
-import org.itcgae.siga.db.entities.FacRenegociacionExample;
 import org.itcgae.siga.db.entities.FacSeriefacturacion;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBanco;
 import org.itcgae.siga.db.entities.FacSeriefacturacionBancoExample;
@@ -190,8 +144,6 @@ import org.itcgae.siga.db.entities.FacTiposproduincluenfactuKey;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfact;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactExample;
 import org.itcgae.siga.db.entities.FacTiposservinclsenfactKey;
-import org.itcgae.siga.db.entities.FcsPagosEstadospagos;
-import org.itcgae.siga.db.entities.FcsPagosEstadospagosExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioKey;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -200,25 +152,20 @@ import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.entities.GenRecursosKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
-import org.itcgae.siga.db.entities.PysAnticipoletrado;
-import org.itcgae.siga.db.entities.PysLineaanticipo;
 import org.itcgae.siga.db.entities.PysTipoiva;
 import org.itcgae.siga.db.entities.PysTipoivaExample;
 import org.itcgae.siga.db.mappers.AdmContadorMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.EnvComunicacionmorososMapper;
-import org.itcgae.siga.db.mappers.FacBancoinstitucionMapper;
 import org.itcgae.siga.db.mappers.FacClienincluidoenseriefacturMapper;
 import org.itcgae.siga.db.mappers.FacFacturaincluidaendisqueteMapper;
 import org.itcgae.siga.db.mappers.FacHistoricofacturaMapper;
 import org.itcgae.siga.db.mappers.FacLineadevoludisqbancoMapper;
-import org.itcgae.siga.db.mappers.FacPagoabonoefectivoMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.mappers.FacRenegociacionMapper;
 import org.itcgae.siga.db.mappers.FcsPagosEstadospagosMapper;
@@ -227,7 +174,6 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
-import org.itcgae.siga.db.mappers.PysAnticipoletradoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
@@ -247,7 +193,6 @@ import org.itcgae.siga.db.services.fac.mappers.FacGrupcritincluidosenserieExtend
 import org.itcgae.siga.db.services.fac.mappers.FacHistoricofacturaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineaabonoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacLineafacturaExtendsMapper;
-import org.itcgae.siga.db.services.fac.mappers.FacRegistroFichContaExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionBancoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacSeriefacturacionExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.FacTipocliincluidoenseriefacExtendsMapper;
@@ -256,15 +201,12 @@ import org.itcgae.siga.db.services.fac.mappers.FacTiposservinclsenfactExtendsMap
 import org.itcgae.siga.db.services.fac.mappers.PySTipoIvaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacAbonoincluidoendisqueteExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPagoabonoefectivoExtendsMapper;
-import org.itcgae.siga.db.services.fcs.mappers.FacPagosporcajaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FacPropositosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
-import org.itcgae.siga.exception.FacturacionSJCSException;
 import org.itcgae.siga.fac.services.IFacturacionPySService;
 import org.itcgae.siga.security.CgaeAuthenticationProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -2255,13 +2197,10 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		return itemsDTO;
 	}
 
-	/**
-	 *
-	 */
 	@Override
 	@Transactional(timeout=24000,rollbackFor = Exception.class)
-	public DeleteResponseDTO eliminarFacturacion(List<FacFacturacionEliminarItem> facs, HttpServletRequest request)
-			throws Exception {
+	public DeleteResponseDTO eliminarFacturacion(List<FacFacturacionEliminarItem> facs, HttpServletRequest request) throws Exception {
+		
 		LOGGER.info("eliminarFacturacion() -> Entrada al servicio para eliminar facturación");
 
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
@@ -2279,7 +2218,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 		}
 		error.description(borradasOK+"/"+borradasKO);
-		
 		
 		deleteResponseDTO.setError(error);
 
@@ -2380,8 +2318,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	public FacturaDTO getFacturas(FacturaItem item, HttpServletRequest request) throws Exception {
 		FacturaDTO facturaDTO = new FacturaDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
-		List<FacturaItem> items = new ArrayList<>();
-
+		
 		LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Entrada al servicio para obtener las facturas");
 
 		// Conseguimos información del usuario logeado
@@ -2404,13 +2341,15 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 			Integer tamMaximo = getTamanoMaximo(usuario.getIdinstitucion());
 			
-			items = facFacturaExtendsMapper.getFacturas(item, usuario.getIdinstitucion().toString(),
-						usuario.getIdlenguaje(),filtrosSoloAbono,filtrosSoloFactura, tamMaximo);
+			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item, usuario, filtrosSoloAbono, filtrosSoloFactura, tamMaximo);
+			
+			LOGGER.debug("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 			facturaDTO.setFacturasItems(items);
+            if (facturaDTO.getFacturasItems().size() >= tamMaximo) {
+                facturaDTO.setError(UtilidadesString.creaInfoResultados());
+            }
 		}
-
-		LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 		return facturaDTO;
 	}

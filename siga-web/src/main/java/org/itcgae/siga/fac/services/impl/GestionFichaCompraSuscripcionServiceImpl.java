@@ -373,7 +373,8 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				solicitud.setTipopeticion("A");
 				// Caso en el que el colegio no necesite aprobacion para realizar compras o
 				// suscripciones
-				if (aprobNecesaria.getValor().equals("N")) {
+				// cuando se realiza una carga masiva, que la hacen NO LETRADOS, el estado pasa directamente a APROBADO 
+				if (aprobNecesaria.getValor().equals("N")  || letrado.equals("N")) {
 					solicitud.setIdestadopeticion((short) 20);
 				}
 				else {
@@ -403,7 +404,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
-				if (aprobNecesaria.getValor().equals("N")) {
+				if (aprobNecesaria.getValor().equals("N") || letrado.equals("N")) {
 					ficha.setNuevo(false);
 					this.aprobarCompra(request, ficha);
 

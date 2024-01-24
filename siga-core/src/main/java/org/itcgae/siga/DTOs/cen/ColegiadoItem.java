@@ -96,7 +96,7 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 	private Boolean cambioEstado;
 	private Boolean searchCount;
 	private String count;
-	
+	private String tipoCliente;
 	private String cuentaContable;
 	
 	// Nombre del colegio que se mostrará como resultado en la tabla de busqueda
@@ -1828,6 +1828,14 @@ public class ColegiadoItem implements Comparable<ColegiadoItem>{
 
 	public void setCuentaContable(String cuentaContable) {
 		this.cuentaContable = cuentaContable;
+	}
+
+	public String getTipo() {
+		return tipoCliente;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipoCliente = tipo;
 	}
 }
 

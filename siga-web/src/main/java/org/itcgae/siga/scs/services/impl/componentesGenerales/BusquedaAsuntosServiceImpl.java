@@ -1737,8 +1737,21 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				List<ScsDefendidosdesigna> defendidosDesigna = scsDefendidosdesignaMapper
 						.selectByExample(defendidosDesignaExample);
 
-				for (ScsDefendidosdesigna interesado : defendidosDesigna) {
+				for (ScsDefendidosdesigna interesado : defendidosDesigna) { // calidad O
+					if(interesado.getCalidad().equalsIgnoreCase("O")) {
+						//actualizamos el ejg con el solicitante
+						ScsEjgKey ejgKey2 = new ScsEjgKey();
 
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setAnio(item.getAnioejg());
+						ejgKey.setIdtipoejg(item.getIdtipoejg());
+						ejgKey.setNumero(item.getNumeroejg());
+
+						ScsEjg ejg2 = scsEjgMapper.selectByPrimaryKey(ejgKey);
+						ejg2.setIdpersonajg(interesado.getIdpersona());
+
+						scsEjgMapper.updateByPrimaryKey(ejg2);
+					}
 					// Se crea el familiar que se introducira en la unidad familiar del EJG
 					ScsUnidadfamiliarejg familiar = new ScsUnidadfamiliarejg();
 

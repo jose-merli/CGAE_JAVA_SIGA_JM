@@ -2523,7 +2523,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
 						
-						if (scsDesigna.getIdpretension() == 0) {
+						if (scsDesigna.getIdpretension() == null || scsDesigna.getIdpretension() == 0) {
 							scsDesigna.setIdpretension(null);
 					      }
 
@@ -3345,7 +3345,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setIdturno(designaItem.getIdTurno());
 
 					Calendar cal = Calendar.getInstance();
-					short year = (short) cal.get(Calendar.YEAR);
+					short year = (short) designaItem.getAno();
 					designa.setAnio(year);
 
 					// CALCULO CAMPO CODIGO (NUMERO EN FRONT)
@@ -8257,6 +8257,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setNumerodesigna((long) designasCodigo.get(0).getNumero());
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria().andDesignaAnioEqualTo((short) designaItem.getAno()).andDesignaNumeroEqualTo((long) designaItem.getNumero())
+					.andIdinstitucionEqualTo(idInstitucion);
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					if(asis.size() > 0) {
+						ScsAsistencia asistencia = asis.get(0);
+						asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
+						asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+						asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
+						scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+					}
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
 				} catch (Exception e) {
