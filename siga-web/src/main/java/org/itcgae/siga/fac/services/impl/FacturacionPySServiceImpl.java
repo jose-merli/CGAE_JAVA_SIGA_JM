@@ -52,6 +52,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
+import org.itcgae.siga.DTO.fac.ComunicacionesMorososDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
@@ -2343,7 +2344,18 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			
 			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item, usuario, filtrosSoloAbono, filtrosSoloFactura, tamMaximo);
 			
-			LOGGER.debug("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
+			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> obteniendo comunicaciones morosos");
+			
+			// obtener comunicaciones moroso
+			for (FacturaItem facturaItem : items) {
+				if ("FACTURAS".equalsIgnoreCase(facturaItem.getTipo())) {
+					ComunicacionesMorososDTO comunicacionesMorosos = facFacturaExtendsMapper.getComunicacionesMorosos(facturaItem.getIdFactura(), facturaItem.getIdInstitucion(), facturaItem.getIdPersona());
+					facturaItem.setComunicacionesFacturas(comunicacionesMorosos.getComunicacionesFacturas());
+					facturaItem.setUltimaComunicacion(comunicacionesMorosos.getUltimaComunicacion());
+				}
+			}
+			
+			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 			facturaDTO.setFacturasItems(items);
             if (facturaDTO.getFacturasItems().size() >= tamMaximo) {
