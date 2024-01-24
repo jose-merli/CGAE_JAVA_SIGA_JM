@@ -56,6 +56,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
     private String getQueryFacturas(FacturaItem item, String idInstitucion, String idLenguaje) {
     	SQL facturas = new SQL();
     	SQL facturasPendientes = new SQL();
+        SQL numComunicaciones = new SQL();
+        SQL ultComunicacion = new SQL();
         SQL sqlEstadosPagos = new SQL();
         SQL sqlUltimoEstado = new SQL();
         SQL sqlUltimoImportePorPagar = new SQL();
@@ -82,6 +84,17 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             if(item.getFacturasPendientesDesde() != null)
                 facturasPendientes.HAVING("COUNT(IMPTOTALPORPAGAR) >=to_number(" + item.getFacturasPendientesDesde() + ",'99999999999999999')");
         }
+        
+        //num comunicaciones
+        numComunicaciones.SELECT("COUNT(1)");
+        numComunicaciones.FROM("env_comunicacionmorosos m");
+        numComunicaciones.WHERE("m.idinstitucion = f.idinstitucion AND m.idpersona = f.idpersona AND m.idfactura = f.idfactura");
+
+        //ult comunicacion
+        ultComunicacion.SELECT("MAX(m.fecha_envio)");
+        ultComunicacion.FROM("env_comunicacionmorosos m");
+        ultComunicacion.WHERE("m.idinstitucion = f.idinstitucion AND m.idpersona = f.idpersona AND m.idfactura = f.idfactura");
+
 
         //Ultimo estadosPagos
         sqlEstadosPagos.SELECT("max(idhistorico)");
@@ -141,8 +154,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.SELECT("f.imptotalporpagar");
      	facturas.SELECT("f.estado idestado");
      	facturas.SELECT("(" + sqlEstadoFac.toString() + ") estado");
-     	facturas.SELECT("null AS  numcomunicaciones"); 
-     	facturas.SELECT("null AS  ultcomunicacion"); 
+        facturas.SELECT("(" + numComunicaciones.toString() + ") numcomunicaciones");
+        facturas.SELECT("(" + ultComunicacion.toString() + ") ultcomunicacion");
      	facturas.SELECT("p.idpersona");
      	facturas.SELECT("f.idformapago");
      	facturas.SELECT("(" + sqlFormaPago.toString() + ") NOMBREFORMAPAGO");
@@ -746,7 +759,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
     	 sql.SELECT("COUNT(1) numcomunicaciones");
     	 sql.SELECT("MAX(m.fecha_envio) ultcomunicacion");
     	 sql.FROM("env_comunicacionmorosos m");
-    	 sql.WHERE("m.idinstitucion = '" + idInstitucion + "' AND m.idpersona = '" + idPersona + "' AND m.idfactura = '" + idFactura );
+    	 sql.WHERE("m.idinstitucion = " + idInstitucion + " AND m.idpersona = " + idPersona + " AND m.idfactura = " + idFactura );
 
     	 return sql.toString();
     }
