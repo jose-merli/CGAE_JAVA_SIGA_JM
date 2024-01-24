@@ -371,13 +371,13 @@ public class DesignacionesController {
 	}
 
 	@RequestMapping(value = "/designas/existeDesginaJuzgadoProcedimiento", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DesignaItem> existeDesginaJuzgadoProcedimiento(HttpServletRequest request,
+	ResponseEntity<String> existeDesginaJuzgadoProcedimiento(HttpServletRequest request,
 			@RequestBody DesignaItem designaItem) {
-		DesignaItem response = designacionesService.existeDesginaJuzgadoProcedimiento(designaItem, request);
+		String response = designacionesService.existeDesginaJuzgadoProcedimiento(designaItem, request);
 		if (response != null) {
-			return new ResponseEntity<DesignaItem>(response, HttpStatus.OK);
+			return new ResponseEntity<String>(response, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<DesignaItem>(new DesignaItem(),
+			return new ResponseEntity<String>(new String(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 

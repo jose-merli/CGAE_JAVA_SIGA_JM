@@ -5088,9 +5088,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request) {
+	public String existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request) {
 		// DesignaItem result = new DesignaItem();
-		DesignaItem designas = null;
+		String designas = null;
 		// List<GenParametros> tamMax = null;
 		// Integer tamMaximo = null;
 
@@ -5133,6 +5133,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa);
+					
+					if (designas == null) {
+						designas = "0";
+					}
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.getDatosAdicionales -> Salida del servicio");

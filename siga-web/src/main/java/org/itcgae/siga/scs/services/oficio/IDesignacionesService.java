@@ -149,7 +149,7 @@ public interface IDesignacionesService {
 
 	public InsertResponseDTO guardarProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
 	
-	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
+	public String existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
 
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
 
