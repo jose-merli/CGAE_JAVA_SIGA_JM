@@ -223,6 +223,8 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private static final String RET_OK = "0";
 	
+	private static final String FACTURA = "FACTURA";
+	
     protected static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
 
 	private Logger LOGGER = Logger.getLogger(FacturacionPySServiceImpl.class);
@@ -2344,17 +2346,6 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			
 			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item, usuario, filtrosSoloAbono, filtrosSoloFactura, tamMaximo);
 			
-			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> obteniendo comunicaciones morosos");
-			
-			// obtener comunicaciones moroso
-			for (FacturaItem facturaItem : items) {
-				if ("FACTURAS".equalsIgnoreCase(facturaItem.getTipo())) {
-					ComunicacionesMorososDTO comunicacionesMorosos = facFacturaExtendsMapper.getComunicacionesMorosos(facturaItem.getIdFactura(), facturaItem.getIdInstitucion(), facturaItem.getIdPersona());
-					facturaItem.setComunicacionesFacturas(comunicacionesMorosos.getComunicacionesFacturas());
-					facturaItem.setUltimaComunicacion(comunicacionesMorosos.getUltimaComunicacion());
-				}
-			}
-			
 			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 			facturaDTO.setFacturasItems(items);
@@ -2397,7 +2388,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getFactura() -> obteniendo los detalles de la factura");
 
-			if (tipo.equalsIgnoreCase("FACTURA")) {
+			if (tipo.equalsIgnoreCase(FACTURA)) {
 				List<FacturaItem> items = facFacturaExtendsMapper.getFactura(idFactura,
 						usuario.getIdinstitucion().toString(),usuario.getIdlenguaje());
 
@@ -2445,7 +2436,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las observaciones de una factura");
 
-			if (item.getTipo().equalsIgnoreCase("FACTURA")) {
+			if (item.getTipo().equalsIgnoreCase(FACTURA)) {
 
 				FacFacturaKey key = new FacFacturaKey();
 				key.setIdfactura(item.getIdFactura());
