@@ -45,7 +45,7 @@ public class GestionFichaCompraSuscripcionController {
 	
 	@PostMapping(value = "/pys/solicitarCompra")
 	ResponseEntity<InsertResponseDTO>  SolicitarCompra(HttpServletRequest request, @RequestBody FichaCompraSuscripcionItem ficha) throws Exception {
-		InsertResponseDTO response = gestionFichaCompraSuscripcionService.solicitarCompra(request, ficha);
+		InsertResponseDTO response = gestionFichaCompraSuscripcionService.solicitarCompra(request, ficha, false);
 		if(response.getStatus()=="200") return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
