@@ -21,12 +21,17 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         String queryFacturas = "";
         String queryAbonos = "";
 
-        if (!(filtrosSoloAbono && !filtrosSoloFactura)) {
+        if (filtrosSoloFactura) {
 			queryFacturas = getQueryFacturas(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 		}
 		
-		if (!(!filtrosSoloAbono && filtrosSoloFactura)) {
-			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());	
+		if (filtrosSoloAbono) {
+			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+		}
+		
+		if (!filtrosSoloFactura && !filtrosSoloAbono) {
+			queryFacturas = getQueryFacturas(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 		}
 
         //query completa facturas
@@ -203,9 +208,17 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             facturas.WHERE("f.estado in (" + aux + ")");
         }
 
-        //forma de pago o abono
-        if (item.getFormaCobroFactura() != null) {
-            facturas.WHERE("f.idformapago=" + item.getFormaCobroFactura());
+        //forma de pago o abono (FACTURA)
+        if (item.getFormaCobroAbono() != null) {
+        	String formaPago = "";
+        	if(item.getFormaCobroAbono().equals("E")) {
+        		formaPago = "10,30,50,60";
+        	}else if(item.getFormaCobroAbono().equals("B")) {
+        		formaPago = "20";
+        	}else {
+        		formaPago = "10,20,30,40,50,60,70,80";
+        	}
+            facturas.WHERE("f.idformapago IN (" + formaPago + ")");
         }
 
         //fecha emision

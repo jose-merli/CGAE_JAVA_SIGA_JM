@@ -2331,7 +2331,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 					|| item.getIdentificadorDevolucion() != null || item.getComunicacionesFacturasDesde() != null
 					|| item.getComunicacionesFacturasHasta() != null || item.getImporteAdeudadoDesde() != null
 					|| item.getImporteAdeudadoHasta() != null || item.getFacturacion() != null
-					|| item.getSerie() != null || item.getFormaCobroFactura() != null
+					|| item.getSerie() != null || item.getFormaCobroAbono() != null
 					|| (item.getEstadosFiltroFac() != null && item.getEstadosFiltroFac().size() > 0)
 					|| item.getFacturasPendientesHasta() != null || item.getFacturasPendientesDesde() != null;
 
