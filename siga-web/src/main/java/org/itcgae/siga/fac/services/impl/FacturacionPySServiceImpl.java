@@ -52,6 +52,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroDTO;
 import org.itcgae.siga.DTO.fac.ComunicacionCobroItem;
+import org.itcgae.siga.DTO.fac.ComunicacionesMorososDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesDTO;
 import org.itcgae.siga.DTO.fac.ContadorSeriesItem;
 import org.itcgae.siga.DTO.fac.CuentasBancariasDTO;
@@ -221,6 +222,8 @@ import org.w3c.dom.NodeList;
 public class FacturacionPySServiceImpl implements IFacturacionPySService {
 
 	private static final String RET_OK = "0";
+	
+	private static final String FACTURA = "FACTURA";
 	
     protected static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
 
@@ -2343,7 +2346,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			
 			List<FacturaItem> items = facFacturaExtendsMapper.getFacturas(item, usuario, filtrosSoloAbono, filtrosSoloFactura, tamMaximo);
 			
-			LOGGER.debug("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
+			LOGGER.info("FacturacionPySServiceImpl.getFacturas() -> Salida del servicio  para obtener las facturas");
 
 			facturaDTO.setFacturasItems(items);
             if (facturaDTO.getFacturasItems().size() >= tamMaximo) {
@@ -2385,7 +2388,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacturacionPySServiceImpl.getFactura() -> obteniendo los detalles de la factura");
 
-			if (tipo.equalsIgnoreCase("FACTURA")) {
+			if (tipo.equalsIgnoreCase(FACTURA)) {
 				List<FacturaItem> items = facFacturaExtendsMapper.getFactura(idFactura,
 						usuario.getIdinstitucion().toString(),usuario.getIdlenguaje());
 
@@ -2433,7 +2436,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		if (usuario != null) {
 			LOGGER.info("FacFacturaExtendsMapper.updateByPrimaryKey -> guardando las observaciones de una factura");
 
-			if (item.getTipo().equalsIgnoreCase("FACTURA")) {
+			if (item.getTipo().equalsIgnoreCase(FACTURA)) {
 
 				FacFacturaKey key = new FacFacturaKey();
 				key.setIdfactura(item.getIdFactura());
