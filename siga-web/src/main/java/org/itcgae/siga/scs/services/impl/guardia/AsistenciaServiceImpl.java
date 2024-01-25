@@ -4514,8 +4514,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 					}
 
 					if (!UtilidadesString.esCadenaVacia(filtro.getNumColegiado())) {
-						List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper
-								.busquedaColegiadoExpress(filtro.getNumColegiado(), idInstitucion.toString());
+						List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper.busquedaColegiadoExpress(filtro.getNumColegiado(), null, idInstitucion.toString());
 						if (colegiados != null && !colegiados.isEmpty()) {
 							filtro.setIdLetradoGuardia(colegiados.get(0).getIdPersona());
 						}
@@ -5028,9 +5027,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caractasistencia.setIdpretension(null);
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getNumColegiado())) {
-							List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper.busquedaColegiadoExpress(
-									caracteristicasAsistenciaItem.getNumColegiado(), String.valueOf(idInstitucion));
-
+							List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper.busquedaColegiadoExpress(caracteristicasAsistenciaItem.getNumColegiado(), null, String.valueOf(idInstitucion));
 							if (colegiados != null && !colegiados.isEmpty()) {
 								caractasistencia.setIdpersona(Long.valueOf(colegiados.get(0).getIdPersona()));
 							}
@@ -5204,9 +5201,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							caractasistencia.setIdpretension(null);
 						}
 						if (!UtilidadesString.esCadenaVacia(caracteristicasAsistenciaItem.getNumColegiado())) {
-							List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper.busquedaColegiadoExpress(
-									caracteristicasAsistenciaItem.getNumColegiado(), String.valueOf(idInstitucion));
-
+							List<ColegiadoJGItem> colegiados = cenPersonaExtendsMapper.busquedaColegiadoExpress(caracteristicasAsistenciaItem.getNumColegiado(), null, String.valueOf(idInstitucion));
 							if (colegiados != null && !colegiados.isEmpty()) {
 								caractasistencia.setIdpersona(Long.valueOf(colegiados.get(0).getIdPersona()));
 							}

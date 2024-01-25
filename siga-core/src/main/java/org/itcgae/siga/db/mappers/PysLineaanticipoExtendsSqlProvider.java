@@ -13,9 +13,12 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
 
 	public String selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        SQL query = new SQL();
-        query.SELECT("anti.fecha", "pers.nifcif", "pers.idpersona", "(pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) as nombre_completo", "anti.idanticipo", "anti.descripcion", "anti.importeinicial as importe_inicial"
-        		, "nvl(sum(gastos.importeanticipado), 0) as importe_usado", "anti.importeinicial - nvl(SUM(gastos.importeanticipado), 0) as importe_restante");
+        SQL sqlFinal = new SQL();
+        sqlFinal.SELECT("FECHA, NIFCIF, IDPERSONA, NOMBRECOMPLETO, IDANTICIPO, DESCRIPCION, IMPORTEINICIAL, IMPORTEUSADO, (IMPORTEINICIAL - IMPORTEUSADO) AS IMPORTERESTANTE");
+        
+        SQL query = new SQL();        
+        query.SELECT("anti.fecha AS FECHA, pers.nifcif AS NIFCIF, pers.idpersona AS IDPERSONA, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre) AS NOMBRECOMPLETO, "
+        		+ "	anti.idanticipo AS IDANTICIPO, anti.descripcion AS DESCRIPCION, anti.importeinicial AS IMPORTEINICIAL, nvl(sum(gastos.importeanticipado), 0) AS IMPORTEUSADO");
         query.FROM("pys_anticipoletrado anti");
         query.INNER_JOIN("cen_persona pers on pers.idpersona = anti.idpersona");
         query.LEFT_OUTER_JOIN("pys_lineaanticipo gastos on gastos.idpersona = pers.idpersona and gastos.idanticipo = anti.idanticipo and (gastos.idfactura is not null or gastos.liquidacion = 1)");
@@ -23,32 +26,28 @@ public class PysLineaanticipoExtendsSqlProvider extends PysLineaanticipoSqlProvi
         query.WHERE("anti.idinstitucion = " + institutionId);
         
         if (filter.getFechaDesde() != null ){
-
             String since = dateFormat.format(filter.getFechaDesde());
-            
-            query.WHERE("TO_CHAR(anti.FECHA, 'DD/MM/YYYY') >= TO_DATE('" + since
-                    + "','DD/MM/YYYY') ");
+            query.WHERE("TO_CHAR(anti.FECHA, 'YYYYMMDD') >= TO_CHAR(TO_DATE('" + since + "', 'DD/MM/YYYY'), 'YYYYMMDD')");
         }
         
         if(filter.getFechaHasta() != null) {
         	String until = dateFormat.format(filter.getFechaHasta());
-        	query.WHERE(" TO_CHAR(anti.FECHA, 'DD/MM/YYYY') <= TO_DATE('"
-                    + until + "','DD/MM/YYYY')");
+        	query.WHERE("TO_CHAR(anti.FECHA, 'YYYYMMDD') <= TO_CHAR(TO_DATE('" + until + "', 'DD/MM/YYYY'), 'YYYYMMDD')");
         }
         
-        if(filter.getIdPersonaColegiado() != null) {
+        if(filter.getIdPersonaColegiado() != null && !"".equalsIgnoreCase(filter.getIdPersonaColegiado())) {
         	query.WHERE("pers.idpersona = "+filter.getIdPersonaColegiado());
         }
 
-        query.GROUP_BY("anti.idanticipo", "anti.FECHA", "pers.NIFCIF", "pers.idpersona", "anti.idanticipo", "pers.APELLIDOS1", "pers.APELLIDOS2", "pers.NOMBRE", "anti.descripcion", "anti.importeinicial");
+        query.GROUP_BY("anti.FECHA, pers.NIFCIF, pers.idpersona, (pers.apellidos1 || ' ' || pers.apellidos2 || ', ' || pers.nombre), anti.idanticipo, anti.descripcion, anti.importeinicial");
         
-        query.ORDER_BY("anti.FECHA desc");
+        sqlFinal.FROM("(" + query.toString() + ")");
+        sqlFinal.WHERE("(IMPORTEINICIAL - IMPORTEUSADO) <> 0");
+        sqlFinal.ORDER_BY("FECHA desc");
         
         LOGGER.info("CONSULTA DE LISTA DE BUSQUEDA DE MONEDEROS: \r\n" + query.toString());
 
-
-
-        return query.toString();
+        return sqlFinal.toString();
     }
     
     public String selectMaxIdLinea(Short idInstitucion, Long idPersona) {
