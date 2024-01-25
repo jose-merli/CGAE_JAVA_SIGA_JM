@@ -231,7 +231,7 @@ public class ScsBaremosGuardiaSqlProvider {
 		sql.WHERE(" hit.idinstitucion = tur.idinstitucion ");
 		sql.WHERE(" hit.idguardia = gua.idguardia ");
 
-		sql.ORDER_BY(" hit.idhito, hit.idguardia, hit.idturno");
+		sql.ORDER_BY("hit.idturno, hit.idguardia, hit.idhito");
 
 		return sql.toString();
 	}
