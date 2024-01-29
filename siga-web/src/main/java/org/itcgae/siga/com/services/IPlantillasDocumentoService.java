@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataListDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -83,6 +84,14 @@ public interface IPlantillasDocumentoService {
 	 * @return
 	 */
 	ResponseDataDTO guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+
+	/**
+	 * Guarda una array de plantillas de documento
+	 * @param request
+	 * @param plantillasDoc
+	 * @return
+	 */
+	ResponseDataListDTO guardarModPlantillasDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO[] plantillasDoc);
 
 	/**
 	 * Guarda datos salida de la plantilla documento

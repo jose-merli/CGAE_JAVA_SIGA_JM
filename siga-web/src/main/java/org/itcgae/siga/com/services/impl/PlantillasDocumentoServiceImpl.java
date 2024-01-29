@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataListDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
@@ -940,6 +941,182 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		LOGGER.info(
 				"guardarModPlantillaDocumento() -> Salida del servicio para guardar los datos de la plantilla de documento");
 		return respuesta;
+	}
+	
+	
+	@Override
+	public ResponseDataListDTO guardarModPlantillasDocumento(HttpServletRequest request,
+			TarjetaPlantillaDocumentoDTO[] plantillasDoc) {
+		LOGGER.info(
+				"guardarModPlantillaDocumento() -> Entrada al servicio para guardar los datos de la plantilla de documento");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		ResponseDataListDTO respuesta = new ResponseDataListDTO();
+		Error error = new Error();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			try {
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					for (TarjetaPlantillaDocumentoDTO plantillaDoc : plantillasDoc) {
+						procesaPlantilla(usuario, plantillaDoc, respuesta);
+						if(respuesta.getError()!=null) {
+							break;
+						}
+					}
+				}
+			} catch (Exception e) {
+				error.setCode(500);
+				error.setDescription("Error al guardar datos generales");
+				error.setMessage(e.getMessage());
+				respuesta.setError(error);
+			}
+
+		}
+		LOGGER.info(
+				"guardarModPlantillasDocumento() -> Salida del servicio para guardar los datos de la plantilla de documento");
+		return respuesta;
+	}
+
+	private void procesaPlantilla(AdmUsuarios usuario, TarjetaPlantillaDocumentoDTO plantillaDoc, ResponseDataListDTO respuesta) {
+		Error error = new Error();
+		Long idInforme = (long) 0;
+		List<Long> listaPlantillasIdAAsociar = new ArrayList<Long>();
+		
+		if (plantillaDoc.getIdModeloComunicacion() != null) {
+
+			if (plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0) {
+
+				idInforme = obtenerIdInforme(plantillaDoc);
+
+
+				List<DocumentoPlantillaItem> listaPlantillas = new ArrayList<>(plantillaDoc.getPlantillas().stream()
+						.collect(Collectors.toMap(
+								DocumentoPlantillaItem::getIdIdioma,
+								x -> x,
+								(plantiA,plantiB) -> plantiA
+								)).values()
+						);
+				for (DocumentoPlantillaItem idPlantillaDoc : listaPlantillas) {
+
+					ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
+
+					modeloPlantillaKey.setIdioma(idPlantillaDoc.getIdIdioma());
+					modeloPlantillaKey.setIdplantilladocumento(
+							Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
+					ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
+							.selectByPrimaryKey(modeloPlantillaKey);
+
+					if (modPlantillaDoc != null) {
+						ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
+						modModeloPlantillaDocKey.setIdmodelocomunicacion(
+								Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+						modModeloPlantillaDocKey
+								.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+
+						ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper
+								.selectByPrimaryKey(modModeloPlantillaDocKey);
+
+						if (modModeloPlantillaDoc == null) {
+							trataModModeloPlantillaDoc(usuario,listaPlantillasIdAAsociar,plantillaDoc, idInforme,modPlantillaDoc, modModeloPlantillaDoc);
+						}
+					}
+				}
+			}
+			respuesta.getDataList().add(String.valueOf(idInforme));
+		} else {
+			error.setCode(500);
+			error.setDescription("Error al guardar la plantilla de documento");
+			error.setMessage("Error al guardar la plantilla de documento");
+			respuesta.setError(error);
+		}
+		
+	}
+
+	private Long obtenerIdInforme(TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		Long idInforme;
+		if (plantillaDoc.getIdInforme() != null && !"".equals(plantillaDoc.getIdInforme())) {
+			LOGGER.debug("El informe ya está asociado");
+			idInforme = Long.parseLong(plantillaDoc.getIdInforme());
+
+		} else {
+			idInforme = modModeloPlantillaDocumentoExtendsMapper.selectMaxInforme(
+					Short.parseShort(plantillaDoc.getIdInstitucion()),
+					Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+			if (idInforme == null) {
+				idInforme = (long) 0;
+			}
+			idInforme = idInforme + (long) 1;
+		}
+		return idInforme;
+	}
+
+	private void trataModModeloPlantillaDoc(AdmUsuarios usuario, List<Long> listaPlantillasIdAAsociar, TarjetaPlantillaDocumentoDTO plantillaDoc, Long idInforme, ModPlantilladocumento modPlantillaDoc, ModModeloPlantilladocumento modModeloPlantillaDoc) {
+		modModeloPlantillaDoc = new ModModeloPlantilladocumento();
+		modModeloPlantillaDoc.setFechamodificacion(new Date());
+		modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
+		modModeloPlantillaDoc
+				.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
+		modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+		modModeloPlantillaDoc
+				.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+		modModeloPlantillaDoc.setIdmodelocomunicacion(
+				Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+		modModeloPlantillaDoc.setFechaasociacion(new Date());
+		modModeloPlantillaDoc.setIdinforme(idInforme);
+
+		modModeloPlantilladocumentoMapper.insert(modModeloPlantillaDoc);
+		listaPlantillasIdAAsociar.add(modModeloPlantillaDoc.getIdplantilladocumento());
+
+		// Si el informe ya tiene asociadas consultas se las asociamos para esta
+		// plantilla
+		List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper
+				.selectConsultasByInforme(
+						Short.parseShort(plantillaDoc.getIdInstitucion()),
+						Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
+						idInforme, usuario.getIdlenguaje(), false);
+		if (listaConsultas != null && listaConsultas.size() > 0) {
+			trataListaConsultas(usuario,plantillaDoc, modModeloPlantillaDoc, listaConsultas);
+		}
+		
+	}
+
+	private void trataListaConsultas(AdmUsuarios usuario, TarjetaPlantillaDocumentoDTO plantillaDoc, ModModeloPlantilladocumento modModeloPlantillaDoc, List<ConsultaItem> listaConsultas) {
+		for (ConsultaItem consulta : listaConsultas) {
+			// Obtenemos la sentencia
+			ConConsultaKey key = new ConConsultaKey();
+			key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+			key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
+			ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
+
+			if (consultaEntity != null) {
+				consulta.setSentencia(consultaEntity.getSentencia());
+			}
+
+			ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
+			plantillaConsulta.setIdplantilladocumento(
+					modModeloPlantillaDoc.getIdplantilladocumento());
+			plantillaConsulta.setFechabaja(null);
+			plantillaConsulta.setFechamodificacion(new Date());
+			plantillaConsulta.setUsumodificacion(usuario.getIdusuario());
+			plantillaConsulta.setIdinstitucion(
+					Short.parseShort(plantillaDoc.getIdInstitucion()));
+			plantillaConsulta
+					.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
+			plantillaConsulta.setIdmodelocomunicacion(
+					Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+			plantillaConsulta.setIdinstitucionConsulta(
+					Short.parseShort(consulta.getIdInstitucion()));
+			modPlantilladocConsultaMapper.insert(plantillaConsulta);
+		}
+		
 	}
 
 	@Override
