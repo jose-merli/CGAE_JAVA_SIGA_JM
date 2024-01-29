@@ -346,12 +346,13 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         && !usuarios.isEmpty()
                         && !UtilidadesString.esCadenaVacia(anioNumero)) {
 
-
                     ScsAsistenciaKey scsAsistenciaKey = new ScsAsistenciaKey();
                     scsAsistenciaKey.setIdinstitucion(idInstitucion);
                     scsAsistenciaKey.setAnio(Short.valueOf(anioNumero.split("/")[0]));
                     scsAsistenciaKey.setNumero(Long.valueOf(anioNumero.split("/")[1]));
                     ScsAsistencia scsAsistencia = scsAsistenciaExtendsMapper.selectByPrimaryKey(scsAsistenciaKey);
+                    
+                    updateAsistencia(scsAsistencia, datosGenerales);
                     //Si no trae idActuacion se trata de una nueva actuacion
                     if(UtilidadesString.esCadenaVacia(datosGenerales.getIdActuacion())){
                         NewIdDTO newIdActuacion = scsActuacionasistenciaExtendsMapper.getNewIdActuacion(idInstitucion, anioNumero);
@@ -893,6 +894,26 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
         }
         return historicoActuacionAsistenciaDTO;
     }
+    
+
+    private void updateAsistencia(ScsAsistencia scsAsistencia, DatosGeneralesActuacionAsistenciaItem datosGenerales) {
+    	boolean update = false;
+    	
+    	if (scsAsistencia.getNig() == null && datosGenerales.getNig() != null && !datosGenerales.getNig().isEmpty()) {
+    		scsAsistencia.setNig(datosGenerales.getNig());
+    		update = true;
+    	}
+    	
+    	if (scsAsistencia.getNumerodiligencia()== null && datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
+    		scsAsistencia.setNumerodiligencia(datosGenerales.getNumAsunto());
+    		update = true;
+    	}
+    	
+    	if (update) {
+    		scsAsistenciaExtendsMapper.updateByPrimaryKey(scsAsistencia);
+    	}
+    }
+    
 
     /**
      * Metodo que comprueba si las actuaciones de una asistencia son necesarias validarlas o no  dependiendo de la configuracion del turno
