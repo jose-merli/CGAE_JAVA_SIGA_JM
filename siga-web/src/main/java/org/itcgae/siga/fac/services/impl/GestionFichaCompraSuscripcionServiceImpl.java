@@ -301,7 +301,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 	@Override
 	@Transactional(timeout=24000)
-	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha)
+	public InsertResponseDTO solicitarCompra(HttpServletRequest request, FichaCompraSuscripcionItem ficha, Boolean fromAprobar)
 			throws Exception {
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
@@ -404,7 +404,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 				// Al no necesitar aprobación, se crea el registro de compra
 				// inmediatamente
-				if (aprobNecesaria.getValor().equals("N") || letrado.equals("N")) {
+				if ((aprobNecesaria.getValor().equals("N") || letrado.equals("N")) && !fromAprobar) {
 					ficha.setNuevo(false);
 					this.aprobarCompra(request, ficha);
 
@@ -743,7 +743,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 
 					if(solicitud==null) {
-						this.solicitarCompra(request, ficha);
+						this.solicitarCompra(request, ficha, true);
 						solicitud = pysPeticioncomprasuscripcionMapper
 								.selectByPrimaryKey(solicitudKey);
 					}
@@ -752,7 +752,6 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 					GenParametros aprobNecesaria = getParametroAprobarSolicitud(idInstitucion);
 					
 
-					
 						LOGGER.info(
 								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 	
@@ -807,12 +806,10 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								throw new Exception("Error al insertar un registro de compra en la BBDD.");
 						}
 						
-						LOGGER.info(
+					LOGGER.info(
 								"aprobarCompra() / pysServiciossolicitadosMapper.insert() -> Salida de pysServiciossolicitadosMapper para aprobar una solicitud de compra");
 
-					}
-				
-
+				}
 				
 				updateResponseDTO.setStatus("200");
 				updateResponseDTO.setId(ficha.getnSolicitud());

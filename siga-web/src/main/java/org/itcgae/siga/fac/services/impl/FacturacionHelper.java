@@ -4,12 +4,10 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.itcgae.siga.DTO.fac.*;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.FoUtils;
@@ -65,7 +63,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.nio.channels.FileChannel;
@@ -85,6 +82,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 
 @Service
 public class FacturacionHelper {
@@ -340,6 +338,7 @@ public class FacturacionHelper {
             String content = reemplazarDatos(contenidoPlantilla, idFactura, idInstitucion.toString(), usuario);
             LOGGER.info("DESPUES DE REEMPLAZAR LOS DATOS DE LA PLANTILLA.");
             setFileContent(ficheroFOP, content);
+            FoUtils.fodUpdateTemplateVersion(ficheroFOP);
 
             //Crea el fichero. Si no existe el directorio de la institucion para la descarga lo crea.
             ficheroPDF = new File(rutaServidorDescargas + File.separator + nombreFicheroPDF + ".pdf");
@@ -427,6 +426,7 @@ public class FacturacionHelper {
         }
 
         plantilla = reemplazaVariables(htDatos, plantilla);
+        plantilla = FoUtils.reemplazaCaracteresExpeciales(plantilla);
         return plantilla;
     }
 
@@ -449,6 +449,7 @@ public class FacturacionHelper {
 
         return vLineasFactura;
     }
+    
 
     public String reemplazaVariables(Hashtable htDatos, String plantillaFO) {
         return UtilidadesString.reemplazaParametros(plantillaFO, CTR, htDatos);
