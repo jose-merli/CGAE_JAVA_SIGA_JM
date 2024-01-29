@@ -91,7 +91,7 @@ public interface IPlantillasDocumentoService {
 	 * @param plantillasDoc
 	 * @return
 	 */
-	ResponseDataListDTO guardarModPlantillasDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO[] plantillasDoc);
+	ResponseDataListDTO guardarModPlantillasDocumento(MultipartHttpServletRequest request, TarjetaPlantillaDocumentoDTO[] plantillasDoc);
 
 	/**
 	 * Guarda datos salida de la plantilla documento

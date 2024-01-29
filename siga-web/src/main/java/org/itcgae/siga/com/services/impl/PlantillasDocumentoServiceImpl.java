@@ -945,7 +945,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	
 	
 	@Override
-	public ResponseDataListDTO guardarModPlantillasDocumento(HttpServletRequest request,
+	public ResponseDataListDTO guardarModPlantillasDocumento(MultipartHttpServletRequest request,
 			TarjetaPlantillaDocumentoDTO[] plantillasDoc) {
 		LOGGER.info(
 				"guardarModPlantillaDocumento() -> Entrada al servicio para guardar los datos de la plantilla de documento");
@@ -956,7 +956,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		ResponseDataListDTO respuesta = new ResponseDataListDTO();
-		Error error = new Error();
+		Error error = new Error();		
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
