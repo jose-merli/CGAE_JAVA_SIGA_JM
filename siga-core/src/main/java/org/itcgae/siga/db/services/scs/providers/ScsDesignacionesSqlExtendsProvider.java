@@ -3543,6 +3543,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 				sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 			}
+			if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
+				sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
+			} else {
+				sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
+			}
 		}else {
 			sql.SET("FECHAVALIDACION = NULL");
 			sql.SET("USUVALIDACION = NULL");
@@ -4178,18 +4183,17 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SET("USUJUSTIFICACION = '" + usuario.getIdusuario() + "'");
 			sql.SET("FECHAUSUJUSTIFICACION = SYSDATE");
 			
-			if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
-				sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
-			} else {
-				sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
-			}
 		} else {
 			sql.SET("FECHAJUSTIFICACION = NULL");
 			sql.SET("USUJUSTIFICACION = NULL");
 			sql.SET("FECHAUSUJUSTIFICACION = NULL");
-			sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
 		}
 
+		if (!UtilidadesString.esCadenaVacia(actuacionDesignaItem.getObservacionesJusti())) {
+			sql.SET("OBSERVACIONESJUSTIFICACION = '" + actuacionDesignaItem.getObservacionesJusti() + "'");
+		} else {
+			sql.SET("OBSERVACIONESJUSTIFICACION = NULL");
+		}
 
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.SET("FECHAMODIFICACION = SYSTIMESTAMP");
