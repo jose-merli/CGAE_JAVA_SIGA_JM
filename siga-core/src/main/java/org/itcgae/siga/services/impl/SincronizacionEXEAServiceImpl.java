@@ -1326,12 +1326,42 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
                CenPoblaciones poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(localizacionType.getNacional().getPoblacion().getCodigoPoblacion());
                if(poblacion != null) {
                    direccion.setIdpoblacion(localizacionType.getNacional().getPoblacion().getCodigoPoblacion());
-               }else{
+               }
+               //Si no encuentra la poblacion pero su codigo tiene mas de 5 caracteres buscamos alternativamente
+               else if(localizacionType.getNacional().getPoblacion().getCodigoPoblacion().length() >= 5){
+            	   //Recuperamos los 5 primeros caracteres de la poblacion y rellenamos con 0 el resto del codigo
+            	   String poblacionGeneralizada = localizacionType.getNacional().getPoblacion().getCodigoPoblacion().substring(0, 5) + "000000";
+            	   
+            	   poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(poblacionGeneralizada);
+            	   
+            	   if(poblacion != null) {
+                       direccion.setIdpoblacion(poblacionGeneralizada);
+            	   } 
+            	   //Si sigue sin encontrar la poblacion y la descripcion esta rellena probamos a buscar por descripcion
+            	   else if(!UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion())){
+		                String idPoblacion = getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion(),
+		                		localizacionType.getNacional().getProvincia().getCodigoProvincia());
+		               
+		                if(!UtilidadesString.esCadenaVacia(idPoblacion)) {
+		                    direccion.setIdpoblacion(idPoblacion);
+		                }else{
+		                    ErrorType errorType = response.addNewError();
+		                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+		                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+		                    errorType.setXmlRequest("Sin error XML");
+		                }
+            	   } else {
+	                   ErrorType errorType = response.addNewError();
+	                   errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+	                   errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+	                   errorType.setXmlRequest("Sin error XML");
+            	   }
+               } else {
                    ErrorType errorType = response.addNewError();
                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
                    errorType.setXmlRequest("Sin error XML");
-               }
+        	   }
 
             } else if(UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())
                 && !UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion())){
@@ -2084,11 +2114,31 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
 
                 CenPoblaciones poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion());
                 if (poblacion == null) {
-                    ok = false;
-                    ErrorType errorType = response.addNewError();
-                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
-                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
-                    errorType.setXmlRequest("Sin error XML");
+                	//Probamos a buscar por los 5 primeros digitos del codigo de poblacion
+                    String poblacionGeneralizada = request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion().substring(0, 5) + "000000";
+                    
+                    poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(poblacionGeneralizada);
+
+	                if(poblacion == null){
+	                	//Si aun no encontramos por codigo de poblacion pero viene relleno la descripcion probamos a buscar por ella
+	                	if(!UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion())) {
+	                        String idPoblacion = getIdPoblacionFromDescripcion(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion(), 
+	                        		request.getColegiado().getLocalizacion().getNacional().getProvincia().getCodigoProvincia());
+	                        if (UtilidadesString.esCadenaVacia(idPoblacion)) {
+			                    ok = false;
+			                    ErrorType errorType = response.addNewError();
+			                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+			                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+			                    errorType.setXmlRequest("Sin error XML");
+	                        }
+	                	} else {
+	                		ok = false;
+		                    ErrorType errorType = response.addNewError();
+		                    errorType.setCodigo(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.name());
+		                    errorType.setDescripcion(SigaConstants.ERROR_SINCRONIZACION_EXEA.POBLACION_NOENCONTRADA.getMensajeError());
+		                    errorType.setXmlRequest("Sin error XML");
+	                	}
+	                }
                 }
 
             } else if (UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion())
