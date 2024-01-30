@@ -12,6 +12,7 @@ import org.itcgae.siga.db.mappers.CenReservaNcolegiadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.*;
+import org.itcgae.siga.db.services.cen.providers.CenPoblacionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.exp.mappers.ExpProcedimientosExeaExtendsMapper;
 import org.itcgae.siga.exception.ValidationException;
 import org.itcgae.siga.services.ISincronizacionEXEAService;
@@ -1335,7 +1336,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             } else if(UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getCodigoPoblacion())
                 && !UtilidadesString.esCadenaVacia(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion())){
 
-                String idPoblacion = getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion());
+                String idPoblacion = getIdPoblacionFromDescripcion(localizacionType.getNacional().getPoblacion().getDescripcionPoblacion(),
+                		localizacionType.getNacional().getProvincia().getCodigoProvincia());
                 if(!UtilidadesString.esCadenaVacia(idPoblacion)) {
                     direccion.setIdpoblacion(idPoblacion);
                 }else{
@@ -1901,13 +1903,40 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
      * @param descripcionPoblacion
      * @return
      */
-    private String getIdPoblacionFromDescripcion(String descripcionPoblacion){
-        String idPoblacion = "";
-        List<CenPoblaciones> poblaciones = cenPoblacionesExtendsMapper.selectByFilter(descripcionPoblacion, null);
-        if(poblaciones != null
-            && !poblaciones.isEmpty()){
+    private String getIdPoblacionFromDescripcion(String descripcionPoblacion, String codProvincia){
+    	String idPoblacion = "";
+    	
+    	//Eliminamos las comas de la descripcion
+    	descripcionPoblacion = descripcionPoblacion.replace(",", " ");
+    	
+    	//Eliminamos los parentesis
+    	descripcionPoblacion = descripcionPoblacion.replace("(", "");
+    	descripcionPoblacion = descripcionPoblacion.replace(")", "");
+    	
+    	//Eliminamos los articulos de comienzo y fin
+    	String[] articulos = {"EL", "LA", "LO", "LOS", "LAS"};
+
+        for (String articulo : articulos) {
+            if (descripcionPoblacion.startsWith(articulo + " ")) {
+            	descripcionPoblacion = descripcionPoblacion.substring(articulo.length() + 1);
+            }
+        }
+        
+        for (String articulo : articulos) {
+            if (descripcionPoblacion.endsWith(" " + articulo.toLowerCase())) {
+            	descripcionPoblacion = descripcionPoblacion.substring(0, descripcionPoblacion.length() - (articulo.length() + 1));
+            }
+        }
+        
+        //Quito espacios en blanco al principio y final
+        descripcionPoblacion = descripcionPoblacion.trim();
+
+        List<CenPoblaciones> poblaciones = cenPoblacionesExtendsMapper.recuperaPoblacionPorDescripcion(descripcionPoblacion.toUpperCase(), codProvincia);
+        
+        if(poblaciones != null && !poblaciones.isEmpty()){
             idPoblacion = poblaciones.get(0).getIdpoblacion();
         }
+        
         return idPoblacion;
     }
 
@@ -2065,7 +2094,8 @@ public class SincronizacionEXEAServiceImpl implements ISincronizacionEXEAService
             } else if (UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getCodigoPoblacion())
                     && !UtilidadesString.esCadenaVacia(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion())) {
 
-                String idPoblacion = getIdPoblacionFromDescripcion(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion());
+                String idPoblacion = getIdPoblacionFromDescripcion(request.getColegiado().getLocalizacion().getNacional().getPoblacion().getDescripcionPoblacion(), 
+                		request.getColegiado().getLocalizacion().getNacional().getProvincia().getCodigoProvincia());
                 if (UtilidadesString.esCadenaVacia(idPoblacion)) {
                     ok = false;
                     ErrorType errorType = response.addNewError();
