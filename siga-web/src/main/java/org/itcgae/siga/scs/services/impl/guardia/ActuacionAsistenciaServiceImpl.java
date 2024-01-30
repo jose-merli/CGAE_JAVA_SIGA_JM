@@ -412,7 +412,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                         ScsTipoactuacionExample scsTipoactuacionExample = new ScsTipoactuacionExample();
 						scsTipoactuacionExample.createCriteria()
 								.andIdinstitucionEqualTo(newActuacion.getIdinstitucion())
-								.andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistencia())
+								.andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistenciacolegio())
 								.andIdtipoactuacionEqualTo(newActuacion.getIdtipoactuacion());
 						
                         List<ScsTipoactuacion> tipoActList = scsTipoactuacionMapper.selectByExample(scsTipoactuacionExample);
