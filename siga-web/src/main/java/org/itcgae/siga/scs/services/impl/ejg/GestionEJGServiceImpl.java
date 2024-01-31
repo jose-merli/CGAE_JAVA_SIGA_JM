@@ -24,6 +24,7 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.*;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.exp.mappers.ExpTipoexpedienteExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
 import org.itcgae.siga.exception.BusinessException;
@@ -62,6 +63,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
 
 	@Autowired
 	private GenFicheroMapper genFicheroMapper;
@@ -6199,6 +6203,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.debug(
 						"GestionEJGServiceImpl.nuevoEstado() -> Entrada para insertar en la unidad familiar del ejg");
+				
+				CenInstitucion institucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion);
 
 				// insert de la peticion de EEJG.
 				ScsEejgPeticiones eejgPeticion = new ScsEejgPeticiones();
@@ -6220,6 +6226,15 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				eejgPeticion.setNumerointentosconsulta(Short.parseShort("0"));
 				eejgPeticion.setNumerointentospendienteinfo(Short.parseShort("0"));
 				eejgPeticion.setNumerointentossolicitud(Short.parseShort("0"));
+				String lenguaje = "es_ES";
+				if(institucion.getIdlenguaje().equals(2)) {
+					lenguaje = "ca_ES";
+				}else if(institucion.getIdlenguaje().equals(3)) {
+					lenguaje = "eu_ES";
+				}else if(institucion.getIdlenguaje().equals(4)) {
+					lenguaje = "gl_ES";
+				}
+				eejgPeticion.setIdioma(lenguaje);
 				eejgPeticion.setIdpeticion(scsEejgPeticionesExtendsMapper.getMaxIdpeticion());
 
 				scsEejgPeticionesExtendsMapper.insertSelective(eejgPeticion);

@@ -36,6 +36,8 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
+import org.itcgae.siga.DTOs.scs.TurnosDTO;
+import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
@@ -149,7 +151,7 @@ public interface IDesignacionesService {
 
 	public InsertResponseDTO guardarProcurador(ProcuradorItem procuradorItem, HttpServletRequest request);
 	
-	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
+	public String existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request);
 
 	public List<DesignaItem> getDatosAdicionales(DesignaItem designa, HttpServletRequest request);
 
@@ -250,6 +252,8 @@ public interface IDesignacionesService {
 	public InsertResponseDTO updateContrario(String[] item, HttpServletRequest request);
 
 	public StringDTO busquedaTotalRegistrosDesignas(DesignaItem designaItem, HttpServletRequest request);
+
+	public TurnosDTO busquedaColaOficioPrimerLetrado(TurnosItem turnosItem, HttpServletRequest request);
 
 
 }

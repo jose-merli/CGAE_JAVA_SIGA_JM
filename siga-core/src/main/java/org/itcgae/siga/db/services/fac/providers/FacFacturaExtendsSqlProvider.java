@@ -21,18 +21,23 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         String queryFacturas = "";
         String queryAbonos = "";
 
-        if (!(filtrosSoloAbono && !filtrosSoloFactura)) {
+        if (filtrosSoloFactura) {
 			queryFacturas = getQueryFacturas(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 		}
 		
-		if (!(!filtrosSoloAbono && filtrosSoloFactura)) {
-			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());	
+		if (filtrosSoloAbono) {
+			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+		}
+		
+		if (!filtrosSoloFactura && !filtrosSoloAbono) {
+			queryFacturas = getQueryFacturas(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
+			queryAbonos = getQueryAbonos(item, usuario.getIdinstitucion().toString(), usuario.getIdlenguaje());
 		}
 
         //query completa facturas
         sqlFacturas.SELECT("*");
         if (!UtilidadesString.esCadenaVacia(queryFacturas) && !UtilidadesString.esCadenaVacia(queryAbonos)) {
-        	sqlFacturas.FROM("(" + queryFacturas + " UNION " + queryAbonos + ")");
+        	sqlFacturas.FROM("(" + queryFacturas + " UNION ALL " + queryAbonos + ")");
         } else if (!UtilidadesString.esCadenaVacia(queryFacturas)) {
         	sqlFacturas.FROM("(" + queryFacturas + ")");
         } else {
@@ -56,7 +61,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
     private String getQueryFacturas(FacturaItem item, String idInstitucion, String idLenguaje) {
     	SQL facturas = new SQL();
     	SQL facturasPendientes = new SQL();
-    	SQL numComunicaciones = new SQL();
+        SQL numComunicaciones = new SQL();
         SQL ultComunicacion = new SQL();
         SQL sqlEstadosPagos = new SQL();
         SQL sqlUltimoEstado = new SQL();
@@ -84,7 +89,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             if(item.getFacturasPendientesDesde() != null)
                 facturasPendientes.HAVING("COUNT(IMPTOTALPORPAGAR) >=to_number(" + item.getFacturasPendientesDesde() + ",'99999999999999999')");
         }
-
+        
         //num comunicaciones
         numComunicaciones.SELECT("COUNT(1)");
         numComunicaciones.FROM("env_comunicacionmorosos m");
@@ -94,6 +99,7 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         ultComunicacion.SELECT("MAX(m.fecha_envio)");
         ultComunicacion.FROM("env_comunicacionmorosos m");
         ultComunicacion.WHERE("m.idinstitucion = f.idinstitucion AND m.idpersona = f.idpersona AND m.idfactura = f.idfactura");
+
 
         //Ultimo estadosPagos
         sqlEstadosPagos.SELECT("max(idhistorico)");
@@ -153,8 +159,8 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         facturas.SELECT("f.imptotalporpagar");
      	facturas.SELECT("f.estado idestado");
      	facturas.SELECT("(" + sqlEstadoFac.toString() + ") estado");
-     	facturas.SELECT("(" + numComunicaciones.toString() + ") numcomunicaciones");
-     	facturas.SELECT("(" + ultComunicacion.toString() + ") ultcomunicacion");
+        facturas.SELECT("(" + numComunicaciones.toString() + ") numcomunicaciones");
+        facturas.SELECT("(" + ultComunicacion.toString() + ") ultcomunicacion");
      	facturas.SELECT("p.idpersona");
      	facturas.SELECT("f.idformapago");
      	facturas.SELECT("(" + sqlFormaPago.toString() + ") NOMBREFORMAPAGO");
@@ -203,9 +209,17 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
             facturas.WHERE("f.estado in (" + aux + ")");
         }
 
-        //forma de pago o abono
-        if (item.getFormaCobroFactura() != null) {
-            facturas.WHERE("f.idformapago=" + item.getFormaCobroFactura());
+        //forma de pago o abono (FACTURA)
+        if (item.getFormaCobroAbono() != null) {
+        	String formaPago = "";
+        	if(item.getFormaCobroAbono().equals("E")) {
+        		formaPago = "10,30,50,60";
+        	}else if(item.getFormaCobroAbono().equals("B")) {
+        		formaPago = "20";
+        	}else {
+        		formaPago = "10,20,30,40,50,60,70,80";
+        	}
+            facturas.WHERE("f.idformapago IN (" + formaPago + ")");
         }
 
         //fecha emision
@@ -751,5 +765,17 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
 
         return sql.toString();
     }
+    
+    public String getComunicacionesMorosos(String idFactura, String idInstitucion, String idPersona) {
+    	//num comunicaciones y ult comunicacion
+    	 SQL sql = new SQL();
+    	 sql.SELECT("COUNT(1) numcomunicaciones");
+    	 sql.SELECT("MAX(m.fecha_envio) ultcomunicacion");
+    	 sql.FROM("env_comunicacionmorosos m");
+    	 sql.WHERE("m.idinstitucion = " + idInstitucion + " AND m.idpersona = " + idPersona + " AND m.idfactura = " + idFactura );
+
+    	 return sql.toString();
+    }
+    
 
 }

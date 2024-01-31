@@ -36,6 +36,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.CenPersonaItem;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -54,13 +56,13 @@ import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocolegialExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.scs.services.impl.oficio.DesignacionesServiceImpl;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService {
@@ -95,10 +97,13 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+
+	@Autowired
 	private DesignacionesServiceImpl desigancionesServiceImpl;
-	
+
 	private static final int EXCEL_ROW_FLUSH = 1000;
-	
+
 	@Override
 	public ComboDTO getCivilStatus(HttpServletRequest request) {
 
@@ -181,35 +186,34 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		return comboDTO;
 	}
-	
+
 	@Override
 	public ComboDTO getSituacionGlobalColegiado(String idPersona, HttpServletRequest request) {
-		LOGGER.info("getSituacionGlobalColegiado() -> Entrada al servicio para obtener las situaciones de todos los colegios de la persona");
+		LOGGER.info(
+				"getSituacionGlobalColegiado() -> Entrada al servicio para obtener las situaciones de todos los colegios de la persona");
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		
+
 		if (idPersona != null || idPersona != "") {
 			LOGGER.info(
 					"getSituacionGlobalColegiado() / cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado() -> "
-					+ "Entrada a cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
+							+ "Entrada a cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
 			comboItems = cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado(idPersona);
 			LOGGER.info(
 					"getSituacionGlobalColegiado() / cenEstadocolegialExtendsMapper.getSituacionGlobalColegiado() -> "
-					+ "Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
-			
+							+ "Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
+
 			try {
-				LOGGER.info(
-						"getSituacionGlobalColegiado() / desigancionesServiceImpl.getPersonaPorId() -> "
+				LOGGER.info("getSituacionGlobalColegiado() / desigancionesServiceImpl.getPersonaPorId() -> "
 						+ "Entrada a desigancionesServiceImpl para obtener datos generales persona y saber si esta fallecido");
 				CenPersonaItem cenPersonaItem = desigancionesServiceImpl.getPersonaPorId(idPersona);
-				LOGGER.info(
-						"getSituacionGlobalColegiado() / desigancionesServiceImpl.getPersonaPorId() -> "
+				LOGGER.info("getSituacionGlobalColegiado() / desigancionesServiceImpl.getPersonaPorId() -> "
 						+ "Salida de desigancionesServiceImpl para obtener datos generales persona y saber si esta fallecido");
-				if(cenPersonaItem != null && cenPersonaItem.getFallecido().equals("1")) {
+				if (cenPersonaItem != null && cenPersonaItem.getFallecido().equals("1")) {
 					ComboItem incluirFallecido = new ComboItem();
 					incluirFallecido.setLabel("FFFF");
-					incluirFallecido.setValue("60");					
+					incluirFallecido.setValue("60");
 					comboItems.add(incluirFallecido);
 				}
 			} catch (Exception e) {
@@ -217,11 +221,12 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				e.printStackTrace();
 			}
 		}
-		
+
 		comboDTO.setCombooItems(comboItems);
 
-		LOGGER.info("getSituacionGlobalColegiado() -> Salida del servicio para obtener las situaciones de todos los colegios de la persona");
-		
+		LOGGER.info(
+				"getSituacionGlobalColegiado() -> Salida del servicio para obtener las situaciones de todos los colegios de la persona");
+
 		return comboDTO;
 	}
 
@@ -305,6 +310,35 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return comboDTO;
 	}
+	
+	@Override
+	public ColegiadoJGDTO busquedaColegiadoExpress(ColegiadoJGItem colegiado, HttpServletRequest request) {
+		
+		LOGGER.info("busquedaColegiadoExpress() -> Entrada al servicio para obtener el colegiado");
+
+		ColegiadoJGDTO colegiadoJGDTO = new ColegiadoJGDTO();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info("busquedaColegiadoExpress() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info("busquedaColegiadoExpress() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		if (null != usuarios && usuarios.size() > 0) {
+			LOGGER.info("busquedaColegiadoExpress() / cenPersonaExtendsMapper.busquedaColegiadoExpress() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado");
+			colegiadoJGDTO.setColegiadoJGItem(cenPersonaExtendsMapper.busquedaColegiadoExpress(colegiado.getnColegiado(), colegiado.getNifcif(), colegiado.getIdInstitucion()));
+			LOGGER.info("busquedaColegiadoExpress() / cenGruposclienteExtendsMapper.getLabel() -> Salida de cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
+		} else {
+			LOGGER.warn("busquedaColegiadoExpress() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+		}
+
+		LOGGER.info("busquedaColegiadoExpress() -> Salida del servicio para obtener el colegiado");
+		return colegiadoJGDTO;
+	}
 
 	@Override
 	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
@@ -314,10 +348,10 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
 		List<GenParametros> tamMax = null;
 		Integer tamMaximo = null;
-		
+
 		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
 		List<ColegiadoItem> colegiadoItemListFinal = new ArrayList<ColegiadoItem>();
-		HashMap<String,ColegiadoItem> mapaColegiadoItemFinal = new HashMap<String,ColegiadoItem>();
+		HashMap<String, ColegiadoItem> mapaColegiadoItemFinal = new HashMap<String, ColegiadoItem>();
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -327,65 +361,74 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			if (null != colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
 				colegiadoItem.setNif(dni);
 			}
-		GenParametrosExample genParametrosExample = new GenParametrosExample();
-	    genParametrosExample.createCriteria().andModuloEqualTo("CEN").andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO").andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-	    genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-	    tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-	    LOGGER.info("searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-        if (tamMax != null) {
-            tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-        } else {
-            tamMaximo = null;
-        }
-	    
-        //Recuperamos los colegiados con el ultimo estado con fecha anterior al dia de hoy
-		colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem, tamMaximo);
-		
-		//Recorremos los colegiados, si su ultimo estado es con fecha hacia el futuro le cambiamos el estado a "Sin estado"
-		if(colegiadoItemList != null && !colegiadoItemList.isEmpty()) {
-			
-			for (int i = 0; i < colegiadoItemList.size(); i++) {
-				
-				if(colegiadoItemList.get(i).getFechaEstado() != null && colegiadoItemList.get(i).getFechaEstado().after(new Date())) {
-					colegiadoItemList.get(i).setEstadoColegial("Sin estado");
-				} else {
-					if (colegiadoItemList.get(i).getFechaEstadoStr() != null) {
-						//Formateamos la fecha que viene en string
-						Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(colegiadoItemList.get(i).getFechaEstadoStr());
-						
-						if(fechaEst.after(new Date())) {
+			GenParametrosExample genParametrosExample = new GenParametrosExample();
+			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
+					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
+					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
+			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+			LOGGER.info(
+					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+			if (tamMax != null) {
+				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+			} else {
+				tamMaximo = null;
+			}
+
+			// Recuperamos los colegiados con el ultimo estado con fecha anterior al dia de
+			// hoy
+			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem, tamMaximo);
+
+			// Recorremos los colegiados, si su ultimo estado es con fecha hacia el futuro
+			// le cambiamos el estado a "Sin estado"
+			if (colegiadoItemList != null && !colegiadoItemList.isEmpty()) {
+
+				for (int i = 0; i < colegiadoItemList.size(); i++) {
+
+					if (colegiadoItemList.get(i).getFechaEstado() != null
+							&& colegiadoItemList.get(i).getFechaEstado().after(new Date())) {
+						colegiadoItemList.get(i).setEstadoColegial("Sin estado");
+					} else {
+						if (colegiadoItemList.get(i).getFechaEstadoStr() != null) {
+							// Formateamos la fecha que viene en string
+							Date fechaEst = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")
+									.parse(colegiadoItemList.get(i).getFechaEstadoStr());
+
+							if (fechaEst.after(new Date())) {
+								colegiadoItemList.get(i).setEstadoColegial("Sin estado");
+							}
+						} else {
 							colegiadoItemList.get(i).setEstadoColegial("Sin estado");
 						}
-					} else {
-						colegiadoItemList.get(i).setEstadoColegial("Sin estado");
+
 					}
-					
+					if (mapaColegiadoItemFinal.isEmpty()) {
+						mapaColegiadoItemFinal.put(colegiadoItemList.get(i).getNif(), colegiadoItemList.get(i));
+					}
+					// Quitamos los que ya estén insertados
+					if (!mapaColegiadoItemFinal.containsKey(colegiadoItemList.get(i).getNif())) {
+						mapaColegiadoItemFinal.put(colegiadoItemList.get(i).getNif(), colegiadoItemList.get(i));
+					}
+
 				}
-				if(mapaColegiadoItemFinal.isEmpty()) {
-					mapaColegiadoItemFinal.put(colegiadoItemList.get(i).getNif(), colegiadoItemList.get(i));
-				}
-				//Quitamos los que ya estén insertados
-				if(!mapaColegiadoItemFinal.containsKey(colegiadoItemList.get(i).getNif())){
-					mapaColegiadoItemFinal.put(colegiadoItemList.get(i).getNif(), colegiadoItemList.get(i));
-				}
-				
+
 			}
-			
-			
-		}
-		
-		colegiadoItemListFinal.addAll(mapaColegiadoItemFinal.values());
-		colegiadoItemListFinal.sort(new NombreComparator());
-		
-		//colegiadosDTO.setColegiadoItem(colegiadoItemList);
-		if((colegiadoItemListFinal != null) && tamMaximo != null && (colegiadoItemListFinal.size()) > tamMaximo) {
-			error.setCode(200);
-			error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
-			colegiadosDTO.setError(error);
-			colegiadoItemListFinal.remove(colegiadoItemListFinal.size()-1);
+
+			colegiadoItemListFinal.addAll(mapaColegiadoItemFinal.values());
+			colegiadoItemListFinal.sort(new NombreComparator());
+
+			// colegiadosDTO.setColegiadoItem(colegiadoItemList);
+			if ((colegiadoItemListFinal != null) && tamMaximo != null && (colegiadoItemListFinal.size()) > tamMaximo) {
+				error.setCode(200);
+				error.setDescription("La consulta devuelve más de " + tamMaximo
+						+ " resultados, pero se muestran sólo los " + tamMaximo
+						+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+				colegiadosDTO.setError(error);
+				colegiadoItemListFinal.remove(colegiadoItemListFinal.size() - 1);
 			}
-		colegiadosDTO.setColegiadoItem(colegiadoItemListFinal);
+			colegiadosDTO.setColegiadoItem(colegiadoItemListFinal);
 			if (colegiadoItemListFinal == null || colegiadoItemListFinal.size() == 0) {
 
 				LOGGER.warn(
@@ -434,7 +477,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		return colegiadosDTO;
 	}
-	
+
 	@Override
 	public ColegiadoDTO searchTipoPersona(ColegiadoItem colegiadoItem, HttpServletRequest request) {
 
@@ -512,7 +555,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 					try {
 						Workbook workBook = crearExcel(result);
-						
+
 						// Obtenemos la ruta temporal
 						GenPropertiesKey key = new GenPropertiesKey();
 						key.setFichero(SigaConstants.FICHERO_SIGA);
@@ -608,13 +651,13 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 
 		CellStyle cellStyleNum = workbook.createCellStyle();
 		cellStyleNum.setAlignment(CellStyle.ALIGN_RIGHT);
-		
+
 		CellStyle cellStyleString = workbook.createCellStyle();
 		cellStyleString.setAlignment(CellStyle.ALIGN_LEFT);
-		
+
 		Object campo = null;
 		XSSFRichTextString textCell = null;
-		
+
 		if (result.size() > 0) {
 			for (String value : result.get(0).keySet()) {
 				Cell cell = headerRow.createCell(index);
@@ -625,16 +668,15 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			}
 
 			for (Map<String, Object> map : result) {
-				
+
 				if (map != null) {
-	
+
 					row = sheet.createRow(rowNum++);
 					int cell = 0;
-	
-					
+
 					for (int j = 0; j < columnsKey.size(); j++) {
 						campo = map.get(columnsKey.get(j).trim());
-						
+
 						if (campo == null || campo.toString().trim() == "") {
 							row.createCell(cell).setCellValue("");
 						} else {
@@ -645,39 +687,38 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 								}
 								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
 								celda.setCellValue(Double.parseDouble(campo.toString()));
-								
+
 							} else if (campo instanceof Date) {
 								if (!mapaEstilos.containsKey(cell)) {
 									mapaEstilos.put(cell, cellStyleString);
 								}
-								
+
 								CreationHelper creationHelper = workbook.getCreationHelper();
-								
+
 								celda.setCellValue((Date) campo);
-								
+
 								CellStyle style1 = workbook.createCellStyle();
-								style1.setDataFormat(creationHelper.createDataFormat().getFormat(
-										"dd/mm/yyyy hh:mm"));
+								style1.setDataFormat(creationHelper.createDataFormat().getFormat("dd/mm/yyyy hh:mm"));
 								celda.setCellStyle(style1);
-								
+
 							} else {
 								if (!mapaEstilos.containsKey(cell)) {
 									mapaEstilos.put(cell, cellStyleString);
 								}
-								
+
 								celda.setCellType(Cell.CELL_TYPE_STRING);
 								textCell = new XSSFRichTextString(campo.toString());
 								celda.setCellValue(textCell);
 							}
 						}
 						cell++;
-						
+
 					}
 				}
 			}
 
 			for (int i = 0; i < index; i++) {
-				//sheet.autoSizeColumn(j);
+				// sheet.autoSizeColumn(j);
 				if (mapaEstilos.containsKey(i)) {
 					sheet.setDefaultColumnStyle(i, mapaEstilos.get(i));
 				}
@@ -715,160 +756,175 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.SELECT("f_siga_getncol_ncom(col.idinstitucion,col.idpersona) AS NcolNcom");
-        sql.SELECT("decode (col.comunitario,'1','SI','0','NO') AS Comunitario");
-        sql.SELECT("per.nombre AS Nombre");
-        sql.SELECT("per.apellidos1 AS Apellido1");
-        sql.SELECT("per.apellidos2 AS Apellido2");
-        sql.SELECT("f_siga_getrecurso(tip.descripcion,1) AS TipoIdentificacion");
-        sql.SELECT("per.nifcif AS NifCif");
-        sql.SELECT("Per.Fechanacimiento AS FechadeNacimiento");
-        sql.SELECT("f_siga_getrecurso(est.descripcion,1) AS EstadoCivil");
-        sql.SELECT("per.naturalde AS Naturalde");
-        sql.SELECT("decode (per.fallecido,'1','SI','NO') AS Fallecido");
-        sql.SELECT("decode (per.sexo,'M','MUEJR','HOMBRE') AS Sexo");
-        sql.SELECT("Cli.Fechaalta AS Fechaalta");
-        sql.SELECT("f_siga_getrecurso(tra.descripcion,1) AS Tratamiento");
-        sql.SELECT("cli.caracter AS Caracter");
-        sql.SELECT("cli.publicidad AS Publicidad");
-        sql.SELECT("cli.comisiones AS Comisiones");
-        sql.SELECT("cli.guiajudicial AS GuiaJudicial");
-        sql.SELECT("cli.abonosbanco AS AbonosBanco");
-        sql.SELECT("cli.cargosbanco AS CargosBanco");
-        sql.SELECT("decode (cli.idlenguaje,'1','Castellano','2','Catalá','3','Euskera','4','Galego') AS Lenguaje");
-        sql.SELECT("cli.fotografia AS Fotografia");
-        sql.SELECT("cli.asientocontable AS AsientoContable");
-        sql.SELECT("Cli.Fechacarga AS FechaCarga");
-        sql.SELECT("cli.letrado AS Letrado");
-        sql.SELECT("Cli.Fechaactualizacion AS FechaActualizacion");
-        sql.SELECT("Cli.Fechaexportcenso AS FechaExportCenso");
-        sql.SELECT("cli.noenviarrevista AS NoenviaRevista");
-        sql.SELECT("cli.noaparecerredabogacia AS NoapareceRedAbogacia");
-        sql.SELECT("Col.Fechapresentacion AS FechaPresentacion");
-        sql.SELECT("Col.Fechaincorporacion AS FechaIncorporacion");
-        sql.SELECT("col.indtitulacion AS IndTitulacion");
-        sql.SELECT("col.jubilacioncuota AS JubilacionCuota");
-        sql.SELECT("decode (col.situacionejercicio,'1','Alta','0','Baja') AS SituacionEjercicio");
-        sql.SELECT("decode (col.situacionresidente,'1','SI','0','NO') AS SituacionResidente");
-        sql.SELECT("col.situacionempresa AS SituacionEmpresa");
-        sql.SELECT("Col.Fechajura AS FechaJura");
-        sql.SELECT("Col.Fechatitulacion AS FechaTitulacion");
-        sql.SELECT("decode (col.otroscolegios,'1','SI','0','NO') as OtrosColegios");
-        sql.SELECT("Col.Fechadeontologia AS FechaDeontologia");
-        sql.SELECT("Col.Fechamovimiento AS FechaMovimiento");
-        sql.SELECT("f_siga_getrecurso(ts.nombre,1) AS TipoSeguro");
-        sql.SELECT("col.cuentacontablesjcs AS CuentaContableSJCS");
-        sql.SELECT("decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso','Baja por Deceso') AS EstadoColegial");
-        sql.SELECT("f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate)   AS FechaEstado");
-        sql.SELECT("dir.domicilio AS Domicilio");
-        sql.SELECT("dir.codigopostal AS CodigoPostal");
-        sql.SELECT("dir.telefono1 AS Telefono1");
-        sql.SELECT("dir.telefono2 AS Telefono2");
-        sql.SELECT("dir.movil AS Movil");
-        sql.SELECT("dir.fax1 AS Fax1");
-        sql.SELECT("dir.fax2 AS Fax2");
-        sql.SELECT("dir.correoelectronico AS CorreoElectronico");
-        sql.SELECT("dir.paginaweb AS PaginaWeb");
-        sql.SELECT("CASE WHEN dir.poblacionextranjera IS NULL THEN pob.nombre ELSE dir.poblacionextranjera || '(' || pais.nombre || ')' END AS Poblacion");
-        sql.SELECT("CASE WHEN dir.poblacionextranjera IS NULL THEN pro.nombre ELSE NULL END AS Provincia");
-        sql.SELECT("f_siga_getrecurso(pais.nombre, 1) AS Pais");
+		sql.SELECT("decode (col.comunitario,'1','SI','0','NO') AS Comunitario");
+		sql.SELECT("per.nombre AS Nombre");
+		sql.SELECT("per.apellidos1 AS Apellido1");
+		sql.SELECT("per.apellidos2 AS Apellido2");
+		sql.SELECT("f_siga_getrecurso(tip.descripcion,1) AS TipoIdentificacion");
+		sql.SELECT("per.nifcif AS NifCif");
+		sql.SELECT("Per.Fechanacimiento AS FechadeNacimiento");
+		sql.SELECT("f_siga_getrecurso(est.descripcion,1) AS EstadoCivil");
+		sql.SELECT("per.naturalde AS Naturalde");
+		sql.SELECT("decode (per.fallecido,'1','SI','NO') AS Fallecido");
+		sql.SELECT("decode (per.sexo,'M','MUEJR','HOMBRE') AS Sexo");
+		sql.SELECT("Cli.Fechaalta AS Fechaalta");
+		sql.SELECT("f_siga_getrecurso(tra.descripcion,1) AS Tratamiento");
+		sql.SELECT("cli.caracter AS Caracter");
+		sql.SELECT("cli.publicidad AS Publicidad");
+		sql.SELECT("cli.comisiones AS Comisiones");
+		sql.SELECT("cli.guiajudicial AS GuiaJudicial");
+		sql.SELECT("cli.abonosbanco AS AbonosBanco");
+		sql.SELECT("cli.cargosbanco AS CargosBanco");
+		sql.SELECT("decode (cli.idlenguaje,'1','Castellano','2','Catalá','3','Euskera','4','Galego') AS Lenguaje");
+		sql.SELECT("cli.fotografia AS Fotografia");
+		sql.SELECT("cli.asientocontable AS AsientoContable");
+		sql.SELECT("Cli.Fechacarga AS FechaCarga");
+		sql.SELECT("cli.letrado AS Letrado");
+		sql.SELECT("Cli.Fechaactualizacion AS FechaActualizacion");
+		sql.SELECT("Cli.Fechaexportcenso AS FechaExportCenso");
+		sql.SELECT("cli.noenviarrevista AS NoenviaRevista");
+		sql.SELECT("cli.noaparecerredabogacia AS NoapareceRedAbogacia");
+		sql.SELECT("Col.Fechapresentacion AS FechaPresentacion");
+		sql.SELECT("Col.Fechaincorporacion AS FechaIncorporacion");
+		sql.SELECT("col.indtitulacion AS IndTitulacion");
+		sql.SELECT("col.jubilacioncuota AS JubilacionCuota");
+		sql.SELECT("decode (col.situacionejercicio,'1','Alta','0','Baja') AS SituacionEjercicio");
+		sql.SELECT("decode (col.situacionresidente,'1','SI','0','NO') AS SituacionResidente");
+		sql.SELECT("col.situacionempresa AS SituacionEmpresa");
+		sql.SELECT("Col.Fechajura AS FechaJura");
+		sql.SELECT("Col.Fechatitulacion AS FechaTitulacion");
+		sql.SELECT("decode (col.otroscolegios,'1','SI','0','NO') as OtrosColegios");
+		sql.SELECT("Col.Fechadeontologia AS FechaDeontologia");
+		sql.SELECT("Col.Fechamovimiento AS FechaMovimiento");
+		sql.SELECT("f_siga_getrecurso(ts.nombre,1) AS TipoSeguro");
+		sql.SELECT("col.cuentacontablesjcs AS CuentaContableSJCS");
+		sql.SELECT(
+				"decode (f_siga_gettipocliente(col.idpersona,col.idinstitucion,sysdate),'10','No Ejerciente','20','Ejerciente','30','Baja Colegial','40','Inhabilitacion','50','Suspension Ejercicio','60','Baja por Deceso','Baja por Deceso') AS EstadoColegial");
+		sql.SELECT("f_siga_getfechaestadocolegial(col.idpersona,col.idinstitucion,sysdate)   AS FechaEstado");
+		sql.SELECT("dir.domicilio AS Domicilio");
+		sql.SELECT("dir.codigopostal AS CodigoPostal");
+		sql.SELECT("dir.telefono1 AS Telefono1");
+		sql.SELECT("dir.telefono2 AS Telefono2");
+		sql.SELECT("dir.movil AS Movil");
+		sql.SELECT("dir.fax1 AS Fax1");
+		sql.SELECT("dir.fax2 AS Fax2");
+		sql.SELECT("dir.correoelectronico AS CorreoElectronico");
+		sql.SELECT("dir.paginaweb AS PaginaWeb");
+		sql.SELECT(
+				"CASE WHEN dir.poblacionextranjera IS NULL THEN pob.nombre ELSE dir.poblacionextranjera || '(' || pais.nombre || ')' END AS Poblacion");
+		sql.SELECT("CASE WHEN dir.poblacionextranjera IS NULL THEN pro.nombre ELSE NULL END AS Provincia");
+		sql.SELECT("f_siga_getrecurso(pais.nombre, 1) AS Pais");
 
-
-		/*String from = "cen_persona per, cen_colegiado col, cen_tipoidentificacion tip, cen_estadocivil est, cen_cliente cli, cen_tratamiento tra, cen_tiposseguro ts";
-
-		sql.WHERE("col.idpersona=per.idpersona");
-		sql.WHERE("per.idtipoidentificacion not in '20'");
-		sql.WHERE("per.idtipoidentificacion=tip.idtipoidentificacion");
-		sql.WHERE("est.idestadocivil(+)=per.idestadocivil");
-		sql.WHERE("cli.idpersona=col.idpersona");
-		sql.WHERE("cli.idinstitucion=col.idinstitucion");
-		sql.WHERE("tra.idtratamiento(+)=cli.idtratamiento");
-		sql.WHERE("col.idtiposseguro=ts.idtiposseguro(+)");
-*/
+		/*
+		 * String from =
+		 * "cen_persona per, cen_colegiado col, cen_tipoidentificacion tip, cen_estadocivil est, cen_cliente cli, cen_tratamiento tra, cen_tiposseguro ts"
+		 * ;
+		 * 
+		 * sql.WHERE("col.idpersona=per.idpersona");
+		 * sql.WHERE("per.idtipoidentificacion not in '20'");
+		 * sql.WHERE("per.idtipoidentificacion=tip.idtipoidentificacion");
+		 * sql.WHERE("est.idestadocivil(+)=per.idestadocivil");
+		 * sql.WHERE("cli.idpersona=col.idpersona");
+		 * sql.WHERE("cli.idinstitucion=col.idinstitucion");
+		 * sql.WHERE("tra.idtratamiento(+)=cli.idtratamiento");
+		 * sql.WHERE("col.idtiposseguro=ts.idtiposseguro(+)");
+		 */
 		sql.FROM("cen_colegiado col");
-		sql.LEFT_OUTER_JOIN("cen_direcciones dir ON (dir.idinstitucion = col.idinstitucion AND dir.idpersona = col.idpersona AND dir.fechabaja IS NULL AND "
-				+ "EXISTS ( SELECT 1 FROM cen_direccion_tipodireccion tipdir WHERE dir.idinstitucion = tipdir.idinstitucion AND dir.idpersona = tipdir.idpersona AND "
-				+ "dir.iddireccion = tipdir.iddireccion AND tipdir.idtipodireccion = '3'))");
+		sql.LEFT_OUTER_JOIN(
+				"cen_direcciones dir ON (dir.idinstitucion = col.idinstitucion AND dir.idpersona = col.idpersona AND dir.fechabaja IS NULL AND "
+						+ "EXISTS ( SELECT 1 FROM cen_direccion_tipodireccion tipdir WHERE dir.idinstitucion = tipdir.idinstitucion AND dir.idpersona = tipdir.idpersona AND "
+						+ "dir.iddireccion = tipdir.iddireccion AND tipdir.idtipodireccion = '3'))");
 		sql.LEFT_OUTER_JOIN("cen_poblaciones pob ON pob.idpoblacion = dir.idpoblacion");
 		sql.LEFT_OUTER_JOIN("cen_provincias pro ON pro.idprovincia = dir.idprovincia");
 		sql.LEFT_OUTER_JOIN("cen_pais pais ON pais.idpais = dir.idpais");
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
 		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
 
-			
 		if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
-			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
-				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
-				//sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100")) {
+				sql.INNER_JOIN(
+						"cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+				// sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and
+				// col.idinstitucion = cli.idinstitucion)");
+			} else {
+				sql.INNER_JOIN(
+						"cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli.idinstitucion)");
+				// sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and
+				// inst.cen_inst_IDINSTITUCION = cli2.idinstitucion)");
 			}
-			else{
-				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli.idinstitucion)");
-				//sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli2.idinstitucion)");
-			}
-			
-		}else {
-            sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
-			sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
+
+		} else {
+			sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"
+					+ idInstitucion + "')");
+			sql.INNER_JOIN(
+					"cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
 		}
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
 						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
 						+ " and datcol.fechaestado < sysdate))");
-		
+
 		sql.INNER_JOIN("cen_tipoidentificacion tip on (per.idtipoidentificacion = tip.idtipoidentificacion)");
 		sql.LEFT_OUTER_JOIN("cen_estadocivil est on ( est.idestadocivil = per.idestadocivil)");
 		sql.LEFT_OUTER_JOIN(" cen_tratamiento tra on (tra.idtratamiento = cli.idtratamiento)");
-		sql.LEFT_OUTER_JOIN(" cen_tiposseguro ts  on ( col.idtiposseguro = ts.idtiposseguro)") ;     
-		
-		
-		
-		
+		sql.LEFT_OUTER_JOIN(" cen_tiposseguro ts  on ( col.idtiposseguro = ts.idtiposseguro)");
+
 		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
-		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
-				+ "    ((grucli.idinstitucion = inst.idinstitucion or grucli.idinstitucion = '2000') and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
-				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
+			sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
+					+ "    ((grucli.idinstitucion = inst.idinstitucion or grucli.idinstitucion = '2000') and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
+					+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
 		}
-		
-		
-		
-	/*	sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
-		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
-		*/
-		if(!UtilidadesString.esCadenaVacia(colegiadoItem.getDomicilio()) || !UtilidadesString.esCadenaVacia(colegiadoItem.getIdPoblacion()) 
-				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getIdProvincia()) || !UtilidadesString.esCadenaVacia(colegiadoItem.getTelefono())
-				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getCorreo()) || !UtilidadesString.esCadenaVacia(colegiadoItem.getTipoDireccion()) 
-				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getMovil()) || !UtilidadesString.esCadenaVacia(colegiadoItem.getCodigoPostal())) {
-			
+
+		/*
+		 * sql.
+		 * INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)"
+		 * ); sql.
+		 * INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')"
+		 * );
+		 */
+		if (!UtilidadesString.esCadenaVacia(colegiadoItem.getDomicilio())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getIdPoblacion())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getIdProvincia())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getTelefono())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getCorreo())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getTipoDireccion())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getMovil())
+				|| !UtilidadesString.esCadenaVacia(colegiadoItem.getCodigoPostal())) {
+
 			sql.LEFT_OUTER_JOIN(
 					"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 
-			sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
-		                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
-		                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
+			sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"
+					+ " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+					+ " INST.IDINSTITUCION = DIR.IDINSTITUCION)");
 		}
-		
-		if ((colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "") || (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") || (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "")) {
+
+		if ((colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "")
+				|| (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "")
+				|| (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "")) {
 			sql.LEFT_OUTER_JOIN(
 					"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
-			
+
 			sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
-			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
-			sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
+			sql.LEFT_OUTER_JOIN(
+					"cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
+			sql.LEFT_OUTER_JOIN(
+					"cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
 		}
-		if(!instituciones.equals("")) {
+		if (!instituciones.equals("")) {
 			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");
 		} else {
 			if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
-				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
+				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100")) {
 					sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
-				}
-				else{
-                    sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
+				} else {
+					sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
 
 				}
-				
+
 			}
 		}
-		
+
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
@@ -883,18 +939,19 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		}
 
 		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
-			
+
 			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
-			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","%"); 
-			
+			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+", "%");
+
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-			
+
 //			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" +colegiadoItem.getApellidos().replaceAll("\\s+","")
 //					+ "%')");
 		}
-		
+
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
-			sql.WHERE("(decode(col.comunitario,1,col.ncomunitario,col.ncolegiado) = '" + colegiadoItem.getNumColegiado() + "')");
+			sql.WHERE("(decode(col.comunitario,1,col.ncomunitario,col.ncolegiado) = '" + colegiadoItem.getNumColegiado()
+					+ "')");
 		}
 
 		if (colegiadoItem.getSexo() != null && colegiadoItem.getSexo() != "") {
@@ -906,10 +963,15 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		}
 
 		if (colegiadoItem.getTipoDireccion() != null && colegiadoItem.getTipoDireccion() != "") {
-			sql.WHERE("tipodir.idtipodireccion = "+ colegiadoItem.getTipoDireccion());
-		}else {
-			/*sql.WHERE("(tipodir.idtipodireccion = 2 OR 2 NOT IN (SELECT idtipodireccion FROM CEN_DIRECCION_TIPODIRECCION TIPODIR2 "
-					+ "WHERE TIPODIR.IDPERSONA = TIPODIR2.IDPERSONA  AND TIPODIR.IDINSTITUCION = TIPODIR2.IDINSTITUCION ))");*/
+			sql.WHERE("tipodir.idtipodireccion = " + colegiadoItem.getTipoDireccion());
+		} else {
+			/*
+			 * sql.
+			 * WHERE("(tipodir.idtipodireccion = 2 OR 2 NOT IN (SELECT idtipodireccion FROM CEN_DIRECCION_TIPODIRECCION TIPODIR2 "
+			 * +
+			 * "WHERE TIPODIR.IDPERSONA = TIPODIR2.IDPERSONA  AND TIPODIR.IDINSTITUCION = TIPODIR2.IDINSTITUCION ))"
+			 * );
+			 */
 		}
 
 		if (colegiadoItem.getIdEstadoCivil() != null && colegiadoItem.getIdEstadoCivil() != "") {
@@ -932,7 +994,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			String columna = "dir.correoelectronico";
 			String cadena = colegiadoItem.getCorreo();
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
-			
+
 //			sql.WHERE("upper(dir.correoelectronico) LIKE upper('%" + colegiadoItem.getCorreo() + "%')");
 		}
 
@@ -951,7 +1013,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		if (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") {
 			sql.WHERE("datoscv.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
 		}
-		
+
 		if (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "") {
 			sql.WHERE("datoscv.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
 		}
@@ -968,17 +1030,20 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			sql.WHERE("col.comunitario ='" + colegiadoItem.getInscrito() + "'");
 		}
 
-
 		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
 
 			String etiquetas = "";
-					
+
 			for (int i = 0; colegiadoItem.getIdgrupo().length > i; i++) {
 
 				if (i == colegiadoItem.getIdgrupo().length - 1) {
-					etiquetas += "( grucli.IDGRUPO ='" + colegiadoItem.getIdgrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + colegiadoItem.getIdgrupo()[i].getIdInstitucion() + "')";
+					etiquetas += "( grucli.IDGRUPO ='" + colegiadoItem.getIdgrupo()[i].getValue()
+							+ "' and grucli.IDINSTITUCION_GRUPO = '" + colegiadoItem.getIdgrupo()[i].getIdInstitucion()
+							+ "')";
 				} else {
-					etiquetas += "( grucli.IDGRUPO ='" + colegiadoItem.getIdgrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + colegiadoItem.getIdgrupo()[i].getIdInstitucion() + "') or";
+					etiquetas += "( grucli.IDGRUPO ='" + colegiadoItem.getIdgrupo()[i].getValue()
+							+ "' and grucli.IDINSTITUCION_GRUPO = '" + colegiadoItem.getIdgrupo()[i].getIdInstitucion()
+							+ "') or";
 
 				}
 			}
@@ -1015,11 +1080,10 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			}
 		}
 
-
-		
 		if (colegiadoItem.getFechaNacimientoRango() != null && colegiadoItem.getFechaNacimientoRango().length != 0) {
 
-			if (colegiadoItem.getFechaNacimientoRango()[0] != null && colegiadoItem.getFechaNacimientoRango()[1] != null) {
+			if (colegiadoItem.getFechaNacimientoRango()[0] != null
+					&& colegiadoItem.getFechaNacimientoRango()[1] != null) {
 
 				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
 				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
@@ -1046,30 +1110,24 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 			}
 		}
 
-
-
-
-		
-		
 		GenParametrosExample genParametrosExample = new GenParametrosExample();
-		
+
 		List<Short> idInstituciones = new ArrayList<>();
 		idInstituciones.add(idInstitucion);
 		idInstituciones.add(SigaConstants.IDINSTITUCION_0_SHORT);
-		
+
 		genParametrosExample.createCriteria().andIdinstitucionIn(idInstituciones)
-		.andParametroEqualTo("EXPORTAR_COLEGIADOS_ACOGIDOS_A_LOPD");
-		
+				.andParametroEqualTo("EXPORTAR_COLEGIADOS_ACOGIDOS_A_LOPD");
+
 		genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-		
-		
+
 		List<GenParametros> genParametros = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-		
-		if(genParametros != null && genParametros.size() > 0) {
-			
+
+		if (genParametros != null && genParametros.size() > 0) {
+
 			GenParametros parametro = genParametros.get(0);
-			
-			if(parametro.getValor().equals("N")) {
+
+			if (parametro.getValor().equals("N")) {
 				sql.WHERE("(decode(cli.noaparecerredabogacia,null,0,cli.noaparecerredabogacia) <> 1)");
 			}
 		}
@@ -1079,12 +1137,11 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		return sql.toString();
 
 	}
-
 }
 
 class NombreComparator implements java.util.Comparator<ColegiadoItem> {
-    @Override
-    public int compare(ColegiadoItem a, ColegiadoItem b) {
-        return a.getNombre().compareTo(b.getNombre());
-    }
+	@Override
+	public int compare(ColegiadoItem a, ColegiadoItem b) {
+		return a.getNombre().compareTo(b.getNombre());
+	}
 }

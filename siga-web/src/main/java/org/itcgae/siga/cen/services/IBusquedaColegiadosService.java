@@ -9,6 +9,8 @@ import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
 
 public interface IBusquedaColegiadosService {
 
@@ -21,6 +23,8 @@ public interface IBusquedaColegiadosService {
 	public ComboDTO getCVCategory(HttpServletRequest request);
 	
 	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException;
+	
+	public ColegiadoJGDTO busquedaColegiadoExpress(ColegiadoJGItem colegiado, HttpServletRequest request);
 	
 	public ColegiadoDTO searchTipoPersona( ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException;
 	

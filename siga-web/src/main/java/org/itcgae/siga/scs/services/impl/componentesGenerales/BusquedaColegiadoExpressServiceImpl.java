@@ -76,16 +76,11 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 				// la consulta necesita idinstitucion de token y idlenguaje del usuario logueado
 				usuario.setIdinstitucion(idInstitucion);
 
-				LOGGER.info(
-						"busquedaColegiadosExpress() / cenPersonaExtendsMapper.busquedaColegiadoExpress() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado");
-				colegiadoJGDTO.setColegiadoJGItem(
-						cenPersonaExtendsMapper.busquedaColegiadoExpress(colegiadoJGItem, idInstitucion.toString()));
-				LOGGER.info(
-						"getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Salida de cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
+				LOGGER.info("busquedaColegiadosExpress() / cenPersonaExtendsMapper.busquedaColegiadoExpress() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado");
+				colegiadoJGDTO.setColegiadoJGItem(cenPersonaExtendsMapper.busquedaColegiadoExpress(colegiadoJGItem, null, idInstitucion.toString()));
+				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Salida de cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
 			} else {
-				LOGGER.warn(
-						"getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-								+ dni + " e idInstitucion = " + idInstitucion);
+				LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
 			}
 		} else {
 			LOGGER.warn("getLabel() -> idInstitucion del token nula");
