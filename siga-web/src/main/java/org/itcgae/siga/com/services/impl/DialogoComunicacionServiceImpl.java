@@ -3092,14 +3092,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					//FontSettings.getDefaultInstance().setFontsSources(
 					//		new FontSourceBase[] { new SystemFontSource(), new FolderFontSource("C:\\Datos\\fonts\\", true) });
 					
-					//FontSettings.getDefaultInstance().setFontsSources(new FontSourceBase[] {new FolderFontSource(this.getRutaFuentesPDF(), true)});
+					FontSettings.getDefaultInstance().setFontsSources(new FontSourceBase[] {new FolderFontSource(this.getRutaFuentesPDF(), true)});
 					
 					
 					doc = new Document(rutaPlantilla + nombrePlantilla);
 				
 					if(modelosComunicacionItem.getIdClaseComunicacion().equals("9")) { //Carta de Acreditación de Oficio
 						hDatosFinal = completarDatosAcreditación(hDatosFinal,mapaClave);
-						
 					}
 					
 					doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
