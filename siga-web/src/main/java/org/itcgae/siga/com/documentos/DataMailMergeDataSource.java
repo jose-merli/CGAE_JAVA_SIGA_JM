@@ -84,9 +84,16 @@ public class DataMailMergeDataSource implements IMailMergeDataSource{
 
 
 	@Override
-	public boolean getValue(String arg0, Ref<Object> arg1) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean getValue(String fieldName, Ref<Object> fieldValue) {
+	    HashMap registro = (HashMap)lista.get(mRecordIndex);
+	    if (registro.containsKey(fieldName.toUpperCase())) {
+	        fieldValue.set(registro.get(fieldName.toUpperCase()));
+	        return true;
+	    } else {
+	        fieldValue.set("");
+	        return false;
+	    }
 	}
+
 
 }

@@ -11,8 +11,8 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -95,8 +95,6 @@ import org.itcgae.siga.commons.utils.UtilOficio;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
@@ -160,8 +158,6 @@ import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosKey;
 import org.itcgae.siga.db.entities.ScsSaltoscompensaciones;
-import org.itcgae.siga.db.entities.ScsSoj;
-import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.entities.ScsTipodictamenejg;
 import org.itcgae.siga.db.entities.ScsTiporesolucion;
 import org.itcgae.siga.db.entities.ScsTurno;
@@ -5555,8 +5551,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 0;
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY");
-		SimpleDateFormat sdf2 = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
 		Boolean letradoDesigSinTurno = Boolean.FALSE;
 
 		if (idInstitucion != null) {
@@ -5600,19 +5596,22 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				// Validar que la fecha sea igual o posterior a la fecha de la designación
 				// anterior
 				if (designaLetradoVieja != null && designaLetradoVieja.getFechadesigna() != null
-						&& designaLetradoNueva.getFechadesigna() != null
-						&& designaLetradoVieja.getFechadesigna().toInstant().atZone(ZoneId.systemDefault())
-								.toLocalDate().compareTo(designaLetradoNueva.getFechadesigna().toInstant()
-										.atZone(ZoneId.systemDefault()).toLocalDate()) > 0) {
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					LOGGER.error(
-							"DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
-					error.setCode(400);
-					error.setDescription("justiciaGratuita.oficio.designas.letrados.fechaDesignaIncorrecta");
+					    && designaLetradoNueva != null && designaLetradoNueva.getFechadesigna() != null) {
 
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
-				}
+					    LocalDate fechaVieja = designaLetradoVieja.getFechadesigna().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					    LocalDate fechaNueva = designaLetradoNueva.getFechadesigna().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					    
+					    if (fechaVieja.isAfter(fechaNueva)) {
+					        // La fecha de designación en designaLetradoVieja es posterior a la fecha en designaLetradoNueva
+					        updateResponseDTO.setStatus(SigaConstants.KO);
+					        LOGGER.error("DesignacionesServiceImpl.updateLetradoDesigna() -> Se ha producido un error al actualizar el letrado asociado a la designación");
+					        error.setCode(400);
+					        error.setDescription("justiciaGratuita.oficio.designas.letrados.fechaDesignaIncorrecta");
+
+					        updateResponseDTO.setError(error);
+					        return updateResponseDTO;
+					    }
+					}
 
 				// Seleccion de un letrado en el caso de que no se haya introducido
 				if (letradoEntrante.getIdpersona() == null) {
