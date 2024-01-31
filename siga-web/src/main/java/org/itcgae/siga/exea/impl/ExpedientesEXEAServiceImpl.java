@@ -1162,7 +1162,10 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         if(expediente.getDocumentosFisicos() != null
                 && !expediente.getDocumentosFisicos().isNil()){
 
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.parse(new InputSource(new StringReader(expediente.getDocumentosFisicos().xmlText())));
             NodeList docFisicos = doc.getElementsByTagName("ser:documentosFisicos");
             for (int i = 0; i < docFisicos.getLength(); i++) {
@@ -1190,7 +1193,10 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         if(expediente.getDocumentosElectronicos() != null
                 && !expediente.getDocumentosElectronicos().isNil()){
 
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.parse(new InputSource(new StringReader(expediente.getDocumentosFisicos().xmlText())));
             NodeList docFisicos = doc.getElementsByTagName("ser:documentosElectronicos");
             for (int i = 0; i < docFisicos.getLength(); i++) {
@@ -1223,8 +1229,12 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
     private String getXMLBusquedaAvanzada(String dniColegiado) throws ParserConfigurationException, TransformerException {
 
         TransformerFactory tf = TransformerFactory.newInstance();
+        tf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        tf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         Transformer transformer = tf.newTransformer();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        docFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
         // root elements
@@ -1280,7 +1290,10 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
 
             LOGGER.info("getExpedienteItemFromXML() / String del XML con los expedientes: " + xmlExpedientes);
 
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
             Document doc = documentBuilder.parse(new InputSource(new StringReader(xmlExpedientes)));
 
             NodeList nodes = doc.getElementsByTagName("item");
@@ -1802,8 +1815,12 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
      */
     private String createXMLDatosEspecificosFromSolicitud(CenSolicitudincorporacion solicitudincorporacion) throws TransformerException, ParserConfigurationException {
         TransformerFactory tf = TransformerFactory.newInstance();
+        tf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        tf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         Transformer transformer = tf.newTransformer();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        docFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
         // root elements

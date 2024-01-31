@@ -32,13 +32,13 @@ public interface PysLineaanticipoExtendsMapper extends PysLineaanticipoMapper {
     @Results({
             @Result(column="FECHA", property="fecha", jdbcType= JdbcType.TIMESTAMP),
             @Result(column="NIFCIF", property="nifCif", jdbcType=JdbcType.VARCHAR),
-            @Result(column="NOMBRE_COMPLETO", property="nombreCompleto", jdbcType=JdbcType.VARCHAR),
-            @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR),
-            @Result(column="IMPORTE_INICIAL", property="importeInicial", jdbcType=JdbcType.DECIMAL),
-            @Result(column="IMPORTE_RESTANTE", property="importeRestante", jdbcType=JdbcType.DECIMAL),
-            @Result(column="IMPORTE_USADO", property="importeUsado", jdbcType=JdbcType.DECIMAL),
             @Result(column="IDPERSONA", property="idPersona", jdbcType=JdbcType.DECIMAL),
-            @Result(column="IDANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL)
+            @Result(column="NOMBRECOMPLETO", property="nombreCompleto", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IDANTICIPO", property="idAnticipo", jdbcType=JdbcType.DECIMAL),
+            @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR),
+            @Result(column="IMPORTEINICIAL", property="importeInicial", jdbcType=JdbcType.DECIMAL),
+            @Result(column="IMPORTEUSADO", property="importeUsado", jdbcType=JdbcType.DECIMAL),
+            @Result(column="IMPORTERESTANTE", property="importeRestante", jdbcType=JdbcType.DECIMAL)
     })
     List<ListaMonederosItem> selectByPersonIdAndCreationDate(Short institutionId, FiltroMonederoItem filter);
     

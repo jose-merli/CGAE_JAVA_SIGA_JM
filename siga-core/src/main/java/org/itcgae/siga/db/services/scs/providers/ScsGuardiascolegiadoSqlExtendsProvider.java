@@ -119,7 +119,7 @@ public class ScsGuardiascolegiadoSqlExtendsProvider extends ScsCabeceraguardiasS
         sql.AND();
         sql.WHERE("gc.idturno IN ("+idTurno+")");
         sql.AND();
-        sql.WHERE("TO_DATE('"+guardiaDia+"', 'DD/MM/YYYY') BETWEEN trunc(gc.fechainicio) AND trunc(gc.fechafin)");
+        sql.WHERE("TO_DATE('"+guardiaDia+"', 'DD/MM/YYYY') BETWEEN trunc(cg.fechainicio) AND trunc(cg.fecha_fin)");
         sql.ORDER_BY("posicion,nombre");
 
 

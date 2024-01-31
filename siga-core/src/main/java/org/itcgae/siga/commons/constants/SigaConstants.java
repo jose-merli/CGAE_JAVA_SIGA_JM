@@ -917,6 +917,7 @@ public class SigaConstants {
 	public static String parametroRutaCalendarios = "sjcs.directorioFisicoGeneracionCalendarios";
 	public static String rutaPlantillaSinClase = "plantillasSinClase";
 	public static String parametroSizePlantillas = "gen.ficheros.maxsize.bytes";
+	public static String parametroRutaFuentesPdf = "directorios.fuentesPDF";
 	
 	public static String pathAbsolutoFiler = "path.absoluto.origenFiler"; 
 	public static String pathRelativoTemp = "path.relativo.temporalesDescarga"; 
@@ -1577,7 +1578,7 @@ public class SigaConstants {
 	public static String EEJG_IDSISTEMA ="EEJG_IDSISTEMA";
 	public static String EEJG_URLWS ="EEJG_URLWS";
 	public static String SIGAFRONT_VERSION = "202109071016";
-	public static String SIGAWEB_VERSION = "1.0.113_0";
+	public static String SIGAWEB_VERSION = "1.0.116_1";
 	
 	public static final String ACREDITACION_TIPO_INICIO = "1";
 	public static final String ACREDITACION_TIPO_FIN = "2";

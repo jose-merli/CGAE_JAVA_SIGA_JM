@@ -27,31 +27,19 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 	
 	public String getComboInstitucionesCol(String idInstitucion) {
 		
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("ABREVIATURA as NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
 		
-		if (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
-			SQL sql = new SQL();
-			sql.SELECT("IDINSTITUCION");
-			sql.SELECT("ABREVIATURA as NOMBRE");
-			sql.FROM("CEN_INSTITUCION");
-			sql.ORDER_BY("NOMBRE");
-			return sql.toString();
-		}else if(Long.parseLong(idInstitucion) > 2100){
-			SQL sql = new SQL();
-			sql.SELECT("IDINSTITUCION");
-			sql.SELECT("ABREVIATURA as NOMBRE");
-			sql.FROM("CEN_INSTITUCION");
+		if(Long.parseLong(idInstitucion) > 2100){
 			sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion  + "'");
-			sql.ORDER_BY("NOMBRE");
-			return sql.toString();
-		}else{
-			SQL sql = new SQL();
-			sql.SELECT("IDINSTITUCION");
-			sql.SELECT("ABREVIATURA as NOMBRE");
-			sql.FROM("CEN_INSTITUCION");
+		}else if (!idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
 			sql.WHERE("IDINSTITUCION = '" + idInstitucion  + "'");
-			sql.ORDER_BY("NOMBRE");
-			return sql.toString();
 		}
+		
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
 	}
 	
 	

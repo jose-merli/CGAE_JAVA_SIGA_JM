@@ -219,6 +219,20 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		return SQL_PADRE.toString();
 	}
 	
+	public String getFechasByCabeceraGuardiaColegiado(GuardiasItem guardiaItem, String idInstitucion) {
+		SQL sql = new SQL();
+		SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+		
+		sql.SELECT_DISTINCT("FECHAFIN");
+		sql.FROM("SCS_GUARDIASCOLEGIADO");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("IDTURNO = " + guardiaItem.getIdTurno());
+		sql.WHERE("IDGUARDIA = " + guardiaItem.getIdGuardia());
+		sql.WHERE("FECHAINICIO = TO_DATE('" + formatoFecha.format(guardiaItem.getFechadesde()) + "', 'DD/MM/YYYY')");
+		sql.ORDER_BY("FECHAFIN ASC");
+		return sql.toString();
+	}
+	
 	public String searchGuardias(TurnosItem turnosItem, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 
@@ -1804,7 +1818,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.FROM("SCS_PROG_CALENDARIOS PC");
 		sql.INNER_JOIN("SCS_HCO_CONF_PROG_CALENDARIOS HPC ON PC.IDPROGCALENDARIO = HPC.IDPROGCALENDARIO AND PC.IDINSTITUCION = HPC.IDINSTITUCION");
 		sql.WHERE("(PC.ESTADO IN (0,5) OR HPC.ESTADO IN (0))");
-		sql.WHERE("PC.FECHAPROGRAMACION < SYSDATE");
+		sql.WHERE("trunc(PC.FECHAPROGRAMACION) <= trunc(SYSDATE)");
 		// OBTENEMOS LOS CALENDARIOS PROGRAMADOS Y REPROGRAMADOS HASTA LA FECHA
 		//sql.WHERE("EXISTS (" + sql2 +" )");
 		sql.ORDER_BY("PC.FECHAPROGRAMACION");

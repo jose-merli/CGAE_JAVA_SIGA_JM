@@ -1,5 +1,6 @@
 package org.itcgae.siga.fac.controllers;
 
+import org.apache.ibatis.javassist.tools.web.BadHttpRequest;
 import org.itcgae.siga.DTO.fac.FacturacionRapidaRequestDTO;
 import org.itcgae.siga.DTO.fac.ListaCompraProductosItem;
 import org.itcgae.siga.DTO.fac.ListaFacturasPeticionItem;
@@ -107,20 +108,25 @@ public class FacturacionRapidaController {
 
     @PostMapping("/descargarFacturas")
     ResponseEntity<Resource> descargarFacturasBySolicitud(HttpServletRequest request, @RequestBody List<ListaCompraProductosItem> listaPeticiones) {
-
+    	
         try {
-            Resource resource = this.facturacionRapidaService.descargarFacturasBySolicitud(request, listaPeticiones);
-
-            HttpHeaders headers = new HttpHeaders();
+        	Resource resource = this.facturacionRapidaService.descargarFacturasBySolicitud(request, listaPeticiones);
+        	
+        	if (resource == null) {
+        		throw new BadHttpRequest();
+        	}
+        	
+        	HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
            // headers.add(HttpHeaders.CONTENT_DISPOSITION, "tipoFichero=" + (resource.getFilename().contains("pdf") ? "pdf" : "zip"));
             headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-
+            
             return ResponseEntity.ok().headers(headers).contentLength(resource.contentLength()).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
-
+            
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+        
 
     }
 

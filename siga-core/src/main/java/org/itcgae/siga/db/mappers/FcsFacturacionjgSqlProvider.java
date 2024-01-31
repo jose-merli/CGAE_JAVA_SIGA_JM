@@ -232,6 +232,7 @@ public class FcsFacturacionjgSqlProvider {
 		sql.SET("IDECOMCOLA = #{record.idecomcola,jdbcType=DECIMAL}");
 		sql.SET("VISIBLE = #{record.visible,jdbcType=VARCHAR}");
 		sql.SET("IDPARTIDAPRESUPUESTARIA = #{record.idpartidapresupuestaria,jdbcType=DECIMAL}");
+		sql.SET("ARCHIVADA = #{record.archivada,jdbcType=DECIMAL}");
 		FcsFacturacionjgExample example = (FcsFacturacionjgExample) parameter.get("example");
 		applyWhere(sql, example, true);
 		return sql.toString();
@@ -294,6 +295,9 @@ public class FcsFacturacionjgSqlProvider {
 		}
 		if (record.getIdpartidapresupuestaria() != null) {
 			sql.SET("IDPARTIDAPRESUPUESTARIA = #{idpartidapresupuestaria,jdbcType=DECIMAL}");
+		}
+		if (record.getArchivada() != null) {
+			sql.SET("ARCHIVADA = #{archivada,jdbcType=DECIMAL}");
 		}
 		sql.WHERE("IDINSTITUCION = #{idinstitucion,jdbcType=DECIMAL}");
 		sql.WHERE("IDFACTURACION = #{idfacturacion,jdbcType=DECIMAL}");

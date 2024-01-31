@@ -5,12 +5,14 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.fac.ComunicacionesMorososDTO;
 import org.itcgae.siga.DTO.fac.DatoImpresionInformeFacturaDTO;
 import org.itcgae.siga.DTO.fac.FacturaFacturacionProgramadaDTO;
 import org.itcgae.siga.DTO.fac.FacturaItem;
 import org.itcgae.siga.DTO.fac.FacturasFacturacionRapidaDTO;
 import org.itcgae.siga.DTO.fac.InformeFacturacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.FacFacturaMapper;
 import org.itcgae.siga.db.services.fac.providers.FacFacturaExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -25,16 +27,18 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getFacturas")
 	@Results({
 			@Result(column = "idfactura", property = "idFactura", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idabono", property = "idAbono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idinstitucion", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numerofactura", property = "numeroFactura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "fecha", property = "fechaEmision", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "facturacion", property = "facturacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idprogramacion", property = "idProgramacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ncolident", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "nifcif", property = "numeroIdentificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "nombreCompleto", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "idpersona", property = "idCliente", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "nombreinst", property = "nombreInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "imptotal", property = "importefacturado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "imptotalporpagar", property = "importeAdeudadoPendiente", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "idestado", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "estado", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "numcomunicaciones", property = "comunicacionesFacturas", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ultcomunicacion", property = "ultimaComunicacion", jdbcType = JdbcType.VARCHAR),
@@ -48,7 +52,7 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 			@Result(column = "fechamodificacionult", property = "fechaModificacionUlt", jdbcType = JdbcType.VARCHAR),
 			
 	})
-	List<FacturaItem> getFacturas(FacturaItem item, String idInstitucion, String idLenguaje, boolean filtrosSoloAbono, boolean filtrosSoloFactura, Integer tamMaximo);
+	List<FacturaItem> getFacturas(FacturaItem item, AdmUsuarios usuario, boolean filtrosSoloAbono, boolean filtrosSoloFactura, Integer tamMaximo);
 
 	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getFacturasByIdSolicitud")
 	@Results({
@@ -188,4 +192,13 @@ public interface FacFacturaExtendsMapper extends FacFacturaMapper {
 
 	@UpdateProvider(type = FacFacturaExtendsSqlProvider.class, method = "updateImportesFactura")
 	int updateImportesFactura(String idFactura, Short idInstitucion, Integer idUsuario);
+	
+	@SelectProvider(type = FacFacturaExtendsSqlProvider.class, method = "getComunicacionesMorosos")
+	@Results({
+			@Result(column = "numcomunicaciones", property = "comunicacionesFacturas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ultcomunicacion", property = "ultimaComunicacion", jdbcType = JdbcType.VARCHAR),
+			
+	})
+	ComunicacionesMorososDTO getComunicacionesMorosos(String idFactura, String idInstitucion, String idPersona);
+
 }

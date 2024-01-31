@@ -66,12 +66,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				grupo = SigaConstants.getTipoUsuario(rol.getDescripcion());
 			}
 			
-			LOGGER.debug("DNI: " + dni);
-			LOGGER.debug("INSTITUCION: " + institucion);
-			LOGGER.debug("GRUPO: " + grupo);
-
 			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,null, rol, nombre);
-			LOGGER.info("Intento de autenticación en siga {}", user);
 			//return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
 		} catch (Exception e) {
