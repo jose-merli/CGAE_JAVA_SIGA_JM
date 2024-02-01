@@ -285,8 +285,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '" + fechaPonenteHast
 					+ "','DD/MM/RRRR')");
 		}
-		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-			sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
+		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "") {
+			sql.WHERE("EJG.NUMERO_CAJG LIKE('%" +ejgItem.getNumCAJG()+"%')"); 
+		}
+			//sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
 		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 				|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
 			sql.WHERE(condicionAnnioNumActas);
@@ -1168,8 +1170,11 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			sql.WHERE("TO_DATE(EJG.FECHAPRESENTACIONPONENTE,'DD/MM/RRRR') <= TO_DATE( '" + fechaPonenteHast
 					+ "','DD/MM/RRRR')");
 		}
-		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "")
-			sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
+		if (ejgItem.getNumCAJG() != null && ejgItem.getNumCAJG() != "") {
+			sql.WHERE("EJG.NUMERO_CAJG LIKE('%" +ejgItem.getNumCAJG()+"%')"); 
+		}
+			//sql.WHERE("REGEXP_REPLACE(EJG.NUMERO_CAJG, '^0+', '') = '"  + ejgItem.getNumCAJG().trim() + "'");
+			
 		if ((ejgItem.getAnnioActa() != null && ejgItem.getAnnioActa() != "")
 				|| (ejgItem.getNumActa() != null && ejgItem.getNumActa() != "")) {
 			sql.WHERE(condicionAnnioNumActas);
