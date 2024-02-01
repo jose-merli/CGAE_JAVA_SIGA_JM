@@ -82,7 +82,6 @@ import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.SaltoCompGuardiaItem;
-import org.itcgae.siga.DTOs.scs.TurnosDTO;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
@@ -97,7 +96,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
-import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenFichero;
@@ -3423,7 +3421,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						LetradoInscripcionItem letradoAlgoritmoSeleccion = this.getLetradoTurno(
 								idInstitucion.toString(), String.valueOf(designaItem.getIdTurno()), fechaform, usuario,
-								designaLetrado, false);
+								designaLetrado);
 
 						if (letradoAlgoritmoSeleccion == null) {
 							response = 0;
@@ -3803,7 +3801,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	public LetradoInscripcionItem getLetradoTurno(String idInstitucion, String idTurno, String fechaForm,
-			AdmUsuarios usuario, ScsDesignasletrado designaLetradoVieja, Boolean simular) throws java.lang.Exception {
+			AdmUsuarios usuario, ScsDesignasletrado designaLetradoVieja) throws java.lang.Exception {
 
 		// Variables generales
 		ArrayList<String> diasGuardia; // Periodo o dia de guardia para rellenar con letrado
@@ -3892,7 +3890,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			// actualizando el ultimo letrado en la guardia solo si no es de la lista de
 			// compensaciones
-			if (letradoGuardia.getSaltoocompensacion() == null && !simular) {
+			if (letradoGuardia.getSaltoocompensacion() == null) {
 				int punteroUltimo = 0;
 
 				if (punteroListaLetrados.getValor() == 0)
@@ -3914,89 +3912,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		}
 
 		return letradoGuardia;
-	}
-	
-	@Override
-	public TurnosDTO busquedaColaOficioPrimerLetrado(TurnosItem turnosItem, HttpServletRequest request) {
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		TurnosDTO turnosDTO = new TurnosDTO();
-		List<TurnosItem> turnosItems = new ArrayList<>();
-		Error error = new Error();
-		
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"busquedaColaOficioPrimerLetrado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"busquedaColaOficioPrimerLetrado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-
-				AdmUsuarios usuario = usuarios.get(0);
-
-				LOGGER.info(
-						"busquedaColaOficioPrimerLetrado() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
-				
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				String fechaform = sdf.format(new Date());
-				ScsDesignasletrado designaLetrado = new ScsDesignasletrado();
-				
-				try{
-					LetradoInscripcionItem letradoAlgoritmoSeleccion = this.getLetradoTurno(
-						idInstitucion.toString(), String.valueOf(turnosItem.getIdturno()), fechaform, usuario,
-						designaLetrado, true);
-					
-					
-					if(letradoAlgoritmoSeleccion != null) {
-						CenColegiadoKey key = new CenColegiadoKey();
-						key.setIdinstitucion(idInstitucion);
-						key.setIdpersona(letradoAlgoritmoSeleccion.getIdpersona());
-						CenColegiado colegiadoSel = cenColegiadoExtendsMapper.selectByPrimaryKey(key);
-						
-						CenPersona personaSel = cenPersonaMapper.selectByPrimaryKey(letradoAlgoritmoSeleccion.getIdpersona());
-						
-						TurnosItem turnoItem = new TurnosItem();
-						
-						if(colegiadoSel.getComunitario().equals("1")) {
-							turnoItem.setNumerocolegiado(colegiadoSel.getNcomunitario());
-						}else {
-							turnoItem.setNumerocolegiado(colegiadoSel.getNcolegiado());
-						}
-						if(personaSel.getApellidos2() != null && !personaSel.getApellidos2().isEmpty()) {
-							turnoItem.setAlfabeticoapellidos(personaSel.getApellidos1() + " " +personaSel.getApellidos2());
-						}else {
-							turnoItem.setAlfabeticoapellidos(personaSel.getApellidos1());
-						}
-						turnoItem.setNombrepersona(personaSel.getNombre());
-						turnosItems.add(turnoItem);
-					}
-				} catch (Exception e) {
-					error.setCode(400);
-					error.setDescription("general.mensaje.error.bbdd");
-					turnosDTO.setError(error);
-					LOGGER.error(e);
-					return turnosDTO;
-				}
-
-				LOGGER.info(
-						"busquedaColaOficioPrimerLetrado()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
-
-				if (turnosItems != null) {
-					turnosDTO.setTurnosItems(turnosItems);
-				}
-			}
-
-		}
-		LOGGER.info("busquedaColaOficioPrimerLetrado() -> Salida del servicio para obtener la busqueda Cola Oficio");
-		return turnosDTO;
 	}
 
 	public CenPersonaItem getPersonaPorId(String idPersona) throws Exception {
@@ -5623,7 +5538,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					// Letrado.
 					LetradoInscripcionItem newLetrado = this.getLetradoTurno(idInstitucion.toString(),
 							String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),
-							usuarios.get(0), designaLetradoVieja, false);
+							usuarios.get(0), designaLetradoVieja);
 
 					if (newLetrado == null) {
 						updateResponseDTO.setStatus(SigaConstants.KO);

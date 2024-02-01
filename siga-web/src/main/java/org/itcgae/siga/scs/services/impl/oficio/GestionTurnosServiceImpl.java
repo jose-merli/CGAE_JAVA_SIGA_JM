@@ -1332,7 +1332,105 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return turnosDTO;
 	}
 	
-	
+	@Override
+	public TurnosDTO busquedaColaOficioPrimerLetrado(TurnosItem turnosItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		TurnosDTO turnosDTO = new TurnosDTO();
+		List<TurnosItem> turnosItems = new ArrayList<>();
+		boolean foundUltimo;
+		TurnosItem punteroTurno = null;
+		String busquedaOrden = "";
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaColaOficioPrimerLetrado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaColaOficioPrimerLetrado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"busquedaColaOficioPrimerLetrado() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+				ScsTurnoKey turnoKey = new ScsTurnoKey();
+				turnoKey.setIdinstitucion(idInstitucion);
+				turnoKey.setIdturno(Integer.valueOf(turnosItem.getIdturno()));
+				
+				ScsTurno unTurno = scsTurnosExtendsMapper.selectByPrimaryKey(turnoKey);
+				
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = new ArrayList<ComboItem>();
+				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(unTurno.getIdordenacioncolas().toString());
+				comboDTO.setCombooItems(comboItems);
+
+				for (int i = 0; i < comboDTO.getCombooItems().size(); i++) {
+					if (!comboDTO.getCombooItems().get(i).getLabel().toString().equals("0")) {
+						busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
+					}
+				}
+
+				if (busquedaOrden != null && busquedaOrden.length() > 0) {
+					busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
+				}
+
+				Date prueba = turnosItem.getFechaActual();
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String strDate = dateFormat.format(prueba);
+
+				List<TurnosItem> turnosAuxiliar = new ArrayList<TurnosItem>();
+				List<TurnosItem> listaTurnos = scsTurnosExtendsMapper.busquedaColaOficioPrimerLetrado(turnosItem, strDate, busquedaOrden, idInstitucion);
+				foundUltimo = false;
+				int indiceOrden = 0;
+
+				for (int i = 0; i < listaTurnos.size(); i++) {
+
+					punteroTurno = listaTurnos.get(i);
+					punteroTurno.setOrden(String.valueOf(i + 1));
+
+					if (foundUltimo) {
+						turnosItems.add(punteroTurno);
+					} else {
+						turnosAuxiliar.add(punteroTurno);						
+					}
+
+					if (!foundUltimo && (punteroTurno.getIdpersona().equals(unTurno.getIdpersonaUltimo().toString()))) {
+						foundUltimo = true;
+					}
+				}
+
+				if (turnosAuxiliar.size() > 0) {
+					turnosItems.addAll(turnosAuxiliar);
+				}
+
+				// Reordenar correctamente la lista
+				for (TurnosItem turno : turnosItems) {
+					turno.setOrden(String.valueOf(indiceOrden + 1));
+					turnosItems.set(indiceOrden, turno);
+					indiceOrden++;
+				}
+
+				LOGGER.info(
+						"busquedaColaOficioPrimerLetrado()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+
+				if (turnosItems != null) {
+					turnosDTO.setTurnosItems(turnosItems);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaColaOficioPrimerLetrado() -> Salida del servicio para obtener la busqueda Cola Oficio");
+		return turnosDTO;
+	}
 
 	@Override
 	public TurnosDTO busquedaColaGuardia(TurnosItem turnosItem, HttpServletRequest request) {

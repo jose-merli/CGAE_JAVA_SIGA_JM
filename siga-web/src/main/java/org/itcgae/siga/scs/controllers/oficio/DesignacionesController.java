@@ -41,8 +41,6 @@ import org.itcgae.siga.DTOs.scs.ProcuradorDTO;
 import org.itcgae.siga.DTOs.scs.ProcuradorItem;
 import org.itcgae.siga.DTOs.scs.RelacionesDTO;
 import org.itcgae.siga.DTOs.scs.RelacionesItem;
-import org.itcgae.siga.DTOs.scs.TurnosDTO;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.db.entities.ScsContrariosdesigna;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
 import org.itcgae.siga.db.entities.ScsDesigna;
@@ -1113,13 +1111,6 @@ public class DesignacionesController {
 		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/designas/busquedaColaOficioPrimerLetrado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<TurnosDTO> busquedaColaOficioPrimerLetrado(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
-		TurnosDTO response = designacionesService.busquedaColaOficioPrimerLetrado(turnosItem, request);
-		if (response.getError() == null)
-			return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<TurnosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+
 	
 }
