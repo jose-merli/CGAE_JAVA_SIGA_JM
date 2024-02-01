@@ -115,12 +115,6 @@ public class TurnosController {
 		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/turnos/busquedaColaOficioPrimerLetrado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<TurnosDTO> busquedaColaOficioPrimerLetrado(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
-		TurnosDTO response = turnosService.busquedaColaOficioPrimerLetrado(turnosItem, request);
-		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
-	}
-	
 	@RequestMapping(value = "/turnos/busquedaGuardias",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<GuardiasDTO> busquedaGuardias(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		GuardiasDTO response = turnosService.busquedaGuardias(turnosItem, request);

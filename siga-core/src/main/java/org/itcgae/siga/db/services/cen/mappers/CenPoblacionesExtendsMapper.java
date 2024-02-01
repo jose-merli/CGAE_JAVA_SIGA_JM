@@ -32,4 +32,17 @@ public interface CenPoblacionesExtendsMapper extends CenPoblacionesMapper{
 			@Result(column = "IDPOBLACIONMUNICIPIO", property = "idpoblacionmunicipio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PRIORIDAD", property = "prioridad", jdbcType = JdbcType.DECIMAL) })
 	List<CenPoblaciones> selectByFilter(String filtro, String idProvincia);
+	
+	@SelectProvider(type = CenPoblacionesSqlExtendsProvider.class, method = "recuperaPoblacionPorDescripcion")
+	@Results({ @Result(column = "IDPOBLACION", property = "idpoblacion", jdbcType = JdbcType.VARCHAR, id = true),
+			@Result(column = "IDPROVINCIA", property = "idprovincia", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "IDPARTIDO", property = "idpartido", jdbcType = JdbcType.DECIMAL),
+			@Result(column = "CODIGOEXT", property = "codigoext", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INE", property = "ine", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPOBLACIONMUNICIPIO", property = "idpoblacionmunicipio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PRIORIDAD", property = "prioridad", jdbcType = JdbcType.DECIMAL) })
+	List<CenPoblaciones> recuperaPoblacionPorDescripcion(String descripcion, String provincia);
 }
