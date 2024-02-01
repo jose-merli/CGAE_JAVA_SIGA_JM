@@ -452,7 +452,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.WHERE(condSolicitud);
 		}
 		
-		if(filtro.getIdpersona() != null)sql.WHERE("pet.idpersona = "+filtro.getIdpersona());
+		if(filtro.getIdpersona() != null && !"".equalsIgnoreCase(filtro.getIdpersona())) {
+			sql.WHERE("pet.idpersona = "+filtro.getIdpersona());
+		}
 		
 		if(filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")sql.WHERE("pet.idpeticion like '%"+filtro.getnSolicitud()+"%'");
 		
@@ -677,8 +679,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			sql.WHERE(condSolicitud); 
 		}
 
-		if (filtro.getIdpersona() != null)
+		if (filtro.getIdpersona() != null && !"".equalsIgnoreCase(filtro.getIdpersona())) {
 			sql.WHERE("pet.idpersona = " + filtro.getIdpersona());
+		}
 
 		if (filtro.getnSolicitud() != null && filtro.getnSolicitud().trim() != "")
 			sql.WHERE("pet.idpeticion like '%" + filtro.getnSolicitud().trim() + "%'");
