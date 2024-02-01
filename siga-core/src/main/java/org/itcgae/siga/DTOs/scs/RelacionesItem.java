@@ -36,8 +36,9 @@ public class RelacionesItem {
     private String idFundamentoCalif;
     private String idGuardia;
     private String idTipoDictamenEJG;
-    
-    //AUX
+    private String idExpedienteExt;
+
+	//AUX
     private String nColLetrado;
     private String nifInteresado;
 
@@ -288,6 +289,14 @@ public class RelacionesItem {
     public void setIdpersonajg(String idpersonajg) {
         this.idpersonajg = idpersonajg;
     }
+    
+    public String getIdExpedienteExt() {
+		return idExpedienteExt;
+	}
+
+	public void setIdExpedienteExt(String idExpedienteExt) {
+		this.idExpedienteExt = idExpedienteExt;
+	}
 
     @Override
     public boolean equals(Object o) {
@@ -319,12 +328,14 @@ public class RelacionesItem {
                 Objects.equals(centrodetencion, that.centrodetencion) &&
                 Objects.equals(fechaasunto, that.fechaasunto) &&
                 Objects.equals(dilnigproc, that.dilnigproc) &&
-                Objects.equals(idpersonajg, that.idpersonajg);
+                Objects.equals(idpersonajg, that.idpersonajg) &&
+        		Objects.equals(idExpedienteExt, that.idExpedienteExt);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sjcs, idinstitucion, anio, numero, idletrado, letrado, interesado, idturno, idturnodesigna, idtipo, codigo, descturno, destipo, fechaDesignacion, datosinteres, idsjcs, impugnacion, fechaimpugnacion, dictamen, fechadictamen, resolucion, fecharesolucion, centrodetencion, fechaasunto, dilnigproc, idpersonajg);
+        return Objects.hash(sjcs, idinstitucion, anio, numero, idletrado, letrado, interesado, idturno, idturnodesigna, idtipo, codigo, descturno, destipo, fechaDesignacion, datosinteres, idsjcs, impugnacion, fechaimpugnacion, dictamen, fechadictamen, resolucion, fecharesolucion, centrodetencion, fechaasunto, dilnigproc, idpersonajg, idExpedienteExt);
     }
 
     @Override
@@ -356,6 +367,7 @@ public class RelacionesItem {
                 ", fechaasunto=" + fechaasunto +
                 ", dilnigproc='" + dilnigproc + '\'' +
                 ", idpersonajg='" + idpersonajg + '\'' +
+                ", idExpedienteExt='" + idExpedienteExt + '\'' +
                 '}';
     }
 
