@@ -10,6 +10,7 @@ import org.itcgae.siga.db.entities.EcomCola;
 import org.itcgae.siga.db.entities.EcomIntercambio;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
 import org.itcgae.siga.db.entities.ScsEejgPeticionesExample;
@@ -150,6 +151,30 @@ public class EJGIntercambiosHelper {
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
         insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación EJG - %s", documentacionejg.getIddocumentacion()));
+    }
+    
+    @Transactional
+    public void insertarDocumentacionAdicionalEnColaDes(ScsDocumentaciondesigna documentaciondesigna) throws Exception {
+        Map<String, String> parametrosCola = new HashMap<>();
+
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION, documentaciondesigna.getIddocumentaciondes().toString());
+
+        EcomCola colaEnviaPericles = new EcomCola();
+        colaEnviaPericles.setIdinstitucion(documentaciondesigna.getIdinstitucion());
+        
+        switch(documentaciondesigna.getIdinstitucion().intValue()) {
+	        case 2055:
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.ASIGNA_ENVIO_DOCUMENTO.getId());
+	        	break;
+	        case 2032:
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.GV_ENVIO_DOCUMENTO.getId());
+	        	break;
+	        default:
+	        	colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_COMUNICACION.getId());
+        }
+
+        facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Designa - %s", documentaciondesigna.getIddocumentaciondes()));
     }
 
     @Transactional
