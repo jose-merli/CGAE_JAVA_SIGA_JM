@@ -3867,6 +3867,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 		sql.WHERE("NUMPROCEDIMIENTO = '" + designa.getNumProcedimiento() + "'");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		if(designa.getAno() != 0 && designa.getNumero() != 0) {
+			sql.WHERE("( NUMERO != '" + designa.getNumero() + "' OR ANIO != '" + designa.getAno() + "')");
+		}
 		
 		return sql.toString();
 	}
