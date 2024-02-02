@@ -3308,6 +3308,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
+	@Transactional
 	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request) {
 		LOGGER.info("createDesigna() ->  Entrada al servicio para insertar designacion");
 
@@ -4285,9 +4286,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LetradoInscripcionItem letradoSeleccionado;
 		String idPersona;
 
-		compensaciones = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
 
 		try {
+			
+			compensaciones = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
 
 			for (LetradoInscripcionItem elem : compensaciones) {
 
@@ -4300,19 +4302,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				InscripcionTurnoItem inscripcionTurno = scsDesignacionesExtendsMapper
 						.getInscripcionTurnoActiva(idInstitucion.toString(), idTurno.toString(), idPersona, fechaBBDD2);
 
-				if (inscripcionTurno == null) {
-					continue;
+				if (inscripcionTurno != null) {
+					letradoSeleccionado = new LetradoInscripcionItem();
+
+					letradoSeleccionado.setIdpersona(elem.getIdpersona());
+					letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
+					letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
+					letradoSeleccionado.setIdTurno(elem.getIdTurno());
+					letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
+					letradoSeleccionado.setSaltoocompensacion("C");
+					alLetradosCompensados.add(letradoSeleccionado);
 				}
-
-				letradoSeleccionado = new LetradoInscripcionItem();
-
-				letradoSeleccionado.setIdpersona(elem.getIdpersona());
-				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
-				letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
-				letradoSeleccionado.setIdTurno(elem.getIdTurno());
-				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
-				letradoSeleccionado.setSaltoocompensacion("C");
-				alLetradosCompensados.add(letradoSeleccionado);
 
 			}
 
