@@ -44,10 +44,14 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
 
         sql.FROM("ECOM_INTERCAMBIO IC");
 
-        String idEcomCola = getEcomColaListadoIntercambios(
+        String idEcomCola = getEcomColaListadoIntercambiosReducido(
         		String.join(", ", Arrays.asList(PERICLES_ENVIA_ALTA_EXPEDIENTE, PERICLES_CONSULTAR_ESTADO, PERICLES_CONSULTAR_RESOLUCION, ASIGNA_CONSULTA_NUMERO, PERICLES_ENVIA_EXPEDIENTE_PENDIENTE,
-        				XUNTA_ENVIA_PRESENTACION, XUNTA_VERIFICA_PRESENTACION)), idInstitucion, anio, idTipoEJG, numero);
+        				XUNTA_ENVIA_PRESENTACION, XUNTA_VERIFICA_PRESENTACION)));
         sql.WHERE(String.format("IC.IDECOMCOLA IN (%s)", idEcomCola));
+        sql.WHERE(String.format("IC.IDINSTITUCION = '%s' ", idInstitucion));
+        sql.WHERE(String.format("IC.EJG_ANIO = '%s' ", anio));
+        sql.WHERE(String.format("IC.EJG_NUMERO = '%s' ", numero));
+        sql.WHERE(String.format("IC.EJG_IDTIPO = '%s' ", idTipoEJG));
         sql.ORDER_BY("FECHAENVIO DESC");
         return sql.toString();
     }
@@ -59,11 +63,14 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
 
         sql.FROM("ECOM_INTERCAMBIO IC");
 
-        String idEcomCola = getEcomColaListadoIntercambios(
+        String idEcomCola = getEcomColaListadoIntercambiosReducido(
                 String.join(", ", Arrays.asList(PERICLES_ENVIA_DOCUMENTO, PERICLES_ENVIA_COMUNICACION,  ASIGNA_ENVIO_DOCUMENTO, GV_ENVIO_DOCUMENTO, ARAGON_ENVIO_DOCUMENTO,
-                		ALCALA_ENVIO_DOCUMENTO)),
-                idInstitucion, anio, idTipoEJG, numero);
+                		ALCALA_ENVIO_DOCUMENTO)));
         sql.WHERE(String.format("IC.IDECOMCOLA IN (%s)", idEcomCola));
+        sql.WHERE(String.format("IC.IDINSTITUCION = '%s' ", idInstitucion));
+        sql.WHERE(String.format("IC.EJG_ANIO = '%s' ", anio));
+        sql.WHERE(String.format("IC.EJG_NUMERO = '%s' ", numero));
+        sql.WHERE(String.format("IC.EJG_IDTIPO = '%s' ", idTipoEJG));
         sql.ORDER_BY("FECHAENVIO DESC");
         return sql.toString();
     }
@@ -77,6 +84,15 @@ public class EcomIntercambioExtendsSqlProvider extends EcomIntercambioSqlProvide
         sql.WHERE(String.format("C.IDECOMCOLA IN (%S)", getParamEcomCola("ANIO", anio)));
         sql.WHERE(String.format("C.IDECOMCOLA IN (%S)", getParamEcomCola("IDTIPOEJG", idTipoEJG)));
         sql.WHERE(String.format("C.IDECOMCOLA IN (%S)", getParamEcomCola("NUMERO", numero)));
+        return sql.toString();
+    }
+    
+    private String getEcomColaListadoIntercambiosReducido(String idOperacion) {
+        SQL sql = new SQL();
+        sql.SELECT("C.IDECOMCOLA");
+        sql.FROM("ECOM_COLA C");
+        sql.WHERE(String.format("C.IDOPERACION IN (%s)", idOperacion));
+
         return sql.toString();
     }
 

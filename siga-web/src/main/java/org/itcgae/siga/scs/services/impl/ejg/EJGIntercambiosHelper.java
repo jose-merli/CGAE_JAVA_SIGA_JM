@@ -119,7 +119,8 @@ public class EJGIntercambiosHelper {
         colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_CONSULTAR_ESTADO.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), "Consulta Estado EJG");
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), "Consulta Estado EJG"
+        		, ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero());
     }
 
 
@@ -149,7 +150,8 @@ public class EJGIntercambiosHelper {
         }
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación EJG - %s", documentacionejg.getIddocumentacion()));
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación EJG - %s", documentacionejg.getIddocumentacion())
+        		, documentacionejg.getIdtipoejg(), documentacionejg.getAnio(), documentacionejg.getNumero());
     }
 
     @Transactional
@@ -168,7 +170,8 @@ public class EJGIntercambiosHelper {
         colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_DOCUMENTO.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación económica - %s", eejgPeticiones.getNif()));
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación económica - %s", eejgPeticiones.getNif())
+        		, eejgPeticiones.getIdtipoejg(), eejgPeticiones.getAnio(), eejgPeticiones.getNumero());
     }
 
     @Transactional
@@ -186,7 +189,8 @@ public class EJGIntercambiosHelper {
         colaEnviaPericles.setIdoperacion(SigaConstants.OPERACION.PERICLES_ENVIA_COMUNICACION.getId());
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Regtel - %s", identificadords));
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Regtel - %s", identificadords)
+        		, ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero());
     }
 
 
@@ -273,7 +277,8 @@ public class EJGIntercambiosHelper {
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
         LOGGER.info("envioPericlesExpediente() <- Saliendo de Insertar intercabio en ECOM_COLA");
 
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), "Intercambio EJG Pericles");
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), "Intercambio EJG Pericles"
+        		, estadoEjgItem.getIdtipoejg(), estadoEjgItem.getAnio(), estadoEjgItem.getNumero()  );
     }
 
     private void encolaEnvioDocumentacion(ScsEjg ejg) throws Exception {
@@ -298,7 +303,7 @@ public class EJGIntercambiosHelper {
         listasParametros.addAll(listasParametrosEjg);
         listasParametros.addAll(listasParametrosRegtel);
 
-        insercionEnEnviosPericles(listasParametros);
+        insercionEnEnviosPericles(listasParametros, ejg.getIdtipoejg(), ejg.getAnio(), ejg.getNumero());
 
         LOGGER.info("encolaEnvioDocumentacion() <- Saliendo al servicio que encola el envío de todas las documentaciones");
     }
@@ -408,7 +413,7 @@ public class EJGIntercambiosHelper {
         return listaParametros;
     }
 
-    private void insercionEnEnviosPericles(List<Map<String, String>> listaParametros) throws Exception {
+    private void insercionEnEnviosPericles(List<Map<String, String>> listaParametros, Short ejgIdTipo, Short ejgAnio, Long ejgNumero) throws Exception {
         for (int i = 0; i < listaParametros.size(); i++) {
             Map<String, String> parametros = listaParametros.get(i);
 
@@ -428,11 +433,12 @@ public class EJGIntercambiosHelper {
             }
 
             facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametros);
-            insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación %s - %s", documento, identificador));
+            insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación %s - %s", documento, identificador)
+            		, ejgIdTipo, ejgAnio, ejgNumero);
         }
     }
 
-    private void insertaIntercambio(Long idEcomCola, Short idInstitucion, String descripcion) {
+    private void insertaIntercambio(Long idEcomCola, Short idInstitucion, String descripcion, Short ejgIdTipo, Short ejgAnio, Long ejgNumero) {
         LOGGER.info("insertaIntercambio() -> Entrando a insertar intercambio en ECOM_INTERCAMBIO");
 
         EcomIntercambio record = new EcomIntercambio();
@@ -444,6 +450,11 @@ public class EJGIntercambiosHelper {
         record.setDescripcion(descripcion);
 
         record.setFechaenvio(new Date());
+        
+        //se inserta la info de ejg si se tiene
+        record.setEjgIdtipo(ejgIdTipo);
+        record.setEjgAnio(ejgAnio);
+        record.setEjgNumero(ejgNumero);
 
         ecomIntercambioExtendsMapper.insert(record);
 
