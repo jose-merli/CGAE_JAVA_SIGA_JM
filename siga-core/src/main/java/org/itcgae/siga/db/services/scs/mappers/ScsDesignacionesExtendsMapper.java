@@ -607,7 +607,8 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "FECHAASUNTO", property = "fechaasunto", jdbcType = JdbcType.DATE),
 			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOL", property = "nColLetrado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDEXPEDIENTEEXT", property = "idExpedienteExt", jdbcType = JdbcType.VARCHAR)})
 	List<RelacionesItem> busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion);
 	
 	

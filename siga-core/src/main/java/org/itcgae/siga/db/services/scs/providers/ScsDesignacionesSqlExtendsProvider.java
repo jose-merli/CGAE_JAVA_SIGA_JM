@@ -3958,12 +3958,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 				+ "                1,\r\n"
 				+ "                1\r\n"
 				+ "            )\r\n"
-				+ "             || anio\r\n"
+				+ "             || asi.anio\r\n"
 				+ "             || '/'\r\n"
-				+ "             || TO_CHAR(numero) sjcs");
+				+ "             || TO_CHAR(asi.numero) sjcs");
 		sql2.SELECT(" asi.idinstitucion");
-		sql2.SELECT(" anio");
-		sql2.SELECT(" numero");
+		sql2.SELECT(" asi.anio");
+		sql2.SELECT(" asi.numero");
 		sql2.SELECT(" idpersonacolegiado idletrado");
 		sql2.SELECT(" cen_persona.apellidos2\r\n"
 				+ "             || ' '\r\n"
@@ -3974,7 +3974,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT(" TO_CHAR(idturno) idturno");
 		sql2.SELECT(" TO_CHAR(designa_turno) idturnodesigna");
 		sql2.SELECT(" TO_CHAR(idtipoasistencia) idtipo");
-		sql2.SELECT(" TO_CHAR(numero) codigo");
+		sql2.SELECT(" TO_CHAR(asi.numero) codigo");
 		
 		//Subconsulta sql2
 		SQL sql3= new SQL();
@@ -4015,8 +4015,10 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT(" null fecharesolucion");
 		sql2.SELECT(" f_siga_getrecurso(com.nombre,1) centrodetencion");
 		sql2.SELECT(" fechahora fechaasunto");
-		sql2.SELECT(" NVL(numerodiligencia, 'Sin número' ) || ' / ' || NVL(nig,'Sin número') || ' / ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql2.SELECT(" NVL(asi.numerodiligencia, 'Sin número' ) || ' / ' || NVL(asi.nig,'Sin número') || ' / ' || NVL(asi.numeroprocedimiento,'Sin número') dilnigproc");
+		sql2.SELECT(" ej.idexpedienteext");
 		sql2.FROM(" scs_asistencia asi");
+		sql2.JOIN(" scs_ejg ej ON ej.idpersona = asi.idpersonacolegiado AND ej.IDINSTITUCION = asi.IDINSTITUCION");
 		sql2.LEFT_OUTER_JOIN(" cen_colegiado ON cen_colegiado.idpersona = asi.idpersonacolegiado AND CEN_COLEGIADO.IDINSTITUCION = asi.IDINSTITUCION"); 
 		sql2.LEFT_OUTER_JOIN(" cen_persona ON cen_persona.idpersona = cen_colegiado.idpersona");
 		sql2.LEFT_OUTER_JOIN(" scs_personajg perjg on perjg.idpersona = asi.idpersonajg and asi.idinstitucion = perjg.idinstitucion");
@@ -4089,6 +4091,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql5.SELECT(" null centrodetencion");
 		sql5.SELECT(" fechaapertura fechaasunto");
 		sql5.SELECT(" NVL(numerodiligencia, 'Sin número' ) || ' / ' || NVL(nig,'Sin número') || ' / ' || NVL(numeroprocedimiento,'Sin número') dilnigproc");
+		sql5.SELECT(" e.idexpedienteext");
 		sql5.FROM(" scs_ejg e");
 		sql5.JOIN(" scs_ejgdesigna ed on ed.idinstitucion = e.idinstitucion\r\n"
 				+ "                AND\r\n"

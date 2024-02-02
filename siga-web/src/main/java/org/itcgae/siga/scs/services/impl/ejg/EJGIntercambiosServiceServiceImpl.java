@@ -11,6 +11,8 @@ import org.itcgae.siga.DTOs.scs.ExpedienteEconomicoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesigna;
+import org.itcgae.siga.db.entities.ScsDocumentaciondesignaKey;
 import org.itcgae.siga.db.entities.ScsDocumentacionejg;
 import org.itcgae.siga.db.entities.ScsDocumentacionejgKey;
 import org.itcgae.siga.db.entities.ScsEejgPeticiones;
@@ -20,6 +22,7 @@ import org.itcgae.siga.db.entities.ScsEstadoejgExample;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
 import org.itcgae.siga.db.mappers.ScsDocumentacionejgMapper;
+import org.itcgae.siga.db.mappers.ScsDocumentaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEejgPeticionesMapper;
 import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
@@ -48,7 +51,10 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
 
     @Autowired
     private ScsDocumentacionejgMapper scsDocumentacionejgMapper;
-
+    
+    @Autowired
+    private ScsDocumentaciondesignaMapper scsDocumentaciondesignaMapper;
+    
     @Autowired
     private ScsUnidadfamiliarejgMapper scsUnidadfamiliarejgMapper;
 
@@ -268,6 +274,43 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         }
 
         ejgIntercambiosHelper.insertarDocumentacionAdicionalEnCola(documentacionejg);
+
+        LOGGER.info("enviaDocumentacionAdicional() <- Saliendo del servicio para enviar documentación adicional");
+        return updateResponseDTO;
+    }
+    
+    @Override
+    public UpdateResponseDTO enviaDocumentacionAdicionalDes(EjgDocumentacionItem documentacionItem, HttpServletRequest request) throws Exception {
+        LOGGER.info("enviaDocumentacionAdicional() -> Entrando al servicio para enviar documentación adicional");
+
+        UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+        // Conseguimos información del usuario logeado
+        LOGGER.info("enviaDocumentacionAdicional() -> Entrando al servicio de autenticación");
+        AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+        LOGGER.info("enviaDocumentacionAdicional() -> Saliendo del servicio de autenticación");
+
+        if (documentacionItem.getIdDocumentacion() == null) {
+            LOGGER.warn("enviaDocumentacionAdicional() -> Error: Falta alguno de los parámetros necesarios para realizar la petición");
+            throw new Exception("Falta alguno de los parámetros necesarios para realizar la petición");
+        }
+
+        if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
+            LOGGER.warn("enviaDocumentacionAdicional() -> Error: El colegio no pertenece a la zona común");
+            throw new Exception("El colegio no pertenece a la zona común");
+        }
+        
+        ScsDocumentaciondesignaKey documentaciondesignaKey = new ScsDocumentaciondesignaKey();
+        documentaciondesignaKey.setIdinstitucion(usuario.getIdinstitucion());
+        documentaciondesignaKey.setIddocumentaciondes(documentacionItem.getIdDocumentacion().intValue());
+        ScsDocumentaciondesigna documentacionDes = scsDocumentaciondesignaMapper.selectByPrimaryKey(documentaciondesignaKey);
+
+        if (documentacionDes == null) {
+            LOGGER.warn("enviaDocumentacionAdicional() -> Error: No existe la documentación de EJG indicada");
+            throw new Exception("No existe la documentación de EJG indicada");
+        }
+
+        ejgIntercambiosHelper.insertarDocumentacionAdicionalEnColaDes(documentacionDes);
 
         LOGGER.info("enviaDocumentacionAdicional() <- Saliendo del servicio para enviar documentación adicional");
         return updateResponseDTO;

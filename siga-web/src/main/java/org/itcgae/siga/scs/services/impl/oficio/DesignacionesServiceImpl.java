@@ -3308,6 +3308,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
+	@Transactional
 	public InsertResponseDTO createDesigna(DesignaItem designaItem, HttpServletRequest request) {
 		LOGGER.info("createDesigna() ->  Entrada al servicio para insertar designacion");
 
@@ -3861,7 +3862,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			// obteniendo el letrado a asignar.
 			// ATENCION: este metodo es el nucleo del proceso
 			letradoGuardia = getSiguienteLetradoTurno(alCompensaciones, alLetradosOrdenados, punteroListaLetrados,
-					diasGuardia, hmPersonasConSaltos, hmBajasTemporales, idInstitucion, idTurno, null, null, usuario);
+					diasGuardia, hmPersonasConSaltos, hmBajasTemporales, idInstitucion, idTurno, null, null, usuario, simular);
 
 			// Si son la misma guardia se crea una compensacion del Letrado y se obtiene el
 			// siguiente Letrado. (JGC)
@@ -4285,9 +4286,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LetradoInscripcionItem letradoSeleccionado;
 		String idPersona;
 
-		compensaciones = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
 
 		try {
+			
+			compensaciones = scsDesignacionesExtendsMapper.getCompensaciones(idInstitucion, idTurno, fechaForm);
 
 			for (LetradoInscripcionItem elem : compensaciones) {
 
@@ -4300,19 +4302,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				InscripcionTurnoItem inscripcionTurno = scsDesignacionesExtendsMapper
 						.getInscripcionTurnoActiva(idInstitucion.toString(), idTurno.toString(), idPersona, fechaBBDD2);
 
-				if (inscripcionTurno == null) {
-					continue;
+				if (inscripcionTurno != null) {
+					letradoSeleccionado = new LetradoInscripcionItem();
+
+					letradoSeleccionado.setIdpersona(elem.getIdpersona());
+					letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
+					letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
+					letradoSeleccionado.setIdTurno(elem.getIdTurno());
+					letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
+					letradoSeleccionado.setSaltoocompensacion("C");
+					alLetradosCompensados.add(letradoSeleccionado);
 				}
-
-				letradoSeleccionado = new LetradoInscripcionItem();
-
-				letradoSeleccionado.setIdpersona(elem.getIdpersona());
-				letradoSeleccionado.setIdinstitucion(Short.valueOf(elem.getIdinstitucion().toString()));
-				letradoSeleccionado.setIdSaltoCompensacion(elem.getIdSaltoCompensacion());
-				letradoSeleccionado.setIdTurno(elem.getIdTurno());
-				letradoSeleccionado.setInscripcionTurno(inscripcionTurno);
-				letradoSeleccionado.setSaltoocompensacion("C");
-				alLetradosCompensados.add(letradoSeleccionado);
 
 			}
 
@@ -4411,7 +4411,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			ArrayList<LetradoInscripcionItem> alLetradosOrdenados, Puntero punteroLetrado,
 			ArrayList<String> diasGuardia, HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
 			HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales, String idInstitucion, String idTurno,
-			String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario) throws Exception {
+			String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario, Boolean simular) throws Exception {
 
 		LetradoInscripcionItem letradoGuardia, auxLetradoSeleccionado;
 
@@ -4428,7 +4428,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				auxLetradoSeleccionado = (LetradoInscripcionItem) iterador.next();
 				// vale
 				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null,
-						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario)) {
+						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario, simular)) {
 					letradoGuardia = auxLetradoSeleccionado;
 					LOGGER.info("Letrado encontrado. idPersona: " + letradoGuardia.getIdpersona());
 					break;
@@ -4449,7 +4449,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				auxLetradoSeleccionado = (LetradoInscripcionItem) alLetradosOrdenados.get(punteroLetrado.getValor());
 				// vale
 				if (comprobarRestriccionesLetradoColaTurno(auxLetradoSeleccionado, diasGuardia, hmPersonasConSaltos,
-						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario)) {
+						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario, simular)) {
 					letradoGuardia = auxLetradoSeleccionado;
 				}
 
@@ -4477,16 +4477,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private boolean comprobarRestriccionesLetradoColaTurno(LetradoInscripcionItem letradoGuardia,
 			ArrayList<String> diasGuardia, HashMap<Long, ArrayList<LetradoInscripcionItem>> hmPersonasConSaltos,
 			HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales, String idInstitucion, String idTurno,
-			String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario) throws Exception {
+			String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario, Boolean simular) throws Exception {
 
 		LOGGER.info("Probando letrados");
 
 		// si esta de vacaciones, ...
 		if (isLetradoBajaTemporal(hmBajasTemporales.get(letradoGuardia.getIdpersona()), diasGuardia, letradoGuardia)) {
 			// ... crear un salto cumplido (como si fuera un log)
-			insertarNuevoSaltoBT(letradoGuardia, diasGuardia, "Salto por BT", idInstitucion, idTurno, idGuardia,
-					idCalendarioGuardias, usuario);
-
+			if(!simular) {
+				insertarNuevoSaltoBT(letradoGuardia, diasGuardia, "Salto por BT", idInstitucion, idTurno, idGuardia,
+						idCalendarioGuardias, usuario);
+			}
 			return false; // y no seleccionar
 		}
 
@@ -4505,9 +4506,11 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 			if(letradoGuardia.getIdSaltoCompensacion() != null) {
 				// ... cumplir un salto
-				cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", " - Salto cumplido", idInstitucion, idTurno,
+				if(!simular) {
+					cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "S", " - Salto cumplido", idInstitucion, idTurno,
 						idGuardia, idCalendarioGuardias, usuario);
-				alSaltos.remove(0);
+					alSaltos.remove(0);
+				}
 				return false; // y no seleccionar
 			}
 				
@@ -4520,7 +4523,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private boolean comprobarRestriccionesLetradoCompensadoTurno(LetradoInscripcionItem letradoGuardia,
 			ArrayList<String> diasGuardia, Iterator<LetradoInscripcionItem> iteCompensaciones,
 			String idSaltoCompensacionGrupo, HashMap<Long, TreeMap<String, BajasTemporalesItem>> hmBajasTemporales,
-			String idInstitucion, String idTurno, String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario)
+			String idInstitucion, String idTurno, String idGuardia, String idCalendarioGuardias, AdmUsuarios usuario, Boolean simular)
 			throws Exception {
 
 		LOGGER.info("Probando letrados");
@@ -4528,16 +4531,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		// si esta de vacaciones, ...
 		if (isLetradoBajaTemporal(hmBajasTemporales.get(letradoGuardia.getIdpersona()), diasGuardia, letradoGuardia)) {
 			// ... crear un salto cumplido (como si fuera un log)
-			insertarNuevoSaltoBT(letradoGuardia, diasGuardia, "Salto por BT", idInstitucion, idTurno, idGuardia,
+			if(!simular) {
+				insertarNuevoSaltoBT(letradoGuardia, diasGuardia, "Salto por BT", idInstitucion, idTurno, idGuardia,
 					idCalendarioGuardias, usuario);
+			}
 			return false; // y no seleccionar
 		}
 
 		// cumpliendo compensacion
-		cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "C", " - Compensacion cumplida", idInstitucion, idTurno,
-				idGuardia, idCalendarioGuardias, usuario);
-		iteCompensaciones.remove();
-
+		if(!simular) {
+			cumplirSaltoCompensacion(letradoGuardia, diasGuardia, "C", " - Compensacion cumplida", idInstitucion, idTurno,
+					idGuardia, idCalendarioGuardias, usuario);
+			iteCompensaciones.remove();
+		}
 		// una vez comprobado todo, se selecciona a este letrado
 		return true;
 	}
@@ -8944,7 +8950,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				// designa.set (No existe campo calidad en ScsDesigna)
 				designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 				designa.setIdjuzgado(ejg.getJuzgado());
-
+				if (ejg.getJuzgado() != null) {
+					designa.setIdinstitucionJuzg(idInstitucion);
+				}
+				
 				// Actualizamos los delitos del ejg
 				ScsDelitosdesigna delitoDesigna = new ScsDelitosdesigna();
 

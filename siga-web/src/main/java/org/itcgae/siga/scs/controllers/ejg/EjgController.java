@@ -994,6 +994,19 @@ public class EjgController {
 		}
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/gestion-ejg/enviaDocumentacionAdicionalDes", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicionalDes(@RequestBody EjgDocumentacionItem documentacionItem, HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try {
+			response = ejgIntercambiosService.enviaDocumentacionAdicionalDes(documentacionItem, request);
+		} catch (BusinessException e) {
+			response.setError(UtilidadesString.creaError(e.getMessage()));
+		} catch (Exception e) {
+			response.setError(UtilidadesString.creaError("general.mensaje.error.bbdd"));
+		}
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/gestion-ejg/enviaDocumentacionAdicionalExpEconomico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> enviaDocumentacionAdicionalUnidadFamiliar(@RequestBody ExpedienteEconomicoItem expedienteEconomicoItem, HttpServletRequest request) {

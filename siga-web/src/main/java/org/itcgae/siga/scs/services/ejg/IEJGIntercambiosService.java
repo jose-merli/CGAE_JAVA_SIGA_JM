@@ -17,6 +17,7 @@ public interface IEJGIntercambiosService {
     EjgListaIntercambiosDTO getListadoIntercambiosDocumentacionEJG(EjgItem item, HttpServletRequest request) throws Exception;
     UpdateResponseDTO consultarEstadoPericles(EjgItem ejgItem, HttpServletRequest request) throws Exception;
     UpdateResponseDTO enviaDocumentacionAdicional(EjgDocumentacionItem documentacionItemItem, HttpServletRequest request) throws Exception;
+    UpdateResponseDTO enviaDocumentacionAdicionalDes(EjgDocumentacionItem documentacionItemItem, HttpServletRequest request) throws Exception;
     UpdateResponseDTO enviaDocumentacionAdicionalRegtel(EjgItem ejgItem, HttpServletRequest request) throws Exception;
     UpdateResponseDTO enviaDocumentacionAdicionalUnidadFamiliar(ExpedienteEconomicoItem expedienteEconomicoItem, HttpServletRequest request) throws Exception;
 }

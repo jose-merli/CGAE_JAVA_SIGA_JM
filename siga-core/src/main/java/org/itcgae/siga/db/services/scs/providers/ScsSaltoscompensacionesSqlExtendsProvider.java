@@ -338,6 +338,7 @@ public class ScsSaltoscompensacionesSqlExtendsProvider extends ScsSaltoscompensa
 		sql.WHERE("IT.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("IT.IDTURNO = '" + idTurno + "'");
 		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("FECHAVALIDACION IS NOT NULL");
 
 		return sql.toString();
 	}
