@@ -176,7 +176,8 @@ public class EJGIntercambiosHelper {
         }
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Designa - %s", documentaciondesigna.getIddocumentaciondes()));
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Designa - %s", documentaciondesigna.getIddocumentaciondes())
+        		, null, null, null);
     }
 
     @Transactional
