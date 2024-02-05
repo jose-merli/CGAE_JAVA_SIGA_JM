@@ -328,8 +328,8 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 		sql.SELECT("pet.idPeticion AS NSOLICITUD");
 		sql.SELECT("per.nifcif AS NIDENTIFICACION");
 		sql.SELECT("col.NCOLEGIADO AS NCOLEGIADO");
-		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre AS APELLIDOSNOMBRE");
-		sql.SELECT("CASE WHEN compra.fechaBaja IS NOT NULL THEN 5 WHEN compra.fecha IS NOT NULL AND petBaja.fecha IS NOT NULL THEN 5 WHEN compra.fecha IS NOT NULL THEN 3 WHEN compra.fecha IS NULL AND petBaja.fecha IS NOT NULL THEN 2 ELSE 1 END AS IDESTADOSOLICITUD");
+		sql.SELECT("per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre AS APELLIDOSNOMBRE");		
+		sql.SELECT("CASE WHEN compra.fechaBaja IS NOT NULL THEN 5 WHEN compra.fecha IS NOT NULL AND petBaja.fecha IS NOT NULL THEN 4 WHEN compra.fecha IS NOT NULL THEN 3 WHEN compra.fecha IS NULL AND petBaja.fecha IS NOT NULL THEN 2 ELSE 1 END AS IDESTADOSOLICITUD");
 		sql.SELECT("prodIns.descripcion AS CONCEPTO");
 		sql.SELECT("prodSol.idformapago AS IDFORMADEPAGO");
 		sql.SELECT("CASE WHEN prodSol.noFacturable = '1' THEN 'No facturable' ELSE f_siga_getrecurso(formPago.descripcion, 1) END AS DESFROMADEPAGO");
