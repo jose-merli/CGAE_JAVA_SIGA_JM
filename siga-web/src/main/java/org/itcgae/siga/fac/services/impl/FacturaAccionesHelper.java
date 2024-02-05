@@ -1360,11 +1360,7 @@ public class FacturaAccionesHelper {
             facUpdate.setEstado(Short.parseShort(SigaConstants.ESTADO_FACTURA_ANULADA));
             facFacturaExtendsMapper.updateByPrimaryKey(facUpdate);
 
-            insertarHistoricoFacParametros(facUpdate.getIdinstitucion(),
-                    facUpdate.getIdfactura(), (short) 9, null, null,
-                    null,null,null,null,null,
-                    facUpdate.getIdfactura());
-
+            
             try {
                 // Si no se produce error regeneramos el pdf con la información de la factura
                 facturacionHelper.generarPdfFacturaFirmada(facUpdate.getIdfactura(), facUpdate.getIdinstitucion().toString(), true, usuario);
@@ -1429,6 +1425,12 @@ public class FacturaAccionesHelper {
                     : Short.parseShort(SigaConstants.ESTADO_FACTURA_BANCO));
 
             facFacturaExtendsMapper.insertSelective(facturaComision);
+            
+            insertarHistoricoFacParametros(facUpdate.getIdinstitucion(),
+                    facUpdate.getIdfactura(), (short) 9, null, null,
+                    null,null,null,null,null,
+                    facturaComision.getIdfactura());
+
 
             // Rellenamos los datos para insercciónn EMISIÓN Y CONFIRMACIÓN
             FacHistoricofactura facHistoricoFacturaDevuelta = rellenarHistoricoFactura(facturaComision, usuario);
