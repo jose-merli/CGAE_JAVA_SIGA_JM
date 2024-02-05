@@ -290,14 +290,28 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
         LOGGER.info("enviaDocumentacionAdicional() -> Saliendo del servicio de autenticación");
 
-        if (documentacionItem.getIdDocumentacion() == null) {
+        if (UtilidadesString.anyMatchCadenaVacia(documentacionItem.getAnio(), documentacionItem.getIdTipoEjg(), documentacionItem.getNumero())
+                || documentacionItem.getIdDocumentacion() == null) {
             LOGGER.warn("enviaDocumentacionAdicional() -> Error: Falta alguno de los parámetros necesarios para realizar la petición");
             throw new Exception("Falta alguno de los parámetros necesarios para realizar la petición");
+        }
+        
+        ScsEjg ejg = ejgIntercambiosHelper.getScsEjg(usuario.getIdinstitucion(),
+                Short.parseShort(documentacionItem.getAnio()), Short.parseShort(documentacionItem.getIdTipoEjg()),
+                Long.parseLong(documentacionItem.getNumero()));
+        if (ejg == null) {
+            LOGGER.warn("enviaDocumentacionAdicional() -> Error: No se ha encontrado el EJG indicado");
+            throw new Exception("No se ha encontrado el EJG indicado");
         }
 
         if (!ejgIntercambiosHelper.envioPericlesDisponible(usuario.getIdinstitucion())) {
             LOGGER.warn("enviaDocumentacionAdicional() -> Error: El colegio no pertenece a la zona común");
             throw new Exception("El colegio no pertenece a la zona común");
+        }
+        
+        if (ejg.getIdexpedienteext() == null) {
+            LOGGER.warn("enviaDocumentacionAdicional() -> Error: El EJG no tiene el identificador de Pericles");
+            throw new Exception("El EJG no tiene el identificador de Pericles");
         }
         
         ScsDocumentaciondesignaKey documentaciondesignaKey = new ScsDocumentaciondesignaKey();
@@ -306,11 +320,12 @@ public class EJGIntercambiosServiceServiceImpl implements IEJGIntercambiosServic
         ScsDocumentaciondesigna documentacionDes = scsDocumentaciondesignaMapper.selectByPrimaryKey(documentaciondesignaKey);
 
         if (documentacionDes == null) {
-            LOGGER.warn("enviaDocumentacionAdicional() -> Error: No existe la documentación de EJG indicada");
+            LOGGER.warn("enviaDocumentacionAdicional() -> Error: No existe la documentación indicada");
             throw new Exception("No existe la documentación de EJG indicada");
         }
 
-        ejgIntercambiosHelper.insertarDocumentacionAdicionalEnColaDes(documentacionDes);
+        ejgIntercambiosHelper.insertarDocumentacionAdicionalEnColaDes(documentacionDes, 
+        		documentacionItem.getAnio(), documentacionItem.getIdTipoEjg(), documentacionItem.getNumero());
 
         LOGGER.info("enviaDocumentacionAdicional() <- Saliendo del servicio para enviar documentación adicional");
         return updateResponseDTO;
