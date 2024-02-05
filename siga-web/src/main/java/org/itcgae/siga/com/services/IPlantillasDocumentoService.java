@@ -71,6 +71,13 @@ public interface IPlantillasDocumentoService {
 	ComboSufijoDTO obtenerSufijos(HttpServletRequest request);
 
 	/**
+	 * Obtiene el combo de sufijos posibles
+	 * @param request
+	 * @return
+	 */
+	ComboSufijoDTO obtenerSufijosAgrupados(HttpServletRequest request);
+
+	/**
 	 * Obtiene el combo de formatos de salida
 	 * @param request
 	 * @return
