@@ -14,6 +14,7 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String idInstitucion;
 	private String idClaseComunicacion;
 	private String idioma;
+	private String idIdioma;
 	private String nombreFicheroSalida;
 	private String formatoSalida;
 	private String idFormatoSalida;
@@ -37,6 +38,13 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
+	}
+	
+	public String getIdIdioma() {
+		return idIdioma;
+	}
+	public void setIdIdioma(String idIdioma) {
+		this.idIdioma = idIdioma;
 	}
 
 	public String getFormatoSalida() {

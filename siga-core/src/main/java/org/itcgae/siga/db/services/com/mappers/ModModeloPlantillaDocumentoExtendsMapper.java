@@ -23,6 +23,9 @@ public interface ModModeloPlantillaDocumentoExtendsMapper {
 		@Result(column = "FORMATOSALIDA", property = "idFormatoSalida", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAASOCIACION", property = "fechaAsociacion", jdbcType = JdbcType.DATE),
 		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLADOCUMENTO", property = "idPlantillaDocumento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREDOCUMENTO", property = "nombreDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLAS", property = "idPlantillas")
 	})
 	List<PlantillaModeloDocumentoDTO> selectInformes(Short idInstitucion, Long idModeloComunicacion, String idLenguaje);
