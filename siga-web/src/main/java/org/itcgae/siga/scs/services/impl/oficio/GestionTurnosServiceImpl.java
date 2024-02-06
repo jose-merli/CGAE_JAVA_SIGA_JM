@@ -40,6 +40,7 @@ import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
+import org.itcgae.siga.db.entities.ScsTurnoKey;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
@@ -1330,6 +1331,8 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		LOGGER.info("busquedaColaOficio() -> Salida del servicio para obtener la busqueda Cola Oficio");
 		return turnosDTO;
 	}
+	
+	
 
 	@Override
 	public TurnosDTO busquedaColaGuardia(TurnosItem turnosItem, HttpServletRequest request) {
