@@ -76,6 +76,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.SufijoItem.SufijosAgrupados;
+
 @Service
 @Transactional(timeout=2400)
 public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoService {
@@ -672,22 +674,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return response;
 	}
 	
-	public enum SufijosAgrupados {
-		I_NASUNTO("1", "1", "N. Asunto"), II_NASUNTO_NCOL_APENOMBRE("2", "2", "N. Asunto - N. Col - Apellidos, Nombre"),
-		III_NCOL_APENOMBRE("3", "3", "N. Col - Apellidos, Nombre"),
-		IV_NCOL_APENOMBRE_NASUNTO("4", "4", "N. Col - Apellidos Nombre - N. Asunto");
-
-		String id;
-		String orden;
-		String nombre;
-
-		SufijosAgrupados(String id, String orden, String nombre) {
-			this.id = id;
-			this.nombre = nombre;
-			this.orden = orden;
-		};
-		
-	}
 
 	@Override
 	public ComboSufijoDTO obtenerSufijosAgrupados(HttpServletRequest request) {
@@ -697,7 +683,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		List<SufijoItem> comboItems = new ArrayList<SufijoItem>();
 		
 		for(SufijosAgrupados s: SufijosAgrupados.values()) {
-			comboItems.add(new SufijoItem(s.id,s.orden,s.nombre));
+			comboItems.add(new SufijoItem(s.getId(),s.getOrden(),s.getNombre()));
 		}		
 		
 		comboDTO.setSufijos(comboItems);
@@ -1075,11 +1061,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				LOGGER.error(
 						"uploadFile() -> Error al guardar la plantilla de documento en el directorio indicado",
 						ioe);
-			} finally {
-				// close the stream
-				LOGGER.debug("uploadFile() -> Cierre del stream del documento");
-				// stream.close();
-			}
+			} 
 		} else {
 			Error error = new Error();
 			error.setCode(400);
@@ -1154,6 +1136,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			} else {
 				actualizarModeloPlantillaDoc(usuario,modModeloPlantillaDoc,plantillaDoc);
 			}
+			
+			tratarSufijos(usuario, modModeloPlantillaDoc, plantillaDoc);
 		
 			MultipartFile ficheroAdjunto = request.getFile("uploadFile_"+plantillaDoc.getIdIdioma());
 			if(ficheroAdjunto!=null)
@@ -1167,6 +1151,64 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			error.setMessage("Error al guardar la plantilla de documento");
 			respuesta.setError(error);
 		}
+	}
+
+	private void tratarSufijos(AdmUsuarios usuario, ModModeloPlantilladocumento modModeloPlantillaDoc,
+			TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
+		relSufijoPlantillaExample.createCriteria()
+				.andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
+				.andIdinformeEqualTo(modModeloPlantillaDoc.getIdinforme())
+				.andIdplantilladocumentoEqualTo(modModeloPlantillaDoc.getIdplantilladocumento());
+		relSufijoPlantillaExample.setOrderByClause("ORDEN ASC");
+		
+		List<ModRelPlantillaSufijo> sufijosAsignados = modRelPlantillaSufijoMapper.selectByExample(relSufijoPlantillaExample);
+		
+		if(!mismaConfiguracionSufijos(sufijosAsignados, plantillaDoc)) {
+			actualizarSufijos(usuario,relSufijoPlantillaExample,plantillaDoc);
+		}
+		
+	}
+
+	private void actualizarSufijos(AdmUsuarios usuario, ModRelPlantillaSufijoExample relSufijoPlantillaExample,
+			TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		SufijosAgrupados configuracion = SufijosAgrupados.valueOf(plantillaDoc.getIdSufijo());
+		modRelPlantillaSufijoMapper.deleteByExample(relSufijoPlantillaExample);
+		Short orden=1;
+		for(Short idSufijo:configuracion.getIdSufijos()) {
+			insertarSufijo(usuario, idSufijo, orden++, plantillaDoc);
+		}
+		
+	}
+
+	private void insertarSufijo(AdmUsuarios usuario, Short idSufijo, Short orden, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		ModRelPlantillaSufijo sufijo = new ModRelPlantillaSufijo();
+		sufijo.setIdsufijo(idSufijo);
+		sufijo.setOrden(orden);
+		sufijo.setIdinforme(Long.valueOf(plantillaDoc.getIdInforme()));
+		sufijo.setIdmodelocomunicacion(Long.valueOf(plantillaDoc.getIdModeloComunicacion()));
+		sufijo.setIdplantilladocumento(Long.valueOf(plantillaDoc.getIdPlantillaDocumento()));
+		sufijo.setFechamodificacion(new Date());
+		sufijo.setUsumodificacion(usuario.getIdusuario());
+		
+		modRelPlantillaSufijoMapper.insertSelective(sufijo);
+	}
+
+	private boolean mismaConfiguracionSufijos(List<ModRelPlantillaSufijo> sufijosAsignados, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		if (plantillaDoc.getIdSufijo().equals("")) return true; // si viene vacío mantenemos configuración
+		SufijosAgrupados configuracion = SufijosAgrupados.valueOf(plantillaDoc.getIdSufijo());
+		List<Short> listIdSufijosAsignados = sufijosAsignados.stream().map(s->s.getIdsufijo()).collect(Collectors.toList());
+		
+		if(configuracion.getIdSufijos().size() != listIdSufijosAsignados.size()) {
+			return false;
+		}
+		
+		Iterator<Short> itSufijos = listIdSufijosAsignados.iterator();
+		for(Short idSufijo:configuracion.getIdSufijos()) {
+			Short nextSufijo = itSufijos.next(); 
+			if(!nextSufijo.equals(idSufijo)) return false;
+		}
+		return true;
 	}
 
 	private ModPlantilladocumento crearPlantillaDoc(AdmUsuarios usuario, ModModeloPlantilladocumento modModeloPlantillaDoc, TarjetaPlantillaDocumentoDTO plantillaDoc) {
