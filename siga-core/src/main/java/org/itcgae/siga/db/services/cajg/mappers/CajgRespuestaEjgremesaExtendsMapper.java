@@ -13,4 +13,8 @@ public interface CajgRespuestaEjgremesaExtendsMapper extends CajgRespuestaEjgrem
 	@DeleteProvider(type = CajgRespuestaEjgremesaExtendsProvider.class, method = "deleteConSelect")
 	int deleteConSelect(Long idremesa, Short idInstitucion);
 	
+	@DeleteProvider(type = CajgRespuestaEjgremesaExtendsProvider.class, method = "deleteByEJGRemesa")
+	int deleteByEJGRemesa(Long idejgremesa);
+
+	
 }
