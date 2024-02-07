@@ -156,9 +156,12 @@ public class EJGIntercambiosHelper {
     }
     
     @Transactional
-    public void insertarDocumentacionAdicionalEnColaDes(ScsDocumentaciondesigna documentaciondesigna) throws Exception {
+    public void insertarDocumentacionAdicionalEnColaDes(ScsDocumentaciondesigna documentaciondesigna, String anio, String idTipoEJG, String numero) throws Exception {
         Map<String, String> parametrosCola = new HashMap<>();
-
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDINSTITUCION, documentaciondesigna.getIdinstitucion().toString());
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_ANIO, anio);
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDTIPOEJG, idTipoEJG);
+        parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_NUMERO, numero);
         parametrosCola.put(SigaConstants.PERICLES_PARAM_ECOMCOLA_IDDOCUMENTACION, documentaciondesigna.getIddocumentaciondes().toString());
 
         EcomCola colaEnviaPericles = new EcomCola();
@@ -176,8 +179,9 @@ public class EJGIntercambiosHelper {
         }
 
         facturacionSJCSHelper.insertaColaConParametros(colaEnviaPericles, parametrosCola);
-        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), String.format("Envío documentación Designa - %s", documentaciondesigna.getIddocumentaciondes())
-        		, null, null, null);
+        insertaIntercambio(colaEnviaPericles.getIdecomcola(), colaEnviaPericles.getIdinstitucion(), 
+        		String.format("Envío documentación Designa - %s", documentaciondesigna.getIddocumentaciondes()),
+        		Short.parseShort(idTipoEJG), Short.parseShort(anio), Long.parseLong(numero));
     }
 
     @Transactional
