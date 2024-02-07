@@ -1664,7 +1664,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					item.setTipoEJGColegio(datos.getTipoEJGColegio());
 					item.setIdTipoExpInsos(datos.getIdTipoExpInsos());
 					item.setEstadoEJG(datos.getEstadoEJG());
-
+					if(datos.getNombreApeSolicitante() != null) {
+						item.setNombreApeSolicitante(datos.getNombreApeSolicitante());
+					}
+					
 					list.add(item);
 
 					ejgdto.setEjgItems(list);
@@ -2026,6 +2029,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		if (item.getidInstitucion() != null) {
 			result.setIdinstitucion(Short.parseShort(item.getidInstitucion()));
+		}
+		
+		if (item.getIdPersonajg() != null) {
+			result.setIdpersonajg(Long.parseLong(item.getIdPersonajg()));
 		}
 
 		if (item.getFechaApertura() != null) {

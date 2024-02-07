@@ -2353,7 +2353,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							if (colegiado != null) {
 								asistenciaResponse.setNombreColegiado(colegiado.getApellido1() + " "
-										+ (colegiado.getApellido2() != null ? colegiado.getApellido2() : "") + " " + colegiado.getNombre());
+										+ (colegiado.getApellido2() != null ? colegiado.getApellido2() : "") + ", " + colegiado.getNombre());
 								asistenciaResponse.setNumeroColegiado(colegiado.getNumeroColegiado());
 							}
 
@@ -2378,7 +2378,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											asistido += " " + justiciables.get(0).getApellido2();
 										}
 										if (justiciables.get(0).getNombre() != null) {
-											asistido += " " + justiciables.get(0).getNombre();
+											asistido += ", " + justiciables.get(0).getNombre();
 										}
 
 										asistenciaResponse.setAsistido(asistido);
@@ -2389,7 +2389,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											asistido += " " + justiciables.get(0).getApellido1();
 										}
 										if (justiciables.get(0).getNombre() != null) {
-											asistido += " " + justiciables.get(0).getNombre();
+											asistido += ", " + justiciables.get(0).getNombre();
 										}
 
 										asistenciaResponse.setAsistido(asistido);

@@ -75,6 +75,7 @@ import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAsistenciaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsDefendidosdesignasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDesignacionesExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
@@ -97,6 +98,9 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 	@Autowired
 	private ScsEjgExtendsMapper scsEjgExtendsMapper;
+	
+	@Autowired
+	private ScsDefendidosdesignasExtendsMapper scsDefendidosdesignasExtendsMapper;
 
 	@Autowired
 	private ScsDesignasletradoMapper scsDesignasletradoMapper;
@@ -1365,10 +1369,17 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				asis.setDelitosimputados(designa.getDelitos());
 				asis.setContrarios(contrariosAsisString);
-
+				//Busco idPersona del Interesado
+				if(asis.getIdpersonajg() == null) {
+					
+					String interesadoDesigna = scsDefendidosdesignasExtendsMapper.getIdInteresadoDesigna(designa,idInstitucion);
+					if(interesadoDesigna != null) {
+						asis.setIdpersonajg(Long.parseLong(interesadoDesigna));
+					}
+				}
 				asis.setUsumodificacion(usuarios.get(0).getIdusuario());
 				asis.setFechamodificacion(new Date());
-
+			
 				response = scsAsistenciaMapper.updateByPrimaryKey(asis);
 				if (response == 0)
 					throw (new Exception(
