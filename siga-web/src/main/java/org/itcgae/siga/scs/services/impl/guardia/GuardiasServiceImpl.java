@@ -4865,7 +4865,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	}
 
-	//@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario}")
+	@Scheduled(cron = "${cron.pattern.scheduled.guardias.generarCalendario}")
 	@Override
 	public void generarCalendarioAsync() {
 
