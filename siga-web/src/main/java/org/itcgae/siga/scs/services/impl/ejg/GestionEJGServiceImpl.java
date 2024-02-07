@@ -5698,19 +5698,32 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 			}
 
+//		} catch (Exception e) {
+//			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
+//			LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg", e);
+//			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+//		} finally {
+//			if(fileStream != null) {
+//				try {
+//					fileStream.close();
+//				} catch (IOException e) {
+//					LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() --> se ha producido un error al generar el fichero", e);
+//				}
+//			}
+//        }
 		} catch (Exception e) {
 			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
-			LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg", e);
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.INTERNAL_SERVER_ERROR);
-		} finally {
-			if(fileStream != null) {
-				try {
-					fileStream.close();
-				} catch (IOException e) {
-					LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() --> se ha producido un error al generar el fichero", e);
-				}
+			LOGGER.error(
+					"GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg",
+					e);
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+					HttpStatus.INTERNAL_SERVER_ERROR);
+			try {
+				fileStream.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
 			}
-        }
+		}
 
 		LOGGER.warn("AGUERRA - SALE DEL SERVICIO");
 
