@@ -5854,6 +5854,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andEjgnumeroEqualTo(record.getNumeroejg())
+						.andEjganioEqualTo(record.getAnioejg())
+						.andEjgidtipoejgEqualTo(record.getIdtipoejg())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+					if (!asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+						ScsAsistencia scsAsistencia = asis.get(0);
+						scsAsistencia.setFechamodificacion(new Date());
+						scsAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsAsistencia.setDesignaAnio(record.getAniodesigna());
+						scsAsistencia.setDesignaNumero(record.getNumerodesigna());
+						scsAsistencia.setDesignaTurno(record.getIdturno());
+						
+						scsAsistenciaMapper.updateByPrimaryKey(scsAsistencia);
+					}
+					
 
 				} catch (Exception e) {
 					LOGGER.debug("GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ", e);
@@ -5911,6 +5933,30 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					record.setNumero(Long.parseLong(datos.get(2)));
 					record.setAnio(Short.parseShort(datos.get(1)));
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andNumeroEqualTo(record.getNumero())
+						.andAnioEqualTo(record.getAnio())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					
+					EjgItem item = new EjgItem();
+					item.setidInstitucion(idInstitucion.toString());
+					item.setNumero(datos.get(5));
+					item.setTipoEJG(datos.get(3));
+					item.setAnnio(datos.get(4));
+					
+					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					List<EjgItem>ejgDesigna = scsEjgExtendsMapper.getEjgDesignas(item);
+					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+					if (!ejgDesigna.isEmpty() && !asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+						record.setDesignaAnio(ejgDesigna.get(0).getAnioDesigna());
+						record.setDesignaNumero(Long.valueOf(ejgDesigna.get(0).getNumeroDesigna()));
+						record.setDesignaTurno(Integer.valueOf(ejgDesigna.get(0).getTurnoDes()));
+					}
+					
 
 					response = scsAsistenciaMapper.updateByPrimaryKeySelective(record);
 
