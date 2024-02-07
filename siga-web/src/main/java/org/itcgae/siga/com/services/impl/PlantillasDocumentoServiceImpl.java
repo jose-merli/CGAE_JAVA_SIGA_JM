@@ -1137,7 +1137,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				actualizarModeloPlantillaDoc(usuario,modModeloPlantillaDoc,plantillaDoc);
 			}
 			
-			tratarSufijos(usuario, modModeloPlantillaDoc, plantillaDoc);
+			tratarSufijos(usuario, modModeloPlantillaDoc, modPlantillaDoc, plantillaDoc);
 		
 			MultipartFile ficheroAdjunto = request.getFile("uploadFile_"+plantillaDoc.getIdIdioma());
 			if(ficheroAdjunto!=null)
@@ -1154,7 +1154,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	}
 
 	private void tratarSufijos(AdmUsuarios usuario, ModModeloPlantilladocumento modModeloPlantillaDoc,
-			TarjetaPlantillaDocumentoDTO plantillaDoc) {
+			ModPlantilladocumento modPlantillaDoc, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
 		relSufijoPlantillaExample.createCriteria()
 				.andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
@@ -1165,29 +1165,29 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		List<ModRelPlantillaSufijo> sufijosAsignados = modRelPlantillaSufijoMapper.selectByExample(relSufijoPlantillaExample);
 		
 		if(!mismaConfiguracionSufijos(sufijosAsignados, plantillaDoc)) {
-			actualizarSufijos(usuario,relSufijoPlantillaExample,plantillaDoc);
+			actualizarSufijos(usuario,relSufijoPlantillaExample,modModeloPlantillaDoc, modPlantillaDoc, plantillaDoc);
 		}
 		
 	}
 
 	private void actualizarSufijos(AdmUsuarios usuario, ModRelPlantillaSufijoExample relSufijoPlantillaExample,
-			TarjetaPlantillaDocumentoDTO plantillaDoc) {
+			ModModeloPlantilladocumento modModeloPlantillaDoc, ModPlantilladocumento modPlantillaDoc, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		SufijosAgrupados configuracion = SufijosAgrupados.valueOf(plantillaDoc.getIdSufijo());
 		modRelPlantillaSufijoMapper.deleteByExample(relSufijoPlantillaExample);
 		Short orden=1;
 		for(Short idSufijo:configuracion.getIdSufijos()) {
-			insertarSufijo(usuario, idSufijo, orden++, plantillaDoc);
+			insertarSufijo(usuario, idSufijo, orden++,modModeloPlantillaDoc,modPlantillaDoc, plantillaDoc);
 		}
 		
 	}
 
-	private void insertarSufijo(AdmUsuarios usuario, Short idSufijo, Short orden, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+	private void insertarSufijo(AdmUsuarios usuario, Short idSufijo, Short orden, ModModeloPlantilladocumento modModeloPlantillaDoc, ModPlantilladocumento modPlantillaDoc, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		ModRelPlantillaSufijo sufijo = new ModRelPlantillaSufijo();
 		sufijo.setIdsufijo(idSufijo);
 		sufijo.setOrden(orden);
-		sufijo.setIdinforme(Long.valueOf(plantillaDoc.getIdInforme()));
+		sufijo.setIdinforme(modModeloPlantillaDoc.getIdinforme());
 		sufijo.setIdmodelocomunicacion(Long.valueOf(plantillaDoc.getIdModeloComunicacion()));
-		sufijo.setIdplantilladocumento(Long.valueOf(plantillaDoc.getIdPlantillaDocumento()));
+		sufijo.setIdplantilladocumento(Long.valueOf(modPlantillaDoc.getIdplantilladocumento()));
 		sufijo.setFechamodificacion(new Date());
 		sufijo.setUsumodificacion(usuario.getIdusuario());
 		
@@ -1195,7 +1195,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	}
 
 	private boolean mismaConfiguracionSufijos(List<ModRelPlantillaSufijo> sufijosAsignados, TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		if (plantillaDoc.getIdSufijo().equals("")) return true; // si viene vacío mantenemos configuración
+		if (plantillaDoc.getIdSufijo()==null||plantillaDoc.getIdSufijo().equals("")) return true; // si viene vacío mantenemos configuración
 		SufijosAgrupados configuracion = SufijosAgrupados.valueOf(plantillaDoc.getIdSufijo());
 		List<Short> listIdSufijosAsignados = sufijosAsignados.stream().map(s->s.getIdsufijo()).collect(Collectors.toList());
 		
@@ -1252,7 +1252,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	private ModModeloPlantilladocumento crearModeloPlantillaDoc(AdmUsuarios usuario, List<Long> listaPlantillasIdAAsociar, TarjetaPlantillaDocumentoDTO plantillaDoc, Long idInforme) {
 		ModModeloPlantilladocumento modModeloPlantillaDoc = new ModModeloPlantilladocumento();
 		
-		Long idPlantillaDoc = Long.getLong(modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento().getNewId())+1l;
+		Long idPlantillaDoc = Long.valueOf(modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento().getNewId())+1l;
 		
 		modModeloPlantillaDoc.setFechamodificacion(new Date());
 		modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
