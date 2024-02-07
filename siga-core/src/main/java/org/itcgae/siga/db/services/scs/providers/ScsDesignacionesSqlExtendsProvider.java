@@ -4323,6 +4323,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.WHERE(" IDGUARDIA IS NULL ");
 		}
 		sql.WHERE(" FECHACUMPLIMIENTO IS NULL ");
+		sql.WHERE(" FECHA_ANULACION IS NULL ");
 		sql.WHERE(" SALTOOCOMPENSACION = 'S'  ");
 		sql.ORDER_BY("FECHA, IDSALTOSTURNO");
 
