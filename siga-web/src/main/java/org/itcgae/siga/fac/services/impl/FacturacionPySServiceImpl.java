@@ -2796,8 +2796,17 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 		try {
 
 			Workbook workbook = new SXSSFWorkbook(EXCEL_ROW_FLUSH);
-			Sheet sheet = workbook.createSheet(sheetName);
 			
+			sheetName = sheetName.replace("\\", " ");
+			sheetName = sheetName.replace("/", " ");
+			sheetName = sheetName.replace(":", " ");
+			sheetName = sheetName.replace("|", " ");
+			sheetName = sheetName.replace("?", " ");
+			sheetName = sheetName.replace("*", " ");
+			sheetName = sheetName.replace("[", " ");
+			sheetName = sheetName.replace("]", " ");
+			
+			Sheet sheet = workbook.createSheet(sheetName);
 			
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 			
@@ -2809,6 +2818,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			rowFecha.createCell(3).setCellValue("DESCRIPCION");
 			
 			Date date = new Date();
+			
 			String fecha = dateFormat.format(date);
 			//Fecha
 			Row Accion = sheet.createRow(1);
@@ -2986,7 +2996,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 			}
 		}
 
-		if (record.getIdestadoconfirmacion() != null && facItem.getEsDatosGenerales()
+		if (record.getIdestadoconfirmacion() != null && facItem.getEsDatosGenerales() != null && facItem.getEsDatosGenerales()
 				&& (record.getIdestadoconfirmacion() == string2Short("21") // Confirmación con errores
 						|| record.getIdestadoconfirmacion() == string2Short("2") // Generada
 				)) {
