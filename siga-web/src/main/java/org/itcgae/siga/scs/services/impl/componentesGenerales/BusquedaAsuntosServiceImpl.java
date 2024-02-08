@@ -1626,7 +1626,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 //					PRE
 				ejg.setNumeroprocedimiento(designa.getNumprocedimiento());
 				ejg.setNig(designa.getNig());
-				ejg.setObservaciones(designa.getObservaciones());
+				ejg.setObservaciones(designa.getResumenasunto());
 				if(designa.getIdpretension() != null) {
 					ejg.setIdpretension(designa.getIdpretension().longValue());
 				}else {
