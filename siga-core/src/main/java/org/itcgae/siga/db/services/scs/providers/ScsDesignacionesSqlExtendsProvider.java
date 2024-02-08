@@ -3857,7 +3857,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa) {
 
 		SQL sql = new SQL();			
-		sql.SELECT("LISTAGG('D' || d.ANIO || '/' || LPAD(d.NUMERO, 5, '0'), ', ') WITHIN GROUP (ORDER BY d.NUMERO) AS LISTA");
+		sql.SELECT("LISTAGG('D' || d.ANIO || '/' || LPAD(d.CODIGO, 5, '0'), ', ') WITHIN GROUP (ORDER BY d.NUMERO) AS LISTA");
 		sql.FROM("SCS_DESIGNA d");
 		
 		if(designa.getIdJuzgado() != null) {
@@ -4293,6 +4293,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.WHERE(" IDGUARDIA IS NULL ");
 		}
 		sql.WHERE(" FECHACUMPLIMIENTO IS NULL ");
+		sql.WHERE(" FECHA_ANULACION IS NULL ");
 		sql.WHERE(" SALTOOCOMPENSACION = 'S'  ");
 		sql.ORDER_BY("FECHA, IDSALTOSTURNO");
 
