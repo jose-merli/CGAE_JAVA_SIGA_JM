@@ -519,7 +519,7 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                                     .andIdinstitucionEqualTo(idInstitucion)
                                     .andIdactuacionEqualTo(scsActuacionasistencia.getIdactuacion())
                                     .andIdtipoactuacionEqualTo(scsActuacionasistencia.getIdtipoactuacion())
-                                    .andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistencia());
+                                    .andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistenciacolegio());
                             affectedRows += scsActuacionasistcostefijoMapper.deleteByExample(scsActuacionasistcostefijoExample);
 
                             //Insertamos el nuevo coste en caso de que hubiera seleccionado uno
@@ -904,9 +904,27 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
     		update = true;
     	}
     	
-    	if (scsAsistencia.getNumerodiligencia()== null && datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
-    		scsAsistencia.setNumerodiligencia(datosGenerales.getNumAsunto());
+    	// Determinamos si viene definido juzgado o comisaria (Solo puede llegar uno de los dos). 
+    	if (datosGenerales.getJuzgado() != null && !datosGenerales.getJuzgado().isEmpty()) {
+    		scsAsistencia.setJuzgado(Long.parseLong(datosGenerales.getJuzgado()));
     		update = true;
+    		
+    		// En caso de ser juzgado (Declaración judicial), el numero de asunto pasa a ser el numero de diligencia de la asistencia
+        	if (datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
+        		scsAsistencia.setNumerodiligencia(datosGenerales.getNumAsunto());
+        		update = true;
+        	}
+    	}
+    	
+    	else if (datosGenerales.getComisaria() != null && !datosGenerales.getComisaria().isEmpty()) {
+    		scsAsistencia.setComisaria(Long.parseLong(datosGenerales.getComisaria()));
+    		update = true;
+    		
+    		// En caso de ser comisaria (Declaración policial), el numero de asunto pasa a ser el numero de procedimiento de la asistencia
+        	if (datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
+        		scsAsistencia.setNumeroprocedimiento(datosGenerales.getNumAsunto());
+        		update = true;
+        	}
     	}
     	
     	if (update) {
