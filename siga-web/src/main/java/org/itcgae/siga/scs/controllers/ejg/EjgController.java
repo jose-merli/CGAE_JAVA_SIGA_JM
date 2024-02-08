@@ -811,7 +811,7 @@ public class EjgController {
 			return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@PostMapping(value = "/gestion-ejg/descargarDocumentosEjg", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/gestion-ejg/descargarDocumentosEjg", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	ResponseEntity<InputStreamResource> descargarDocumentosEjg(
 			@RequestBody List<EjgDocumentacionItem> listaDocumentoEjgItem, HttpServletRequest request) {
 		ResponseEntity<InputStreamResource> response = gestionEJG.descargarDocumentosEjg(listaDocumentoEjgItem,
