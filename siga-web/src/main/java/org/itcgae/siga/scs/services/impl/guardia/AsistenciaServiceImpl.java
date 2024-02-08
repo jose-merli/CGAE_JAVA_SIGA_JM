@@ -1767,7 +1767,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 											.updateByPrimaryKeySelective(scsSolicitudAceptada);
 
 									List<ComboItem> tiposActuaciones = scsTipoactuacionExtendsMapper.getComboActuacion(
-											asistencia.getIdtipoasistencia().toString(),
+											asistencia.getIdtipoasistenciacolegio().toString(),
 											usuarios.get(0).getIdlenguaje(), idInstitucion);
 
 									// Además le creamos su primera actuacion
@@ -1779,7 +1779,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									scsActuacionasistencia
 											.setIdtipoactuacion(Short.valueOf(tiposActuaciones.get(0).getValue()));
 									scsActuacionasistencia.setFecha(asistencia.getFechahora());
-									scsActuacionasistencia.setIdtipoasistencia(asistencia.getIdtipoasistencia());
+									scsActuacionasistencia.setIdtipoasistencia(asistencia.getIdtipoasistenciacolegio());
 									scsActuacionasistencia.setIdcomisaria(asistencia.getComisaria());
 									scsActuacionasistencia
 											.setIdinstitucionComis(asistencia.getComisariaidinstitucion());

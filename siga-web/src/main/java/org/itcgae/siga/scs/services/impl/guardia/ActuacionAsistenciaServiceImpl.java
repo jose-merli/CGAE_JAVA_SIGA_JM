@@ -120,12 +120,12 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
                                     .andIdinstitucionEqualTo(idInstitucion)
                                     .andIdactuacionEqualTo(Long.valueOf(idActuacion))
                                     .andIdtipoactuacionEqualTo(scsActuacionasistencia.getIdtipoactuacion())
-                                    .andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistencia());
+                                    .andIdtipoasistenciaEqualTo(scsAsistencia.getIdtipoasistenciacolegio());
                             //Buscamos la descripcion del coste fijo
                             List<ScsActuacionasistcostefijo> costesActuacion = scsActuacionasistcostefijoMapper.selectByExample(scsActuacionasistcostefijoExample);
                             if(costesActuacion != null && !costesActuacion.isEmpty()){
                                 actuacionAsistenciaItem.setIdCoste(costesActuacion.get(0).getIdcostefijo().toString());
-                                List<ComboItem> costes = scsActuacionasistenciaExtendsMapper.comboCosteFijoTipoActuacion(idActuacion,idInstitucion,scsAsistencia.getIdtipoasistencia(),Integer.valueOf(usuarios.get(0).getIdlenguaje()));
+                                List<ComboItem> costes = scsActuacionasistenciaExtendsMapper.comboCosteFijoTipoActuacion(idActuacion,idInstitucion,scsAsistencia.getIdtipoasistenciacolegio(),Integer.valueOf(usuarios.get(0).getIdlenguaje()));
 
                                 if(costes != null && !costes.isEmpty()){
                                     String costeDesc = costes.stream().filter(coste -> actuacionAsistenciaItem.getIdCoste().equals(coste.getValue())).findFirst().orElse(new ComboItem()).getLabel();
