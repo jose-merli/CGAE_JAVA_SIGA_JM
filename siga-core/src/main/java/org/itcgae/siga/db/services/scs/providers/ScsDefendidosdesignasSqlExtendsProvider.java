@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.AsuntosClaveJusticiableItem;
+import org.itcgae.siga.db.entities.ScsDesigna;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaSqlProvider;
 
 public class ScsDefendidosdesignasSqlExtendsProvider extends ScsDefendidosdesignaSqlProvider {
@@ -18,6 +19,20 @@ public class ScsDefendidosdesignasSqlExtendsProvider extends ScsDefendidosdesign
 		sql.WHERE("DEFENDIDOSDESIGNA.anio   = '" + asuntoClave.getAnio() + "'");
 		sql.WHERE("DEFENDIDOSDESIGNA.numero   = '" + asuntoClave.getNumero() + "'");
 		
+		return sql.toString();
+	}
+	
+	public String getIdInteresadoDesigna(ScsDesigna designa, Short idInstitucion ) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("DEFENDIDOSDESIGNA.idpersona");
+		sql.FROM("scs_defendidosdesigna DEFENDIDOSDESIGNA");
+		sql.LEFT_OUTER_JOIN("SCS_PERSONAJG PERSONA ON DEFENDIDOSDESIGNA.IDPERSONA = PERSONA.IDPERSONA  AND DEFENDIDOSDESIGNA.IDINSTITUCION = PERSONA.IDINSTITUCION");
+		sql.WHERE("DEFENDIDOSDESIGNA.idinstitucion = '" + idInstitucion + "'");
+
+		sql.WHERE("DEFENDIDOSDESIGNA.anio   = '" + designa.getAnio() + "'");
+		sql.WHERE("DEFENDIDOSDESIGNA.numero   = '" + designa.getNumero() + "'");
 		return sql.toString();
 	}
 

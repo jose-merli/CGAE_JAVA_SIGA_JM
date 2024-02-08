@@ -365,7 +365,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getEjgDesignas")
 	@Results({ @Result(column = "ANIODESIGNA", property = "anioDesigna", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMERODESIGNA", property = "numeroDesigna", jdbcType = JdbcType.NUMERIC),
-
+			@Result(column = "IDTURNO", property = "turnoDes", jdbcType = JdbcType.NUMERIC)
 	})
 	List<EjgItem>  getEjgDesignas(EjgItem item);
 

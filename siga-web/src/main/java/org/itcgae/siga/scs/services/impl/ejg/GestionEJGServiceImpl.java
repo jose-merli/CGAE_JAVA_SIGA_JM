@@ -1664,7 +1664,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					item.setTipoEJGColegio(datos.getTipoEJGColegio());
 					item.setIdTipoExpInsos(datos.getIdTipoExpInsos());
 					item.setEstadoEJG(datos.getEstadoEJG());
-
+					if(datos.getNombreApeSolicitante() != null) {
+						item.setNombreApeSolicitante(datos.getNombreApeSolicitante());
+					}
+					
 					list.add(item);
 
 					ejgdto.setEjgItems(list);
@@ -2026,6 +2029,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		if (item.getidInstitucion() != null) {
 			result.setIdinstitucion(Short.parseShort(item.getidInstitucion()));
+		}
+		
+		if (item.getIdPersonajg() != null) {
+			result.setIdpersonajg(Long.parseLong(item.getIdPersonajg()));
 		}
 
 		if (item.getFechaApertura() != null) {
@@ -5691,19 +5698,32 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 			}
 
+//		} catch (Exception e) {
+//			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
+//			LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg", e);
+//			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+//		} finally {
+//			if(fileStream != null) {
+//				try {
+//					fileStream.close();
+//				} catch (IOException e) {
+//					LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() --> se ha producido un error al generar el fichero", e);
+//				}
+//			}
+//        }
 		} catch (Exception e) {
 			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
-			LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg", e);
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.INTERNAL_SERVER_ERROR);
-		} finally {
-			if(fileStream != null) {
-				try {
-					fileStream.close();
-				} catch (IOException e) {
-					LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() --> se ha producido un error al generar el fichero", e);
-				}
+			LOGGER.error(
+					"GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg",
+					e);
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+					HttpStatus.INTERNAL_SERVER_ERROR);
+			try {
+				fileStream.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
 			}
-        }
+		}
 
 		LOGGER.warn("AGUERRA - SALE DEL SERVICIO");
 
@@ -5854,6 +5874,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andEjgnumeroEqualTo(record.getNumeroejg())
+						.andEjganioEqualTo(record.getAnioejg())
+						.andEjgidtipoejgEqualTo(record.getIdtipoejg())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+					if (!asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+						ScsAsistencia scsAsistencia = asis.get(0);
+						scsAsistencia.setFechamodificacion(new Date());
+						scsAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsAsistencia.setDesignaAnio(record.getAniodesigna());
+						scsAsistencia.setDesignaNumero(record.getNumerodesigna());
+						scsAsistencia.setDesignaTurno(record.getIdturno());
+						
+						scsAsistenciaMapper.updateByPrimaryKey(scsAsistencia);
+					}
+					
 
 				} catch (Exception e) {
 					LOGGER.debug("GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ", e);
@@ -5911,6 +5953,30 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					record.setNumero(Long.parseLong(datos.get(2)));
 					record.setAnio(Short.parseShort(datos.get(1)));
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andNumeroEqualTo(record.getNumero())
+						.andAnioEqualTo(record.getAnio())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					
+					EjgItem item = new EjgItem();
+					item.setidInstitucion(idInstitucion.toString());
+					item.setNumero(datos.get(5));
+					item.setTipoEJG(datos.get(3));
+					item.setAnnio(datos.get(4));
+					
+					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					List<EjgItem>ejgDesigna = scsEjgExtendsMapper.getEjgDesignas(item);
+					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+					if (!ejgDesigna.isEmpty() && !asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+						record.setDesignaAnio(ejgDesigna.get(0).getAnioDesigna());
+						record.setDesignaNumero(Long.valueOf(ejgDesigna.get(0).getNumeroDesigna()));
+						record.setDesignaTurno(Integer.valueOf(ejgDesigna.get(0).getTurnoDes()));
+					}
+					
 
 					response = scsAsistenciaMapper.updateByPrimaryKeySelective(record);
 

@@ -8350,10 +8350,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
 					if(asis.size() > 0) {
 						ScsAsistencia asistencia = asis.get(0);
-						asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
-						asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
-						asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
-						scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+						// solo se asocia si la asitencia no tiene ya asociado un EJG
+						if (asistencia.getEjgnumero() == null) {
+							asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
+							asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+							asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
+							scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+						}
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
@@ -9253,6 +9256,25 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setDesignaAnio(Short.parseShort(designaItem.get(0)));
 					record.setDesignaNumero(Long.parseLong(designaItem.get(2)));
 					record.setDesignaTurno(Integer.parseInt(designaItem.get(1)));
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andNumeroEqualTo(record.getNumero())
+						.andAnioEqualTo(record.getAnio())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					//obtenemos los datos completos para asignar a la asistencia el EJB de de Designa
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					List<RelacionesItem> rels = scsDesignacionesExtendsMapper.busquedaRelacionesEJG(designaItem.get(0), 
+							designaItem.get(2), designaItem.get(1), idInstitucion.toString());
+					// insertamos los datos del EJG solo si la asistencia no tiene datos de EJG
+					if(!asis.isEmpty() && asis.get(0).getEjgnumero() == null && !rels.isEmpty()) {
+						record.setEjganio(Short.valueOf(rels.get(0).getAnio()));
+						record.setEjgidtipoejg(Short.valueOf(rels.get(0).getIdtipo()));
+						record.setEjgnumero(Long.valueOf(rels.get(0).getNumero()));
+					}
+					
+
 					response = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");

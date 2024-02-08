@@ -20,4 +20,14 @@ public class CajgRespuestaEjgremesaExtendsProvider {
 		return sql.toString();
 	}
 	
+	public String deleteByEJGRemesa(Long idejgremesa) {
+
+		SQL sql = new SQL();
+ 
+		sql.DELETE_FROM("CAJG_RESPUESTA_EJGREMESA resp");
+		sql.WHERE("idejgremesa = "+ idejgremesa);
+	
+		return sql.toString();
+	}
+		
 }

@@ -611,6 +611,38 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 			@Result(column = "IDEXPEDIENTEEXT", property = "idExpedienteExt", jdbcType = JdbcType.VARCHAR)})
 	List<RelacionesItem> busquedaRelaciones(String designaAnio, String designaNumero, String designaTurno, String idInstitucion);
 	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaRelacionesEJG")
+	@Results({ @Result(column = "SJCS", property = "sjcs", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ANIO", property = "anio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDLETRADO", property = "idletrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNO", property = "idturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTURNODESIGNA", property = "idturnodesigna", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPO", property = "idtipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DESC_TURNO", property = "descturno", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DES_TIPO", property = "destipo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IMPUGNACION", property = "impugnacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPUGNACION", property = "fechaimpugnacion", jdbcType = JdbcType.DATE),
+			@Result(column = "DICTAMEN", property = "dictamen", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHADICTAMEN", property = "fechadictamen", jdbcType = JdbcType.DATE),
+			@Result(column = "RESOLUCION", property = "resolucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHARESOLUCION", property = "fecharesolucion", jdbcType = JdbcType.DATE),
+			@Result(column = "CENTRODETENCION", property = "centrodetencion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAASUNTO", property = "fechaasunto", jdbcType = JdbcType.DATE),
+			@Result(column = "DILNIGPROC", property = "dilnigproc", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOL", property = "nColLetrado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIF", property = "nifInteresado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDEXPEDIENTEEXT", property = "idExpedienteExt", jdbcType = JdbcType.VARCHAR)})
+	List<RelacionesItem> busquedaRelacionesEJG(String designaAnio, String designaNumero, String designaTurno, String idInstitucion);
+	
+	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "existeRelacionEJG")
+	@Results({@Result(column = "EXISTE", property = "existe", jdbcType = JdbcType.BOOLEAN)})
+	boolean existeRelacionEJG(String designaAnio, String designaNumero, String designaTurno, String idInstitucion, String anioejg, String numeroejg, String idtipoejg);
+	
 	
 	//Busca la resolución del ejg asociado a la asistencia que le indicamos
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "busquedaResolucionEjgAsistencia")

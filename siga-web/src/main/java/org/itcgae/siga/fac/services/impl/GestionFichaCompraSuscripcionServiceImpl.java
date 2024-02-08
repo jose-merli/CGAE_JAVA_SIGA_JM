@@ -374,7 +374,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				// Caso en el que el colegio no necesite aprobacion para realizar compras o
 				// suscripciones
 				// cuando se realiza una carga masiva, que la hacen NO LETRADOS, el estado pasa directamente a APROBADO 
-				if (aprobNecesaria.getValor().equals("N")  || letrado.equals("N")) {
+				if (!ficha.isNuevo() && (aprobNecesaria.getValor().equals("N")  || letrado.equals("N"))) {
 					solicitud.setIdestadopeticion((short) 20);
 				}
 				else {
@@ -402,13 +402,18 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 				LOGGER.info(
 						"solicitarCompra() / updateProductosPeticion() -> Salida de pysProductossolicitadosMapper para introducir los productos solicitados");
 
-				// Al no necesitar aprobación, se crea el registro de compra
-				// inmediatamente
-				if ((aprobNecesaria.getValor().equals("N") || letrado.equals("N")) && !fromAprobar) {
+				if (ficha.isNuevo()) {
 					ficha.setNuevo(false);
-					this.aprobarCompra(request, ficha);
+				} else {
+					// Al no necesitar aprobación, se crea el registro de compra
+					// inmediatamente
+					if ((aprobNecesaria.getValor().equals("N") || letrado.equals("N")) && !fromAprobar) {
+						//ficha.setNuevo(false);
+						this.aprobarCompra(request, ficha);
 
+					}
 				}
+				
 
 				insertResponseDTO.setStatus("200");
 				insertResponseDTO.setId(ficha.getnSolicitud());
@@ -738,7 +743,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 
 					PysPeticioncomprasuscripcion solicitud = pysPeticioncomprasuscripcionMapper
 							.selectByPrimaryKey(solicitudKey);
-
+					boolean firstAprobacion = false;
 					LOGGER.info(
 							"aprobarCompra() / pysPeticioncomprasuscripcionMapper.selectByPrimaryKey() -> Salida de pysPeticioncomprasuscripcionMapper para extraer la peticion asociada");
 
@@ -746,6 +751,7 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 						this.solicitarCompra(request, ficha, true);
 						solicitud = pysPeticioncomprasuscripcionMapper
 								.selectByPrimaryKey(solicitudKey);
+						firstAprobacion = true;
 					}
 					
 
@@ -801,9 +807,11 @@ public class GestionFichaCompraSuscripcionServiceImpl implements IGestionFichaCo
 								compra.setImporteunitario(new BigDecimal(0));
 							}
 							
-							response = pysCompraMapper.insert(compra);
-							if (response == 0)
-								throw new Exception("Error al insertar un registro de compra en la BBDD.");
+							if (!firstAprobacion) {
+								response = pysCompraMapper.insert(compra);	
+								if (response == 0)
+									throw new Exception("Error al insertar un registro de compra en la BBDD.");
+							}
 						}
 						
 					LOGGER.info(

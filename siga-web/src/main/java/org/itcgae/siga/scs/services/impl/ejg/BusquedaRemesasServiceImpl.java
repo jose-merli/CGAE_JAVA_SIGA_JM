@@ -896,6 +896,10 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 						LOGGER.debug("Borramos la relación entre el EJG y la remesa");
 
 						// Borramos la relación entre el ejg y la remesa
+						
+						//antes revisamos si hay registros en la tabla respuestas y si existe, lo borramos
+						cajgRespuestaEjgremesaExtendsMapper.deleteByEJGRemesa((long)ejg.getIdEjgRemesa());
+						
 
 						CajgEjgremesaExample ejgRemesaExample = new CajgEjgremesaExample();
 						ejgRemesaExample.createCriteria().andIdejgremesaEqualTo(Long.valueOf(ejg.getIdEjgRemesa()));
