@@ -1027,8 +1027,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	
 	private static String corregirFO(String foContent) throws Exception {
 	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	        dbf.setNamespaceAware(true);
 	        javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
 	        InputSource is = new InputSource(new StringReader(foContent));
