@@ -1229,8 +1229,6 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
     private String getXMLBusquedaAvanzada(String dniColegiado) throws ParserConfigurationException, TransformerException {
 
         TransformerFactory tf = TransformerFactory.newInstance();
-        tf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        tf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         Transformer transformer = tf.newTransformer();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -1815,8 +1813,6 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
      */
     private String createXMLDatosEspecificosFromSolicitud(CenSolicitudincorporacion solicitudincorporacion) throws TransformerException, ParserConfigurationException {
         TransformerFactory tf = TransformerFactory.newInstance();
-        tf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        tf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         Transformer transformer = tf.newTransformer();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
