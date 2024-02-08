@@ -63,6 +63,7 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -5084,6 +5085,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			IOUtils.closeQuietly(byteArrayOutputStream);
 
 		} catch (IOException e) {
+			LOGGER.error("getZipFileDocumentosEjg -> Error al generar el zip de los documentos. " + e.getMessage());
 			throw (new Exception("Error al generar el ZIP con la documentación en el EJG, contiene " + listadocumentoEjgItem.size() + " documentos.", e));
 		}
 
@@ -5647,7 +5649,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		HttpHeaders headers = new HttpHeaders();
 
 		LOGGER.warn("AGUERRA - COMIENZA EL SERVICIO");
-		LOGGER.warn("AGUERRA - PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0));
+		LOGGER.warn("AGUERRA - PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0).getNombreFichero());
 		try {
 
 			LOGGER.info("GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -5657,7 +5659,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			LOGGER.info("GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty() && !listadocumentoEjgItem.isEmpty()) {
-
 				if (listadocumentoEjgItem.size() == 1) {
 
 					GenFicheroExample genFicheroExampleP = new GenFicheroExample();
@@ -5673,6 +5674,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					path += "." + extension;
 					LOGGER.warn("AGUERRA - RUTA: " + path);
+					LOGGER.debug("descargarDocumentosEjg: RUTA FICHERO A DESCARGAR: " + path);
 
 					File file = new File(path);
 					fileStream = new FileInputStream(file);
