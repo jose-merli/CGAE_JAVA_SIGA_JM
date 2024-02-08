@@ -3054,6 +3054,10 @@ public class ConsultasServiceImpl implements IConsultasService {
 			}
 		}
 		
+		if(!nombreTablas.contains("CEN_CLIENTE")) {
+			nombreTablas.add("CEN_CLIENTE");
+		}
+		
 		// variable resultado
 	  	String consulta="SELECT ";
 	  	try{
