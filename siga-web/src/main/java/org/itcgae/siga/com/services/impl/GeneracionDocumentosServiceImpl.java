@@ -1068,8 +1068,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	        }
 
 	        TransformerFactory tf = TransformerFactory.newInstance();
-	        tf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-	        tf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 	        Transformer t = tf.newTransformer();
 	        StringWriter writer = new StringWriter();
 	        t.transform(new DOMSource(doc), new StreamResult(writer));
