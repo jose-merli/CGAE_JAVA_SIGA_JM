@@ -425,14 +425,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 										}
 
-										LOGGER.debug("Borramos la relación entre el EJG y la remesa");
-
-										// Borramos la relación entre el ejg y la remesa
-
-										CajgEjgremesaExample ejgRemesaExample = new CajgEjgremesaExample();
-										ejgRemesaExample.createCriteria()
-												.andIdejgremesaEqualTo(cajgEjgRemesa.getIdejgremesa());
-										response = cajgEjgremesaExtendsMapper.deleteByExample(ejgRemesaExample);
+										borrarRemesaYRespuesta(cajgEjgRemesa.getIdejgremesa());
 
 									}
 
@@ -893,17 +886,7 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 
 						}
 
-						LOGGER.debug("Borramos la relación entre el EJG y la remesa");
-
-						// Borramos la relación entre el ejg y la remesa
-						
-						//antes revisamos si hay registros en la tabla respuestas y si existe, lo borramos
-						cajgRespuestaEjgremesaExtendsMapper.deleteByEJGRemesa((long)ejg.getIdEjgRemesa());
-						
-
-						CajgEjgremesaExample ejgRemesaExample = new CajgEjgremesaExample();
-						ejgRemesaExample.createCriteria().andIdejgremesaEqualTo(Long.valueOf(ejg.getIdEjgRemesa()));
-						response = cajgEjgremesaExtendsMapper.deleteByExample(ejgRemesaExample);
+						borrarRemesaYRespuesta((long) ejg.getIdEjgRemesa());
 
 					}
 
@@ -934,6 +917,20 @@ public class BusquedaRemesasServiceImpl implements IBusquedaRemesas {
 		LOGGER.debug("getLabel() -> Salida del servicio para eliminar los expedientes");
 
 		return deleteResponseDTO;
+	}
+
+	private void borrarRemesaYRespuesta(long idEjgRemesa) {
+		LOGGER.debug("Borramos la relación entre el EJG y la remesa");
+
+		// Borramos la relación entre el ejg y la remesa
+		
+		//antes revisamos si hay registros en la tabla respuestas y si existe, lo borramos
+		cajgRespuestaEjgremesaExtendsMapper.deleteByEJGRemesa(idEjgRemesa);
+		
+
+		CajgEjgremesaExample ejgRemesaExample = new CajgEjgremesaExample();
+		ejgRemesaExample.createCriteria().andIdejgremesaEqualTo(idEjgRemesa);
+		cajgEjgremesaExtendsMapper.deleteByExample(ejgRemesaExample);
 	}
 
 	public GenParametros getTipoPCAJG(HttpServletRequest request) {
