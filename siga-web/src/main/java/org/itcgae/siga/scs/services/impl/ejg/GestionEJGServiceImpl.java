@@ -1723,7 +1723,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					example.createCriteria().andAnioejgEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
 
-					example.setOrderByClause(" NUMERODESIGNA DESC");
+					example.setOrderByClause(" aniodesigna DESC, NUMERODESIGNA DESC");
 
 					List<ScsEjgdesigna> ejgDesignas = scsEjgdesignaMapper.selectByExample(example);
 
