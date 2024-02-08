@@ -909,20 +909,21 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
     		scsAsistencia.setJuzgado(Long.parseLong(datosGenerales.getJuzgado()));
     		update = true;
     		
-    		// En caso de ser juzgado (Declaración judicial), el numero de asunto pasa a ser el numero de diligencia de la asistencia
+    		// En caso de ser juzgado (Declaración judicial), el numero de asunto pasa a ser el numero de procedimiento de la asistencia
         	if (datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
-        		scsAsistencia.setNumerodiligencia(datosGenerales.getNumAsunto());
+        		scsAsistencia.setNumeroprocedimiento(datosGenerales.getNumAsunto());
         		update = true;
         	}
+
     	}
     	
     	else if (datosGenerales.getComisaria() != null && !datosGenerales.getComisaria().isEmpty()) {
     		scsAsistencia.setComisaria(Long.parseLong(datosGenerales.getComisaria()));
     		update = true;
     		
-    		// En caso de ser comisaria (Declaración policial), el numero de asunto pasa a ser el numero de procedimiento de la asistencia
+    		// En caso de ser comisaria (Declaración policial), el numero de asunto pasa a ser el numero de diligencia de la asistencia
         	if (datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
-        		scsAsistencia.setNumeroprocedimiento(datosGenerales.getNumAsunto());
+        		scsAsistencia.setNumerodiligencia(datosGenerales.getNumAsunto());
         		update = true;
         	}
     	}
