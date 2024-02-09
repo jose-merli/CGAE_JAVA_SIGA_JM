@@ -574,8 +574,9 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			String strDate = dateFormatSql.format(dateFormatFront.parse(filtro.getaFechaDe().toString()).getTime());
 
 			// Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
-			sql.WHERE("(suscripcion.fechaSuscripcion is not null and " + "to_char(suscripcion.fechaSuscripcion) <= to_date('" + strDate + "','dd/MM/YYYY') and" + "(suscripcion.fechaBaja is null or to_char(suscripcion.fechaBaja) > to_date('" + strDate + "','dd/MM/YYYY')))");
+			sql.WHERE("(suscripcion.fechaSuscripcion is not null and " + "to_char(suscripcion.fechaSuscripcion) <= to_date('" + strDate + "','dd/MM/YYYY') and" + "(suscripcion.fechaBaja is null or to_char(suscripcion.fechaBaja) <= to_date('" + strDate + "','dd/MM/YYYY')))");
 		}
+		
 
 		// REVISAR: No se busca correctamente con alos anteriores al 2000
 		if (filtro.getFechaSolicitudDesde() != null) {
@@ -677,7 +678,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			String strDate = dateFormatSql.format(dateFormatFront.parse(aFechaDe.toString()).getTime());
 			// Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
 			// REVISAR
-			sql.WHERE("(suscripcion.fechaSuscripcion is not null and " + "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and" + "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+			sql.WHERE("(suscripcion.fechaSuscripcion is not null and " + "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY')) and" + "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 
 		sql.WHERE(" servSol.IDINSTITUCION = '" + idInstitucion + "'");
