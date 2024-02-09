@@ -678,7 +678,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 			String strDate = dateFormatSql.format(dateFormatFront.parse(aFechaDe.toString()).getTime());
 			// Deben estar en estado "Aceptada" o "Pendiente de anulacion" en esa fecha
 			// REVISAR
-			sql.WHERE("(suscripcion.fechaSuscripcion is not null and " + "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY')) and" + "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
+			sql.WHERE("(suscripcion.fechaSuscripcion is not null and " + "suscripcion.fechaSuscripcion <= to_date('" + strDate + "','dd/MM/YY') and" + "(suscripcion.fechaBaja is null or suscripcion.fechaBaja > to_date('" + strDate + "','dd/MM/YY')))");
 		}
 
 		sql.WHERE(" servSol.IDINSTITUCION = '" + idInstitucion + "'");
