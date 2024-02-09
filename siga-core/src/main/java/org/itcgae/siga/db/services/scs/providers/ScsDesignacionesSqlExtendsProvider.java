@@ -3857,7 +3857,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 	public String existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa) {
 
 		SQL sql = new SQL();			
-		sql.SELECT("LISTAGG(DISTINCT 'D' || d.ANIO || '/' || LPAD(d.CODIGO, 5, '0'), ', ') WITHIN GROUP (ORDER BY d.NUMERO) AS LISTA");
+		sql.SELECT("LISTAGG(DISTINCT 'D' || d.ANIO || '/' || LPAD(d.CODIGO, 5, '0'), ', ') WITHIN GROUP (ORDER BY d.ANIO DESC, d.CODIGO ASC) AS LISTA");
 		sql.FROM("SCS_DESIGNA d");
 		
 		if(designa.getIdJuzgado() != null) {
