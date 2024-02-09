@@ -906,11 +906,17 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
     	
     	// Determinamos si viene definido juzgado o comisaria (Solo puede llegar uno de los dos). 
     	if (datosGenerales.getJuzgado() != null && !datosGenerales.getJuzgado().isEmpty()) {
-    		scsAsistencia.setJuzgado(Long.parseLong(datosGenerales.getJuzgado()));
-    		update = true;
+    		
+    		// Si el juzgado no estaba relleno en la asistencia, se actualiza
+    		if (scsAsistencia.getJuzgado() == null){
+	    		scsAsistencia.setJuzgado(Long.parseLong(datosGenerales.getJuzgado()));
+	    		update = true;
+    		}
     		
     		// En caso de ser juzgado (Declaración judicial), el numero de asunto pasa a ser el numero de procedimiento de la asistencia
-        	if (datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
+    		// si este estaba vacio previamente
+    		// OJO, la comprobación del literal null es debido al valor por defecto que se le da a este campo, podra eliminarse si se elimina ese valor por defecto
+        	if ((scsAsistencia.getNumeroprocedimiento() == null || scsAsistencia.getNumeroprocedimiento().contains("null")) && datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
         		scsAsistencia.setNumeroprocedimiento(datosGenerales.getNumAsunto());
         		update = true;
         	}
@@ -918,11 +924,16 @@ public class ActuacionAsistenciaServiceImpl implements ActuacionAsistenciaServic
     	}
     	
     	else if (datosGenerales.getComisaria() != null && !datosGenerales.getComisaria().isEmpty()) {
-    		scsAsistencia.setComisaria(Long.parseLong(datosGenerales.getComisaria()));
-    		update = true;
-    		
+    		    		
+    		// Si la comisaria no estaba rellena en la asistencia, se actualiza
+    		if (scsAsistencia.getComisaria() == null){
+        		scsAsistencia.setComisaria(Long.parseLong(datosGenerales.getComisaria()));
+        		update = true;
+    		}
+   		
     		// En caso de ser comisaria (Declaración policial), el numero de asunto pasa a ser el numero de diligencia de la asistencia
-        	if (datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
+    		// si este estaba vacio previamente
+        	if (scsAsistencia.getNumerodiligencia() == null && datosGenerales.getNumAsunto() != null && !datosGenerales.getNumAsunto().isEmpty()) {
         		scsAsistencia.setNumerodiligencia(datosGenerales.getNumAsunto());
         		update = true;
         	}
