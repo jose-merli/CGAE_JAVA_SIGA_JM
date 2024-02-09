@@ -80,4 +80,7 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 	
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectConsultasDestinatarioByModelo")
 	List<ConsultaItem> selectConsultasDestinatarioByModelo(Short idInstitucion, Long idModeloComunicacion, Long idObjetivo, String idioma,String idModeloPlantilla);
+	
+	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectIdiomasPlantillasConsultas")
+	List<String> selectIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idInforme, Long idConsulta);
 }

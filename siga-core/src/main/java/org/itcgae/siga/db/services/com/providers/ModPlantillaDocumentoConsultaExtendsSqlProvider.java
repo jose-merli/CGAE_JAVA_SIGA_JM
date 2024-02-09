@@ -189,4 +189,24 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String selectIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idInforme,Long idConsulta) {
+		SQL sql = new SQL();
+		sql.SELECT("i.nombre");
+		sql.FROM("MOD_PLANTILLADOC_CONSULTA PDC");
+		sql.INNER_JOIN("mod_plantilladocumento p ON p.IDPLANTILLADOCUMENTO = pdc.IDPLANTILLADOCUMENTO");
+		sql.INNER_JOIN("EC_IDIOMA i ON i.IDIDIOMA = p.IDIOMA");
+		sql.INNER_JOIN("MOD_MODELO_PLANTILLADOCUMENTO mmp ON mmp.IDPLANTILLADOCUMENTO = pdc.IDPLANTILLADOCUMENTO");
+		sql.WHERE("PDC.IDCONSULTA="+idConsulta,
+				"PDC.IDMODELOCOMUNICACION="+idModeloComunicacion,
+				"PDC.IDINSTITUCION="+idInstitucion,
+				"mmp.IDINFORME="+idInforme);
+				
+		return sql.toString();
+	}
+	
+//	public static void main(String[] args) {
+//		System.out.println(new ModPlantillaDocumentoConsultaExtendsSqlProvider().selectIdiomasPlantillasConsultas(Short.valueOf("1"), 1L, 1L, 1L));
+//	}
+	
 }

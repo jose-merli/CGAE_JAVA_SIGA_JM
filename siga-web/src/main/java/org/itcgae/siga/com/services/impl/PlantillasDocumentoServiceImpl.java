@@ -159,11 +159,12 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							&& plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
 						plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
 					}
+					Short idInstitucion = Short.parseShort(plantillaDoc.getIdInstitucion());
+					Long idModeloComunicacion = Long.parseLong(plantillaDoc.getIdModeloComunicacion());
+					Long idInforme = Long.parseLong(plantillaDoc.getIdInforme());
 
 					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(
-							Short.parseShort(plantillaDoc.getIdInstitucion()),
-							Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-							Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), historico);
+							idInstitucion, idModeloComunicacion, idInforme, usuario.getIdlenguaje(), historico);
 					if (listaConsultaItem != null && listaConsultaItem.size() > 0) {
 						for (ConsultaItem consulta : listaConsultaItem) {
 
@@ -176,6 +177,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							if (consultaEntity != null) {
 								consulta.setSentencia(consultaEntity.getSentencia());
 							}
+							
+							obtenerIdiomasPlantillasConsultas(idInstitucion, idModeloComunicacion, idInforme, consulta);
 						}
 						respuesta.setConsultaItem(listaConsultaItem);
 					}
@@ -192,6 +195,12 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		LOGGER.info(
 				"obtenerConsultasPlantilla() -> Salida del servicio para obtener las consultas de una plantilla de documento");
 		return respuesta;
+	}
+
+	private void obtenerIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idInforme,
+			ConsultaItem consulta) {
+		List<String> idiomas = modPlantillaDocumentoConsultaExtendsMapper.selectIdiomasPlantillasConsultas(idInstitucion,idModeloComunicacion,idInforme,Long.valueOf(consulta.getIdConsulta()));
+		consulta.setIdiomasPlantillas(idiomas);		
 	}
 
 	@Override
