@@ -304,7 +304,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDesignacionesExtendsMapper scsDesignaMapper;
 
 	@Autowired
-	private ScsSaltoscompensacionesMapper scsSaltoscompensacionesMapper;
+	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesMapper;
 
 	@Autowired
 	private ScsTurnoMapper scsTurnoMapper;
@@ -4165,10 +4165,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					.get(idPersona);
 
 			if (bajasDePersona != null)
-				bajasDePersona.put(this.getFormatedDateShort("", fechaBT), bajasBean);
+				bajasDePersona.put(this.getFormatedDateShort(fechaBT), bajasBean);
 			else {
 				bajasDePersona = new TreeMap<String, BajasTemporalesItem>();
-				bajasDePersona.put(this.getFormatedDateShort("", fechaBT), bajasBean);
+				bajasDePersona.put(this.getFormatedDateShort(fechaBT), bajasBean);
 				mSalida.put(idPersona, bajasDePersona);
 			}
 		}
@@ -4176,8 +4176,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return mSalida;
 	}
 
-	private String getFormatedDateShort(String lang, Date date) throws java.lang.Exception {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	private String getFormatedDateShort( Date date) throws java.lang.Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String datFormat = null;
 
 		if (date.toString() != null && !date.toString().trim().equals("")) {
@@ -4189,12 +4189,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				Exception exc = new Exception("THIS DATE " + date + " IS BAD FORMATED");
 				// exc.setErrorCode("DATEFORMAT");
 				throw exc;
-			}
-
-			if (lang.equalsIgnoreCase("EN")) {
-				sdf.applyPattern("dd/MM/yyyy");
-			} else {
-				sdf.applyPattern("dd/MM/yyyy");
 			}
 		}
 		return datFormat;
@@ -4424,14 +4418,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info("Buscando compensaciones…");
 
 			Iterator<LetradoInscripcionItem> iterador = alCompensaciones.iterator();
-			while (iterador.hasNext()) {
+			while (iterador.hasNext() && letradoGuardia != null) {
 				auxLetradoSeleccionado = (LetradoInscripcionItem) iterador.next();
 				// vale
 				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null,
 						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario, simular)) {
 					letradoGuardia = auxLetradoSeleccionado;
 					LOGGER.info("Letrado encontrado. idPersona: " + letradoGuardia.getIdpersona());
-					break;
+					
 				}
 			}
 		}
@@ -4467,11 +4461,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			} while (letradoGuardia == null && fin != punteroLetrado.getValor());
 		}
-
-		if (letradoGuardia != null)
-			return letradoGuardia;
-		else
-			return null;
+		LOGGER.debug("getSiguienteLetradoTurno()-> letrado guardia: "+ letradoGuardia);
+		return letradoGuardia;
 	}
 
 	private boolean comprobarRestriccionesLetradoColaTurno(LetradoInscripcionItem letradoGuardia,
@@ -4557,21 +4548,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		boolean isLetradoBaja = false;
 		BajasTemporalesItem bajaTemporal;
 
-		LOGGER.info("Se comprueba que no tenga baja temporal");
+		LOGGER.info("Se comprueba que no tenga baja temporal.");
 
-		if (hmBajasTemporales == null)
+		if (hmBajasTemporales == null) {
 			return isLetradoBaja;
+		}
 
-		for (int j = 0; j < diasGuardia.size(); j++) {
+		for (int j = 0; j < diasGuardia.size() && !isLetradoBaja; j++) {
 			String fechaPeriodo = (String) diasGuardia.get(j);
 			if (hmBajasTemporales.containsKey(fechaPeriodo)) {
 				bajaTemporal = hmBajasTemporales.get(fechaPeriodo);
 				letradoGuardia.setBajaTemporal(bajaTemporal);
 				isLetradoBaja = true;
-				LOGGER.info("Se anota en el log Letrado" + letradoGuardia.getPersona().getNombre() + " "
-						+ letradoGuardia.getPersona().getApellidos1() + " "
-						+ letradoGuardia.getPersona().getApellidos2() + " saltado por baja temporal");
-				break;
+				LOGGER.info("Se anota en el log Letrado con id persona " + letradoGuardia.getIdpersona() + " saltado por baja temporal");
 			}
 		}
 
@@ -4618,7 +4607,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
 		scsSaltoscompensaciones.setMotivos(descripcion + ": " + motivo);
 		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
-
+		scsSaltoscompensaciones.setIdpersona(letradoGuardia.getIdpersona());
+		scsSaltoscompensaciones.setFecha(fechaBBDD);
+		scsSaltoscompensaciones.setFechamodificacion(fechaBBDD);
+		scsSaltoscompensaciones.setUsumodificacion(usuario.getIdusuario());
+		
+		// obtenermos id del salto 
+		SaltoCompGuardiaItem saltoItem = new SaltoCompGuardiaItem();
+		saltoItem.setIdTurno(idTurno);
+		MaxIdDto nuevoId = scsSaltoscompensacionesMapper.selectNuevoIdSaltosCompensaciones(saltoItem, idInstitucion);
+		scsSaltoscompensaciones.setIdsaltosturno(nuevoId.getIdMax());
+		
 		scsSaltoscompensacionesMapper.insert(scsSaltoscompensaciones);
 	}
 

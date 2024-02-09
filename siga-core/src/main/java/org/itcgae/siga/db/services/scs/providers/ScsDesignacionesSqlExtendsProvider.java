@@ -4300,6 +4300,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.FROM(" CEN_BAJASTEMPORALES BAJAS, SCS_INSCRIPCIONTURNO INS ");
 		sql.WHERE(" BAJAS.IDINSTITUCION = INS.IDINSTITUCION ");
 		sql.WHERE(" BAJAS.IDPERSONA = INS.IDPERSONA ");
+		sql.WHERE(" BAJAS.VALIDADO = 1 ");
 		sql.WHERE(" INS.IDINSTITUCION ='" + idInstitucion + "'");
 		sql.WHERE(" INS.IDTURNO ='" + idTurno + "'");
 		sql.WHERE(" BAJAS.FECHABT BETWEEN  TO_DATE('" + fecha
