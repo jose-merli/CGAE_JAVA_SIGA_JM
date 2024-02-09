@@ -57,7 +57,7 @@ public class ScsDestinatariosRetencionesSqlExtendsProvider extends FcsDestinatar
 	public String updateRetenciones(DestinatariosItem destinatariosItem, Short idInstitucion) {
 		SQL sql = new SQL();
 		sql.UPDATE("UPDATE FCS_DESTINATARIOS_RETENCIONES\r\n" + 
-				"SET cuentacontable = null where idinstitucion = 2005 and nombre ='a'");
+				"SET cuentacontable = null where idinstitucion = " + idInstitucion + " and nombre ='a'");
 		
 		return sql.toString();
 	}

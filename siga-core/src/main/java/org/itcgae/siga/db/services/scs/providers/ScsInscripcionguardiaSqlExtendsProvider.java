@@ -1658,12 +1658,12 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "	        scs_inscripcionguardia.idinstitucion " + "	    FROM " + "	        scs_inscripcionguardia "
 				+ "	        JOIN scs_guardiasturno ON scs_guardiasturno.idinstitucion = scs_inscripcionguardia.idinstitucion "
 				+ "	                                  AND scs_guardiasturno.idguardia = scs_inscripcionguardia.idguardia "
-				+ "	    WHERE " + "	        scs_guardiasturno.idinstitucion = '2005' "
-				+ "	        AND scs_inscripcionguardia.idpersona = '3500000039' " + "	), guardia_no_asignados ( "
+				+ "	    WHERE " + "	        scs_guardiasturno.idinstitucion = " + idInstitucion
+				+ "	        AND scs_inscripcionguardia.idpersona = " + inscripcion.getIdpersona() + "	), guardia_no_asignados ( "
 				+ "	    idguardia, " + "	    idinstitucion " + "	) AS ( " + "	    SELECT DISTINCT "
 				+ "	        scs_guardiasturno.idguardia, " + "	        scs_guardiasturno.idinstitucion "
 				+ "	    FROM " + "	        scs_guardiasturno " + "	    WHERE "
-				+ "	        scs_guardiasturno.idinstitucion = '2005' " + "	        AND idguardia NOT IN ( "
+				+ "	        scs_guardiasturno.idinstitucion = " + idInstitucion + "	        AND idguardia NOT IN ( "
 				+ "	            SELECT " + "	                idguardia " + "	            FROM "
 				+ "	                guardia_asignados " + "	        ) " + "	) ";
 
