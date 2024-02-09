@@ -1723,7 +1723,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					example.createCriteria().andAnioejgEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
 
-					example.setOrderByClause(" NUMERODESIGNA DESC");
+					example.setOrderByClause(" aniodesigna DESC, NUMERODESIGNA DESC");
 
 					List<ScsEjgdesigna> ejgDesignas = scsEjgdesignaMapper.selectByExample(example);
 
@@ -3873,6 +3873,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			if (response == 0)
 				throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
 
+		}else if(origen.equals("unidadFamiliar")) {
+			response++;
 		}
 
 		// 4. Se asignan los datos del EJG a la asistencia.
@@ -5048,6 +5050,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
 
 				GenFicheroExample genFicheroExampleP = new GenFicheroExample();
+				if (doc.getIdFichero() == null) {
+					throw new SigaExceptions("Error al descarga zip, el IdFichero es null para el documento" + doc.getNombreFichero());
+				}
 				genFicheroExampleP.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdficheroEqualTo(Long.valueOf(doc.getIdFichero()));
 				List<GenFichero> genFichero = genFicheroMapper.selectByExample(genFicheroExampleP);
 
@@ -5662,6 +5667,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				if (listadocumentoEjgItem.size() == 1) {
 
 					GenFicheroExample genFicheroExampleP = new GenFicheroExample();
+					if (listadocumentoEjgItem.get(0).getIdFichero() == null) {
+						throw new SigaExceptions("Error descarga documento el IdFichero es null para el documento" + listadocumentoEjgItem.get(0).getNombreFichero());
+					}
 					genFicheroExampleP.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdficheroEqualTo(Long.valueOf(listadocumentoEjgItem.get(0).getIdFichero()));
 					List<GenFichero> genFichero = genFicheroMapper.selectByExample(genFicheroExampleP);
 					String path = genFichero.get(0).getDirectorio();

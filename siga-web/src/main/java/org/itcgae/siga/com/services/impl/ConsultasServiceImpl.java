@@ -1052,8 +1052,6 @@ public class ConsultasServiceImpl implements IConsultasService {
 			exampleGruposCriterios.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(idConsulta);
 
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(new ByteArrayInputStream(
 					("<root>" + consulta + "</root>").getBytes(StandardCharsets.UTF_8)));
