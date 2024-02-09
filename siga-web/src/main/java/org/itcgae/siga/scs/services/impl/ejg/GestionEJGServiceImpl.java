@@ -3873,6 +3873,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			if (response == 0)
 				throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
 
+		}else if(origen.equals("unidadFamiliar")) {
+			response++;
 		}
 
 		// 4. Se asignan los datos del EJG a la asistencia.
