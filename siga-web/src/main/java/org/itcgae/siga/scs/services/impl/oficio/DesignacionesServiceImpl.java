@@ -5190,28 +5190,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getDatosAdicionales -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-//			GenParametrosExample genParametrosExample = new GenParametrosExample();
-//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-//			LOGGER.info(
-//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-//			LOGGER.info(
-//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			if (tamMax != null) {
-//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-//			} else {
-//				tamMaximo = null;
-//			}
-
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
 						"DesignacionesServiceImpl.getDatosAdicionales -> Entrada a servicio para la busqueda de datos adicionales de una designa");
 
 				try {
-					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa);
+					
+					// Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					Integer longitudDesigna;
+
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					}
+					
+					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa, longitudDesigna);
 					
 					if (designas == null) {
 						designas = "0";
