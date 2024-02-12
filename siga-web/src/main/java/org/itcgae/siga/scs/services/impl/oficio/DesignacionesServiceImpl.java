@@ -3608,14 +3608,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// Marcamos por defecto la partida presupuestaria del turno
-					ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
-					scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdturnoEqualTo(designa.getIdturno());
+					ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+					scsTurnoKey.setIdinstitucion(idInstitucion);
+					scsTurnoKey.setIdturno(designa.getIdturno());
 
-					List<ScsTurno> listaTurnos = scsTurnoMapper.selectByExample(scsTurnoExample);
+					ScsTurno turno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+					
 
-					if (!listaTurnos.isEmpty() && null != listaTurnos.get(0).getIdpartidapresupuestaria()) {
-						designa.setIdpartidapresupuestaria(listaTurnos.get(0).getIdpartidapresupuestaria());
+					if ( null != turno.getIdpartidapresupuestaria()) {
+						designa.setIdpartidapresupuestaria(turno.getIdpartidapresupuestaria());
 					}
 
 					LOGGER.info(
