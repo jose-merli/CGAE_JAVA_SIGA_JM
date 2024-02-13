@@ -1052,8 +1052,6 @@ public class ConsultasServiceImpl implements IConsultasService {
 			exampleGruposCriterios.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(idConsulta);
 
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(new ByteArrayInputStream(
 					("<root>" + consulta + "</root>").getBytes(StandardCharsets.UTF_8)));
@@ -3052,6 +3050,10 @@ public class ConsultasServiceImpl implements IConsultasService {
 					nombreTablas.add(constructorDeConsultasList.get(i).getDescripciontabla());
 				}
 			}
+		}
+		
+		if(!nombreTablas.contains("CEN_CLIENTE")) {
+			nombreTablas.add("CEN_CLIENTE");
 		}
 		
 		// variable resultado

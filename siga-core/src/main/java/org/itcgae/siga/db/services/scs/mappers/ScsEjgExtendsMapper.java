@@ -176,7 +176,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB),
 			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idexpedienteext", property = "idExpedienteExt", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "idexpedienteext", property = "idExpedienteExt", jdbcType = JdbcType.INTEGER)})
 	List<EjgItem> datosEJG(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "datosEJGJustificacionExpres")
@@ -244,7 +244,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 			@Result(column = "observacionesDictamen", property = "dictamen", jdbcType = JdbcType.CLOB),
 			@Result(column = "identificadords", property = "identificadords", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "observaciones", property = "observaciones", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "idexpedienteext", property = "idExpedienteExt", jdbcType = JdbcType.VARCHAR)})
+			@Result(column = "idexpedienteext", property = "idExpedienteExt", jdbcType = JdbcType.INTEGER)})
 	List<EjgItem> datosEJGJustificacionExpres(EjgItem ejgItem, String idInstitucion, String idLenguaje);
 
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getDictamen")
@@ -365,7 +365,7 @@ public interface ScsEjgExtendsMapper extends ScsEjgMapper {
 	@SelectProvider(type = ScsEjgSqlExtendsProvider.class, method = "getEjgDesignas")
 	@Results({ @Result(column = "ANIODESIGNA", property = "anioDesigna", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMERODESIGNA", property = "numeroDesigna", jdbcType = JdbcType.NUMERIC),
-
+			@Result(column = "IDTURNO", property = "turnoDes", jdbcType = JdbcType.NUMERIC)
 	})
 	List<EjgItem>  getEjgDesignas(EjgItem item);
 

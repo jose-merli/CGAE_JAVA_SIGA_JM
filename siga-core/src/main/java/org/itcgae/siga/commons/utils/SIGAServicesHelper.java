@@ -145,7 +145,13 @@ public class SIGAServicesHelper {
 				LOGGER.info("descargarFicheros() -> Saliendo servicio para recuperar un único archivo");
 			} else {
 				LOGGER.info("descargarFicheros() -> Entrada al servicio para recuperar varios archivos");
-
+				
+				for (File fichero: listaFicheros) {
+					if(!fichero.exists()) {
+						throw new BusinessException("messages.general.error.ficheroNoExiste");
+					}
+				}
+				
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(zipContentType);
 				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);

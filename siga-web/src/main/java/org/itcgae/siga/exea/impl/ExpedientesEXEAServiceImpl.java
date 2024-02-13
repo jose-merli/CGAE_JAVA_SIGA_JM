@@ -1163,9 +1163,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                 && !expediente.getDocumentosFisicos().isNil()){
 
         	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            DocumentBuilder builder = dbf.newDocumentBuilder();
+        	DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.parse(new InputSource(new StringReader(expediente.getDocumentosFisicos().xmlText())));
             NodeList docFisicos = doc.getElementsByTagName("ser:documentosFisicos");
             for (int i = 0; i < docFisicos.getLength(); i++) {
@@ -1194,9 +1192,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
                 && !expediente.getDocumentosElectronicos().isNil()){
 
         	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            DocumentBuilder builder = dbf.newDocumentBuilder();
+        	DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.parse(new InputSource(new StringReader(expediente.getDocumentosFisicos().xmlText())));
             NodeList docFisicos = doc.getElementsByTagName("ser:documentosElectronicos");
             for (int i = 0; i < docFisicos.getLength(); i++) {
@@ -1231,8 +1227,6 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        docFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
         // root elements
@@ -1289,9 +1283,7 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
             LOGGER.info("getExpedienteItemFromXML() / String del XML con los expedientes: " + xmlExpedientes);
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        	dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-	        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+        	DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
             Document doc = documentBuilder.parse(new InputSource(new StringReader(xmlExpedientes)));
 
             NodeList nodes = doc.getElementsByTagName("item");
@@ -1815,8 +1807,6 @@ public class ExpedientesEXEAServiceImpl implements ExpedientesEXEAService {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        docFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
         // root elements

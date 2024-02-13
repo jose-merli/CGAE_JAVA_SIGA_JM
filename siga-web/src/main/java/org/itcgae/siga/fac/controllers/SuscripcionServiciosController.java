@@ -36,8 +36,12 @@ public class SuscripcionServiciosController {
 //		peticion.setIdEstadoSolicitud(idEstadoSolicitud);
 //		peticion.setIdEstadoFactura(idEstadoFactura);
 		ListaSuscripcionesDTO listaCompras = suscripcionServiciosService.getListaSuscripciones(request, peticion);
-		if(listaCompras.getError().getCode()==200)return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.OK);
-		else return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.INTERNAL_SERVER_ERROR);
+		if(listaCompras.getError().getCode()==200) {
+			return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<ListaSuscripcionesDTO>(listaCompras, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@PostMapping(value = "/pys/actualizacionColaSuscripcionesPersona")

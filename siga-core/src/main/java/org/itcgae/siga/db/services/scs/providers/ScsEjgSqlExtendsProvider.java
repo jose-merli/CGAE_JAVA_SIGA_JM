@@ -3422,6 +3422,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		
 		sql.SELECT("aniodesigna");
 		sql.SELECT("numerodesigna");
+		sql.SELECT("idturno");
 		sql.FROM("scs_ejgdesigna");
 		sql.WHERE("idinstitucion = " + ejgItem.getidInstitucion());
 		sql.WHERE("anioejg = " + ejgItem.getAnnio());

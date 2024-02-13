@@ -196,8 +196,8 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         sql2.SELECT("cabguar.IDTURNO");
         sql2.FROM("SCS_CABECERAGUARDIAS cabguar");
         sql2.WHERE("(cabguar.FECHAINICIO >= SYSDATE\r\n"
-        		+ "			AND cabguar.IDINSTITUCION = 2005)\r\n"
-        		+ "	AND turno.IDINSTITUCION = 2005");
+        		+ "			AND cabguar.IDINSTITUCION = " + idinstitucion +")"
+        		+ "	AND turno.IDINSTITUCION = " + idinstitucion );
         
     	sql.SELECT("UNIQUE turno.IDTURNO,"
                 + "CONCAT(CONCAT(turno.NOMBRE,' / '),sg.nombre) AS NOMBRE");

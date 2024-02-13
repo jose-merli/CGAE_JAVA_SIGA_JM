@@ -199,6 +199,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	@Autowired
 	private GuardiasServiceImpl guardiasServiceImpl;
 
+	@Autowired
+	private ScsEjgdesignaMapper scsEjgdesignaMapper;
+
 	@Override
 	public ComboDTO getTurnosByColegiadoFecha(HttpServletRequest request, String guardiaDia, String idPersona) {
 		String token = request.getHeader("Authorization");
@@ -4229,6 +4232,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						if ("S".equals(copiarDatos)) { // Pasamos los datos de la asistencia a la designa
 							affectedRows += updateDesignaConAsistencia(scsAsistencia, designaItem, usuarios, idInstitucion);
 						}
+						
+						asociarDesignaAEjb(scsAsistencia, listaDes.get(0), usuarios.get(0).getIdusuario());
 					}
 
 					if (affectedRows > 0) {
@@ -4388,6 +4393,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						error.setDescription("No se actualizo ningun registro");
 						updateResponseDTO.setError(error);
 					}
+					
+					asociarEjbADesigna(scsAsistencia, ejg2, usuarios.get(0).getIdusuario());
 
 				}
 			}
@@ -6873,6 +6880,82 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		LOGGER.info("BusquedaAsuntosServiceImpl.copyAsis2Ejg() -> Saliendo del servicio... ");
 
 		return response;
+	}
+	
+	private void asociarDesignaAEjb(ScsAsistencia asistencia, ScsDesigna designa, Integer idUsuario) {
+		try {
+			if (asistencia != null && asistencia.getDesignaNumero() != null &&  designa!= null) {
+				// obtenemos el EJG de la asistencia
+				ScsEjgExample scsEjgExample = new ScsEjgExample();
+				scsEjgExample.createCriteria().andIdinstitucionEqualTo(asistencia.getIdinstitucion())
+					.andAnioEqualTo(asistencia.getEjganio())
+					.andNumeroEqualTo(asistencia.getEjgnumero())
+					.andIdtipoejgEqualTo(asistencia.getEjgidtipoejg());
+				
+				List<ScsEjg> listEjg= scsEjgMapper.selectByExample(scsEjgExample);
+		
+				
+				if (!listEjg.isEmpty()) {
+					ScsEjg ejg = listEjg.get(0);
+					// Asociar designa y EJG
+					asociarEjbYDesigna(ejg, designa, idUsuario);		
+				}
+
+		
+			}
+		
+		}catch (Exception e) {
+			LOGGER.error("AsistenciaServiceImpl.asociarDesignaAEjb(): No se ha podido establecer asociacion Asistencia, designa y EJG", e);
+		}
+	}
+	
+	private void asociarEjbADesigna(ScsAsistencia asistencia, ScsEjg ejg, Integer idUsuario) {
+		try {
+		
+			if (asistencia != null && asistencia.getDesignaNumero() != null &&  ejg!= null) {
+				// obtenemos el designa de la asistencia
+				ScsDesignaExample exampleDesigna = new ScsDesignaExample();
+				exampleDesigna.createCriteria()
+					.andAnioEqualTo(asistencia.getDesignaAnio())
+					.andNumeroEqualTo(asistencia.getDesignaNumero())
+					.andIdturnoEqualTo(asistencia.getDesignaTurno());
+		
+				List<ScsDesigna> listaDes = scsDesignacionesExtendsMapper.selectByExample(exampleDesigna);
+				
+				if (!listaDes.isEmpty()) {
+					ScsDesigna designa = listaDes.get(0);
+					// Asociar designa y EJG
+					asociarEjbYDesigna(ejg, designa, idUsuario);		
+				}
+	
+			}
+		}catch (Exception e) {
+			LOGGER.error("AsistenciaServiceImpl.asociarEjbADesigna(): No se ha podido establecer asociacion: Asistencia, designa y EJG", e);
+		}
+		
+	}
+	
+	private void asociarEjbYDesigna(ScsEjg ejg, ScsDesigna designa, Integer idUsuario) {
+		boolean existeEjb = scsDesignacionesExtendsMapper.existeRelacionEJG(designa.getAnio().toString(), 
+				designa.getNumero().toString(),designa.getIdturno().toString(), designa.getIdinstitucion().toString(), 
+				ejg.getAnio().toString(), ejg.getNumero().toString(), ejg.getIdtipoejg().toString());
+		// si ya existe el registro no lo insertamos
+		if (!existeEjb) {
+			
+			ScsEjgdesigna record = new ScsEjgdesigna();
+
+			record.setFechamodificacion(new Date());
+			record.setUsumodificacion(idUsuario);
+			record.setAnioejg(ejg.getAnio());
+			record.setIdtipoejg(ejg.getIdtipoejg());
+			record.setNumeroejg(ejg.getNumero());
+			record.setIdinstitucion(designa.getIdinstitucion());
+			record.setIdturno(designa.getIdturno());
+			record.setAniodesigna(designa.getAnio());
+			record.setNumerodesigna(designa.getNumero());
+
+			scsEjgdesignaMapper.insert(record);
+		}	
 	}
 
 }

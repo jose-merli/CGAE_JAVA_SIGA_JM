@@ -304,7 +304,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	private ScsDesignacionesExtendsMapper scsDesignaMapper;
 
 	@Autowired
-	private ScsSaltoscompensacionesMapper scsSaltoscompensacionesMapper;
+	private ScsSaltoscompensacionesExtendsMapper scsSaltoscompensacionesMapper;
 
 	@Autowired
 	private ScsTurnoMapper scsTurnoMapper;
@@ -3608,14 +3608,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// Marcamos por defecto la partida presupuestaria del turno
-					ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
-					scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdturnoEqualTo(designa.getIdturno());
+					ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+					scsTurnoKey.setIdinstitucion(idInstitucion);
+					scsTurnoKey.setIdturno(designa.getIdturno());
 
-					List<ScsTurno> listaTurnos = scsTurnoMapper.selectByExample(scsTurnoExample);
+					ScsTurno turno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+					
 
-					if (!listaTurnos.isEmpty() && null != listaTurnos.get(0).getIdpartidapresupuestaria()) {
-						designa.setIdpartidapresupuestaria(listaTurnos.get(0).getIdpartidapresupuestaria());
+					if ( null != turno.getIdpartidapresupuestaria()) {
+						designa.setIdpartidapresupuestaria(turno.getIdpartidapresupuestaria());
 					}
 
 					LOGGER.info(
@@ -4165,10 +4166,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					.get(idPersona);
 
 			if (bajasDePersona != null)
-				bajasDePersona.put(this.getFormatedDateShort("", fechaBT), bajasBean);
+				bajasDePersona.put(this.getFormatedDateShort(fechaBT), bajasBean);
 			else {
 				bajasDePersona = new TreeMap<String, BajasTemporalesItem>();
-				bajasDePersona.put(this.getFormatedDateShort("", fechaBT), bajasBean);
+				bajasDePersona.put(this.getFormatedDateShort(fechaBT), bajasBean);
 				mSalida.put(idPersona, bajasDePersona);
 			}
 		}
@@ -4176,8 +4177,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		return mSalida;
 	}
 
-	private String getFormatedDateShort(String lang, Date date) throws java.lang.Exception {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	private String getFormatedDateShort( Date date) throws java.lang.Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String datFormat = null;
 
 		if (date.toString() != null && !date.toString().trim().equals("")) {
@@ -4189,12 +4190,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				Exception exc = new Exception("THIS DATE " + date + " IS BAD FORMATED");
 				// exc.setErrorCode("DATEFORMAT");
 				throw exc;
-			}
-
-			if (lang.equalsIgnoreCase("EN")) {
-				sdf.applyPattern("dd/MM/yyyy");
-			} else {
-				sdf.applyPattern("dd/MM/yyyy");
 			}
 		}
 		return datFormat;
@@ -4424,14 +4419,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info("Buscando compensaciones…");
 
 			Iterator<LetradoInscripcionItem> iterador = alCompensaciones.iterator();
-			while (iterador.hasNext()) {
+			while (iterador.hasNext() && letradoGuardia != null) {
 				auxLetradoSeleccionado = (LetradoInscripcionItem) iterador.next();
 				// vale
 				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null,
 						hmBajasTemporales, idInstitucion, idTurno, idGuardia, idCalendarioGuardias, usuario, simular)) {
 					letradoGuardia = auxLetradoSeleccionado;
 					LOGGER.info("Letrado encontrado. idPersona: " + letradoGuardia.getIdpersona());
-					break;
+					
 				}
 			}
 		}
@@ -4467,11 +4462,8 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			} while (letradoGuardia == null && fin != punteroLetrado.getValor());
 		}
-
-		if (letradoGuardia != null)
-			return letradoGuardia;
-		else
-			return null;
+		LOGGER.debug("getSiguienteLetradoTurno()-> letrado guardia: "+ letradoGuardia);
+		return letradoGuardia;
 	}
 
 	private boolean comprobarRestriccionesLetradoColaTurno(LetradoInscripcionItem letradoGuardia,
@@ -4557,21 +4549,19 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		boolean isLetradoBaja = false;
 		BajasTemporalesItem bajaTemporal;
 
-		LOGGER.info("Se comprueba que no tenga baja temporal");
+		LOGGER.info("Se comprueba que no tenga baja temporal.");
 
-		if (hmBajasTemporales == null)
+		if (hmBajasTemporales == null) {
 			return isLetradoBaja;
+		}
 
-		for (int j = 0; j < diasGuardia.size(); j++) {
+		for (int j = 0; j < diasGuardia.size() && !isLetradoBaja; j++) {
 			String fechaPeriodo = (String) diasGuardia.get(j);
 			if (hmBajasTemporales.containsKey(fechaPeriodo)) {
 				bajaTemporal = hmBajasTemporales.get(fechaPeriodo);
 				letradoGuardia.setBajaTemporal(bajaTemporal);
 				isLetradoBaja = true;
-				LOGGER.info("Se anota en el log Letrado" + letradoGuardia.getPersona().getNombre() + " "
-						+ letradoGuardia.getPersona().getApellidos1() + " "
-						+ letradoGuardia.getPersona().getApellidos2() + " saltado por baja temporal");
-				break;
+				LOGGER.info("Se anota en el log Letrado con id persona " + letradoGuardia.getIdpersona() + " saltado por baja temporal");
 			}
 		}
 
@@ -4618,7 +4608,17 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		scsSaltoscompensaciones.setIdcalendarioguardias(idCalendarioGuardiasInt);
 		scsSaltoscompensaciones.setMotivos(descripcion + ": " + motivo);
 		scsSaltoscompensaciones.setSaltoocompensacion(saltoOCompensacion);
-
+		scsSaltoscompensaciones.setIdpersona(letradoGuardia.getIdpersona());
+		scsSaltoscompensaciones.setFecha(fechaBBDD);
+		scsSaltoscompensaciones.setFechamodificacion(fechaBBDD);
+		scsSaltoscompensaciones.setUsumodificacion(usuario.getIdusuario());
+		
+		// obtenermos id del salto 
+		SaltoCompGuardiaItem saltoItem = new SaltoCompGuardiaItem();
+		saltoItem.setIdTurno(idTurno);
+		MaxIdDto nuevoId = scsSaltoscompensacionesMapper.selectNuevoIdSaltosCompensaciones(saltoItem, idInstitucion);
+		scsSaltoscompensaciones.setIdsaltosturno(nuevoId.getIdMax());
+		
 		scsSaltoscompensacionesMapper.insert(scsSaltoscompensaciones);
 	}
 
@@ -5190,28 +5190,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getDatosAdicionales -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-//			GenParametrosExample genParametrosExample = new GenParametrosExample();
-//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-//			LOGGER.info(
-//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-//			LOGGER.info(
-//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			if (tamMax != null) {
-//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-//			} else {
-//				tamMaximo = null;
-//			}
-
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
 						"DesignacionesServiceImpl.getDatosAdicionales -> Entrada a servicio para la busqueda de datos adicionales de una designa");
 
 				try {
-					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa);
+					
+					// Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					Integer longitudDesigna;
+
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					}
+					
+					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa, longitudDesigna);
 					
 					if (designas == null) {
 						designas = "0";
@@ -8350,10 +8349,13 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
 					if(asis.size() > 0) {
 						ScsAsistencia asistencia = asis.get(0);
-						asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
-						asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
-						asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
-						scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+						// solo se asocia si la asitencia no tiene ya asociado un EJG
+						if (asistencia.getEjgnumero() == null) {
+							asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
+							asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+							asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
+							scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+						}
 					}
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
@@ -9253,6 +9255,25 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setDesignaAnio(Short.parseShort(designaItem.get(0)));
 					record.setDesignaNumero(Long.parseLong(designaItem.get(2)));
 					record.setDesignaTurno(Integer.parseInt(designaItem.get(1)));
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andNumeroEqualTo(record.getNumero())
+						.andAnioEqualTo(record.getAnio())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					//obtenemos los datos completos para asignar a la asistencia el EJB de de Designa
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					List<RelacionesItem> rels = scsDesignacionesExtendsMapper.busquedaRelacionesEJG(designaItem.get(0), 
+							designaItem.get(2), designaItem.get(1), idInstitucion.toString());
+					// insertamos los datos del EJG solo si la asistencia no tiene datos de EJG
+					if(!asis.isEmpty() && asis.get(0).getEjgnumero() == null && !rels.isEmpty()) {
+						record.setEjganio(Short.valueOf(rels.get(0).getAnio()));
+						record.setEjgidtipoejg(Short.valueOf(rels.get(0).getIdtipo()));
+						record.setEjgnumero(Long.valueOf(rels.get(0).getNumero()));
+					}
+					
+
 					response = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(record);
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");

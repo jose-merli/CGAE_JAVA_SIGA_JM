@@ -63,6 +63,7 @@ import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.cen.services.impl.FicherosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -1664,7 +1665,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					item.setTipoEJGColegio(datos.getTipoEJGColegio());
 					item.setIdTipoExpInsos(datos.getIdTipoExpInsos());
 					item.setEstadoEJG(datos.getEstadoEJG());
-
+					if(datos.getNombreApeSolicitante() != null) {
+						item.setNombreApeSolicitante(datos.getNombreApeSolicitante());
+					}
+					
 					list.add(item);
 
 					ejgdto.setEjgItems(list);
@@ -1719,7 +1723,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					example.createCriteria().andAnioejgEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroejgEqualTo(Long.parseLong(datos.getNumero()));
 
-					example.setOrderByClause(" NUMERODESIGNA DESC");
+					example.setOrderByClause(" aniodesigna DESC, NUMERODESIGNA DESC");
 
 					List<ScsEjgdesigna> ejgDesignas = scsEjgdesignaMapper.selectByExample(example);
 
@@ -2026,6 +2030,10 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		if (item.getidInstitucion() != null) {
 			result.setIdinstitucion(Short.parseShort(item.getidInstitucion()));
+		}
+		
+		if (item.getIdPersonajg() != null) {
+			result.setIdpersonajg(Long.parseLong(item.getIdPersonajg()));
 		}
 
 		if (item.getFechaApertura() != null) {
@@ -3865,6 +3873,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			if (response == 0)
 				throw (new Exception("Error en copyEjg2Asis() al copiar los datos del EJG a la asistencia."));
 
+		}else if(origen.equals("unidadFamiliar")) {
+			response++;
 		}
 
 		// 4. Se asignan los datos del EJG a la asistencia.
@@ -5040,6 +5050,9 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// path += File.separator + idInstitucion + "_" + doc.getIdFichero() + extension;
 
 				GenFicheroExample genFicheroExampleP = new GenFicheroExample();
+				if (doc.getIdFichero() == null) {
+					throw new SigaExceptions("Error al descarga zip, el IdFichero es null para el documento" + doc.getNombreFichero());
+				}
 				genFicheroExampleP.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdficheroEqualTo(Long.valueOf(doc.getIdFichero()));
 				List<GenFichero> genFichero = genFicheroMapper.selectByExample(genFicheroExampleP);
 
@@ -5077,6 +5090,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			IOUtils.closeQuietly(byteArrayOutputStream);
 
 		} catch (IOException e) {
+			LOGGER.error("getZipFileDocumentosEjg -> Error al generar el zip de los documentos. " + e.getMessage());
 			throw (new Exception("Error al generar el ZIP con la documentación en el EJG, contiene " + listadocumentoEjgItem.size() + " documentos.", e));
 		}
 
@@ -5640,7 +5654,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		HttpHeaders headers = new HttpHeaders();
 
 		LOGGER.warn("AGUERRA - COMIENZA EL SERVICIO");
-		LOGGER.warn("AGUERRA - PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0));
+		LOGGER.warn("AGUERRA - PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0).getNombreFichero());
 		try {
 
 			LOGGER.info("GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -5650,10 +5664,12 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			LOGGER.info("GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && !usuarios.isEmpty() && !listadocumentoEjgItem.isEmpty()) {
-
 				if (listadocumentoEjgItem.size() == 1) {
 
 					GenFicheroExample genFicheroExampleP = new GenFicheroExample();
+					if (listadocumentoEjgItem.get(0).getIdFichero() == null) {
+						throw new SigaExceptions("Error descarga documento el IdFichero es null para el documento" + listadocumentoEjgItem.get(0).getNombreFichero());
+					}
 					genFicheroExampleP.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdficheroEqualTo(Long.valueOf(listadocumentoEjgItem.get(0).getIdFichero()));
 					List<GenFichero> genFichero = genFicheroMapper.selectByExample(genFicheroExampleP);
 					String path = genFichero.get(0).getDirectorio();
@@ -5666,6 +5682,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					path += "." + extension;
 					LOGGER.warn("AGUERRA - RUTA: " + path);
+					LOGGER.debug("descargarDocumentosEjg: RUTA FICHERO A DESCARGAR: " + path);
 
 					File file = new File(path);
 					fileStream = new FileInputStream(file);
@@ -5691,6 +5708,19 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 			}
 
+//		} catch (Exception e) {
+//			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
+//			LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg", e);
+//			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.INTERNAL_SERVER_ERROR);
+//		} finally {
+//			if(fileStream != null) {
+//				try {
+//					fileStream.close();
+//				} catch (IOException e) {
+//					LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() --> se ha producido un error al generar el fichero", e);
+//				}
+//			}
+//        }
 		} catch (Exception e) {
 			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
 			LOGGER.error(
@@ -5854,6 +5884,28 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andEjgnumeroEqualTo(record.getNumeroejg())
+						.andEjganioEqualTo(record.getAnioejg())
+						.andEjgidtipoejgEqualTo(record.getIdtipoejg())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+					if (!asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+						ScsAsistencia scsAsistencia = asis.get(0);
+						scsAsistencia.setFechamodificacion(new Date());
+						scsAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						scsAsistencia.setDesignaAnio(record.getAniodesigna());
+						scsAsistencia.setDesignaNumero(record.getNumerodesigna());
+						scsAsistencia.setDesignaTurno(record.getIdturno());
+						
+						scsAsistenciaMapper.updateByPrimaryKey(scsAsistencia);
+					}
+					
 
 				} catch (Exception e) {
 					LOGGER.debug("GestionEJGServiceImpl.asociarDesignacion() -> Se ha producido un error al actualizar el estado y la fecha de los ejgs. ", e);
@@ -5911,6 +5963,30 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					record.setNumero(Long.parseLong(datos.get(2)));
 					record.setAnio(Short.parseShort(datos.get(1)));
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria()
+						.andNumeroEqualTo(record.getNumero())
+						.andAnioEqualTo(record.getAnio())
+						.andIdinstitucionEqualTo(idInstitucion);
+					
+					
+					EjgItem item = new EjgItem();
+					item.setidInstitucion(idInstitucion.toString());
+					item.setNumero(datos.get(5));
+					item.setTipoEJG(datos.get(3));
+					item.setAnnio(datos.get(4));
+					
+					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					List<EjgItem>ejgDesigna = scsEjgExtendsMapper.getEjgDesignas(item);
+					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+					if (!ejgDesigna.isEmpty() && !asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+						record.setDesignaAnio(ejgDesigna.get(0).getAnioDesigna());
+						record.setDesignaNumero(Long.valueOf(ejgDesigna.get(0).getNumeroDesigna()));
+						record.setDesignaTurno(Integer.valueOf(ejgDesigna.get(0).getTurnoDes()));
+					}
+					
 
 					response = scsAsistenciaMapper.updateByPrimaryKeySelective(record);
 
