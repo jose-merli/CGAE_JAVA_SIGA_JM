@@ -8230,6 +8230,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int response = 0;
+		List<RelacionesItem> relacionesItem = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -8280,6 +8281,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 						}
 					}
+					
 
 					// EJG a asociar
 					EjgItem ejg = new EjgItem();
@@ -8287,7 +8289,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ejg.setAnnio(item.get(1));
 					ejg.setTipoEJG(item.get(2));
 					ejg.setNumero(item.get(5));
-
+					ejg.setidInstitucion(idInstitucion.toString());;
+					
+					
 					// Objeto que vamos a insertar en la base de datos
 					ScsEjgdesigna record = new ScsEjgdesigna();
 
@@ -8299,6 +8303,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setNumeroejg(Long.parseLong(ejg.getNumero()));
 					record.setIdturno(designaItem.getIdTurno());
 					record.setAniodesigna((short) designaItem.getAno());
+					
 					// record.setNumerodesigna((long) designaItem.getNumero());
 
 					// Debido a que no podemos obtener el numero de la designacion sino su codigo,
@@ -8340,6 +8345,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setNumerodesigna((long) designasCodigo.get(0).getNumero());
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					// Inserta defensa juridica en Designa si el Ejg tiene asociado una asistencia y la defensa juridica de la designa es null
+					relacionesItem = scsEjgExtendsMapper.getRelacionesEJG(ejg);
+					
+					
+					if(relacionesItem.size() > 0) {
+						int nAsistencias = 0;
+						int posicionAsistencia = 0;
+						for (int i = 0; i < relacionesItem.size(); i++) {
+							RelacionesItem objeto = relacionesItem.get(i);
+							if (objeto.getSjcs() != null && objeto.getSjcs().trim().toUpperCase().startsWith("A")) {
+								nAsistencias++;
+								posicionAsistencia = i;
+				            }
+						}
+						if(nAsistencias == 1) {
+							ScsAsistenciaKey asistenciaKey = new ScsAsistenciaKey();
+
+							asistenciaKey.setIdinstitucion(idInstitucion);
+							asistenciaKey.setAnio(Short.parseShort(relacionesItem.get(posicionAsistencia).getAnio()));
+							asistenciaKey.setNumero(Long.parseLong(relacionesItem.get(posicionAsistencia).getNumero()));
+
+							ScsAsistencia asistenciaRelacion = scsAsistenciaMapper.selectByPrimaryKey(asistenciaKey);
+							ScsDesignaKey designaKey = new ScsDesignaKey();
+
+							designaKey.setIdinstitucion(idInstitucion);
+							designaKey.setIdturno(Integer.valueOf(item.get(3)));
+							designaKey.setAnio((short) designaItem.getAno());
+							designaKey.setNumero((long) designasCodigo.get(0).getNumero());
+
+							ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+							
+							if(designa.getDefensajuridica() == null) {
+								designa.setDefensajuridica(asistenciaRelacion.getDatosdefensajuridica());
+								scsDesignaMapper.updateByPrimaryKey(designa);
+							}
+
+						}
+					}
+					
+					
+					
+					
 					
 					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
 					
