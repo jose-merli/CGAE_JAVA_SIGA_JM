@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.scs.AsuntosJusticiableDTO;
 import org.itcgae.siga.DTOs.scs.AsuntosJusticiableItem;
 import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgItem;
+import org.itcgae.siga.DTOs.scs.RelacionesItem;
 import org.itcgae.siga.DTOs.scs.TurnosItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -851,7 +852,8 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int response = 0;
-
+		List<RelacionesItem> relacionesItem = null;
+		
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -911,6 +913,41 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 //				designa.setIdpretension(ejg.getIdpretension().shortValue());
 				designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
 				designa.setIdjuzgado(ejg.getJuzgado());
+				
+				// EJG a asociar
+				EjgItem ejgRelaciones = new EjgItem();
+
+				ejgRelaciones.setAnnio(datos.get(5));
+				ejgRelaciones.setTipoEJG(datos.get(4));
+				ejgRelaciones.setNumero(datos.get(6));
+				ejgRelaciones.setidInstitucion(idInstitucion.toString());;
+				
+				relacionesItem = scsEjgExtendsMapper.getRelacionesEJG(ejgRelaciones);
+				if(relacionesItem.size() > 0) {
+					if(designa.getDefensajuridica() == null) {
+						int nAsistencias = 0;
+						int posicionAsistencia = 0;
+						for (int i = 0; i < relacionesItem.size(); i++) {
+							RelacionesItem objeto = relacionesItem.get(i);
+							if (objeto.getSjcs() != null && objeto.getSjcs().trim().toUpperCase().startsWith("A")) {
+								nAsistencias++;
+								posicionAsistencia = i;
+				            }
+						}
+						if(nAsistencias == 1) {
+							ScsAsistenciaKey asistenciaKey = new ScsAsistenciaKey();
+	
+							asistenciaKey.setIdinstitucion(idInstitucion);
+							asistenciaKey.setAnio(Short.parseShort(relacionesItem.get(posicionAsistencia).getAnio()));
+							asistenciaKey.setNumero(Long.parseLong(relacionesItem.get(posicionAsistencia).getNumero()));
+	
+							ScsAsistencia asistenciaRelacion = scsAsistenciaMapper.selectByPrimaryKey(asistenciaKey);
+						
+							designa.setDefensajuridica(asistenciaRelacion.getDatosdefensajuridica());			
+	
+						}
+					}
+				}
 
 				// Actualizamos los delitos de la designacion eliminando los anteriores y
 				// asignando los designados en EJG.
@@ -1423,6 +1460,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int response = 0;
+		List<RelacionesItem> relacionesItem = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -1470,6 +1508,36 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 
 				ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
 
+				// Compruebo si hay una asistencia para introducir Comisaría y Número de Diligencia que tenía la asistencia relacionada.
+				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelaciones(item.getAniodesigna().toString(), item.getNumerodesigna().toString(), item.getIdturno().toString(), idInstitucion.toString());
+				
+				if(relacionesItem.size() > 0) {
+					int nAsistencias = 0;
+					int posicionAsistencia = 0;
+					for (int i = 0; i < relacionesItem.size(); i++) {
+						RelacionesItem objeto = relacionesItem.get(i);
+						if (objeto.getSjcs() != null && objeto.getSjcs().trim().toUpperCase().startsWith("A")) {
+							nAsistencias++;
+							posicionAsistencia = i;
+			            }
+					}
+					if(nAsistencias == 1) {
+						ScsAsistenciaKey asistenciaKey = new ScsAsistenciaKey();
+
+						asistenciaKey.setIdinstitucion(idInstitucion);
+						asistenciaKey.setAnio(Short.parseShort(relacionesItem.get(posicionAsistencia).getAnio()));
+						asistenciaKey.setNumero(Long.parseLong(relacionesItem.get(posicionAsistencia).getNumero()));
+
+						ScsAsistencia asistencia = scsAsistenciaMapper.selectByPrimaryKey(asistenciaKey);
+						if(ejg.getComisaria() == null) {
+							ejg.setComisaria(asistencia.getComisaria());
+						}
+						if(ejg.getNumerodiligencia() == null) {
+							ejg.setNumerodiligencia(asistencia.getNumerodiligencia());
+						}
+					}
+				}
+				
 				// 1. Actualizamos los delitos del EJG.
 
 				// Creamos la base de los nuevos nuevos delitos del EJG
