@@ -6884,7 +6884,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 	
 	private void asociarDesignaAEjb(ScsAsistencia asistencia, ScsDesigna designa, Integer idUsuario) {
 		try {
-			if (asistencia != null && asistencia.getDesignaNumero() != null &&  designa!= null) {
+			if (asistencia != null && asistencia.getDesignaNumero() != null && asistencia.getEjganio() != null
+					&& asistencia.getEjgnumero()  != null && asistencia.getEjgidtipoejg()  != null &&  designa!= null) {
 				// obtenemos el EJG de la asistencia
 				ScsEjgExample scsEjgExample = new ScsEjgExample();
 				scsEjgExample.createCriteria().andIdinstitucionEqualTo(asistencia.getIdinstitucion())
