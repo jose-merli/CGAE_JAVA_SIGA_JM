@@ -1520,7 +1520,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							ordenaciones = ordenaciones.trim();
 							ordenaciones = ordenaciones.substring(0, ordenaciones.length() - 1);
 						} else {
-							ordenaciones = " ANTIGUEDADCOLA, "; // por defecto
+							ordenaciones = " ANTIGUEDADCOLA "; // por defecto // quitado coma.
 						}
 					}
 					// Si hay ultimo se prepara su WHERE correspondiente
@@ -1673,10 +1673,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 						String strDate = formatter.format(new Date());
-
-						List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper
-								.getColaGuardias(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), strDate,
-										ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
+						
+						posicionColaUltimo = scsInscripcionguardiaExtendsMapper.getPosicionUltimoColaGuardia(guardiasItem.getIdTurno(), guardiasItem.getIdGuardia(), idInstitucion.toString(), ordenaciones, guardiasItem.getLetradosIns());
+						
+						List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardiasNueva(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), ordenaciones, guardiasItem.getLetradosIns(), posicionColaUltimo, idInstitucion.toString());
+						
+						//List<InscripcionGuardiaItem> todaColaGuardia = scsInscripcionguardiaExtendsMapper
+						//		.getColaGuardias(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), strDate,
+						//				ultimo, ordenaciones, idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
 						// Obtenemos el ultimo id generado en los grupos
 						ScsGrupoguardiaExample grupoGuardiaExample = new ScsGrupoguardiaExample();
 						grupoGuardiaExample.createCriteria()
@@ -1782,9 +1786,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 							}
 
 						}if(!isOrdenacionManual){ 
-						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
-								guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
-								idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
+						//colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardias(guardiasItem.getIdGuardia(),
+						//		guardiasItem.getIdTurno(), guardiasItem.getLetradosIns(), ultimo, ordenaciones,
+						//		idInstitucion.toString(), grupoUltimo, "1".equals(porGrupos));
+
+						colaGuardia = scsInscripcionguardiaExtendsMapper.getColaGuardiasNueva(guardiasItem.getIdGuardia(), guardiasItem.getIdTurno(), ordenaciones, guardiasItem.getLetradosIns(), posicionColaUltimo, idInstitucion.toString());
+						
+						
 						for (int i = 0; i < colaGuardia.size(); i++) {
 							if (colaGuardia.get(i).getNumeroGrupo() == null
 									|| "null".equals(colaGuardia.get(i).getNumeroGrupo().toLowerCase())) {
@@ -2439,7 +2447,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 							// Se guarda el último letrado en caso de que coincida el letrado con el letrado
 							// del ultimo grupo de la guardia
 							if (item.getFechaSuscripcion() != null && maxGrupo.isPresent() && maxOrden.isPresent()
-									&& item.getUltimoCola() != null && item.getUltimoCola() == 1) {
+									&& item.getUltimoCola() != null && item.getUltimoCola().equals(1)) {
 								SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 								String fSoK = formatter.format(item.getFechaSuscripcion());
 
