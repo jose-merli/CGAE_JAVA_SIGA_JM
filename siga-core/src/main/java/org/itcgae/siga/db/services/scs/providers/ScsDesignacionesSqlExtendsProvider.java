@@ -4021,7 +4021,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.SELECT(" NVL(asi.numerodiligencia, 'Sin número' ) || ' / ' || NVL(asi.nig,'Sin número') || ' / ' || NVL(asi.numeroprocedimiento,'Sin número') dilnigproc");
 		sql2.SELECT(" ej.idexpedienteext");
 		sql2.FROM(" scs_asistencia asi");
-		sql2.JOIN(" scs_ejg ej ON ej.idpersona = asi.idpersonacolegiado AND ej.IDINSTITUCION = asi.IDINSTITUCION");
+		sql2.LEFT_OUTER_JOIN(" scs_ejg ej ON ej.idpersona = asi.idpersonacolegiado AND ej.IDINSTITUCION = asi.IDINSTITUCION");
 		sql2.LEFT_OUTER_JOIN(" cen_colegiado ON cen_colegiado.idpersona = asi.idpersonacolegiado AND CEN_COLEGIADO.IDINSTITUCION = asi.IDINSTITUCION"); 
 		sql2.LEFT_OUTER_JOIN(" cen_persona ON cen_persona.idpersona = cen_colegiado.idpersona");
 		sql2.LEFT_OUTER_JOIN(" scs_personajg perjg on perjg.idpersona = asi.idpersonajg and asi.idinstitucion = perjg.idinstitucion");
