@@ -543,6 +543,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									responseItem.setApellido2(actuacion.getApellido2());
 									responseItem.setNif(actuacion.getNif());
 									responseItem.setSexo(actuacion.getSexo());
+									responseItem.setFechaNacimiento(actuacion.getFechaNacimiento());
 									
 									// Seteamos los datos de la asistencia
 									responseItem.setFechaAsistencia(actuacion.getFechaAsistencia());
@@ -913,6 +914,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			personajgToUpdate.setApellido2(asistencia.getApellido2());
 			personajgToUpdate.setNombre(asistencia.getNombre());
 			personajgToUpdate.setSexo(asistencia.getSexo());
+			personajgToUpdate.setFechanacimiento(parseStringToDate(asistencia.getFechaNacimiento()));
 			personajgToUpdate.setIdinstitucion(idInstitucion);
 			personajgToUpdate.setFechamodificacion(new Date());
 			personajgToUpdate.setUsumodificacion(usuario.getIdusuario());
@@ -932,6 +934,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			newPersonajg.setIdinstitucion(idInstitucion);
 			newPersonajg.setFechamodificacion(new Date());
 			newPersonajg.setUsumodificacion(usuario.getIdusuario());
+			newPersonajg.setFechanacimiento(parseStringToDate(asistencia.getFechaNacimiento()));
 
 			response = scsPersonajgExtendsMapper.insertSelective(newPersonajg);
 
@@ -943,6 +946,21 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return idPersona;
 	}
+	
+	private Date parseStringToDate(String fecha) {
+		Date date = null;
+		if (fecha != null && !fecha.isEmpty()) {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			try {
+				date = sdf.parse(fecha);
+			} catch (ParseException e) {
+				LOGGER.error("parseStringToDate() ERROR: " + e.getMessage(), e);
+			}
+		}
+		return date;
+	}
+	
+	
 
 	/**
 	 * 
