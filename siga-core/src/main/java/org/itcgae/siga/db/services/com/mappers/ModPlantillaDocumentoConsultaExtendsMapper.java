@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -41,7 +42,15 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 		@Result(column = "IDPLANTILLACONSULTA", property = "idPlantillaConsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REGION", property = "region", jdbcType = JdbcType.VARCHAR)
 	})	
-	List<ConsultaItem> selectConsultasByInforme(Short idInstitucion, Long idModeloComunicacion, Long idInforme, String idLenguaje, boolean historico);
+	List<ConsultaItem> selectConsultasByInforme(Short idInstitucion, Long idModeloComunicacion, String idLenguaje, boolean historico);
+	
+
+	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectAllConsultasByIdInstitucionAndIdModelo")
+
+	@Results({ @Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR) })
+	List<ConsultaItem> selectAllConsultasByIdInstitucionAndIdModelo(Short idInstitucion, Long idModeloComunicacion);
+
 
 	@Results({@Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
 			  @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
@@ -82,5 +91,5 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 	List<ConsultaItem> selectConsultasDestinatarioByModelo(Short idInstitucion, Long idModeloComunicacion, Long idObjetivo, String idioma,String idModeloPlantilla);
 	
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectIdiomasPlantillasConsultas")
-	List<String> selectIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idInforme, Long idConsulta);
+	List<String> selectIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idConsulta);
 }
