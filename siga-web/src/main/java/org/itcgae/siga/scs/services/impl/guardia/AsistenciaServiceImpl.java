@@ -61,6 +61,11 @@ import java.util.zip.ZipOutputStream;
 public class AsistenciaServiceImpl implements AsistenciaService {
 
 	private final Logger LOGGER = Logger.getLogger(AsistenciaServiceImpl.class);
+	
+	private final static String TIPO_JUZGADO =  "J";
+	
+	private final static String TIPO_COMISARIA =  "C";
+	
 	@Autowired
 	private ScsGuardiascolegiadoExtendsMapper scsGuardiascolegiadoExtendsMapper;
 
@@ -718,7 +723,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						}
 
 						asistencias.forEach((TarjetaAsistenciaResponse2Item asistencia) -> {
-
+							// si faltan datos en asistencia: Juzgado, comisaria, nº procedimiento o nº diligencia. Se completan esos campos con las actuaciones
+							completarValoresComisariaJuzgado(asistencia);
 							// Comprobamos si existe el justiciable, si no, lo insertamos en scs_personajg y
 							// devolvemos idPersona
 							LOGGER.info("guardarAsistenciasExpres() / Comprobamos si existe el justiciable");
@@ -6975,6 +6981,53 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 			scsEjgdesignaMapper.insert(record);
 		}	
+	}
+	
+	private void completarValoresComisariaJuzgado(TarjetaAsistenciaResponse2Item aistencia) {
+		List<ActuacionAsistenciaItem> actuaciones = aistencia.getActuaciones();
+		// completar juzgado de la asistencia con las actuaciones
+		if (aistencia.getJuzgado() == null || aistencia.getJuzgado().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_JUZGADO.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getLugar() != null && !actuacion.getLugar().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setJuzgado(result.get().getLugar());
+			}
+			
+		}
+		// completar num procedimiento de la asistencia con las actuaciones
+		if (aistencia.getNumProcedimiento() == null || aistencia.getNumProcedimiento().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_JUZGADO.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getNumeroAsunto() != null && !actuacion.getNumeroAsunto().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setNumProcedimiento(result.get().getNumeroAsunto());
+			}
+		}
+		// completar comisaria de la asistencia con las actuaciones
+		if (aistencia.getComisaria() == null || aistencia.getComisaria().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_COMISARIA.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getLugar() != null && !actuacion.getLugar().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setComisaria(result.get().getLugar());
+			}
+			
+		}
+		// completar num diligencia de la asistencia con las actuaciones
+		if (aistencia.getNumDiligencia()== null || aistencia.getNumDiligencia().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_COMISARIA.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getNumeroAsunto() != null && !actuacion.getNumeroAsunto().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setNumDiligencia(result.get().getNumeroAsunto());
+			}
+		}
+		
 	}
 
 }
