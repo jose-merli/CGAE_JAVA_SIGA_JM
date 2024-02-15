@@ -207,7 +207,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 	public String selectAllConsultasByIdInstitucionAndIdModelo(Short idInstitucion, Long idModeloComunicacion) {
 		SQL sql = new SQL();
 		
-		sql.SELECT("DISTINCT mpc.idconsulta IDCONSULTA, mpc.IDINSTITUCION IDINSTITUCION");
+		sql.SELECT("DISTINCT mpc.idconsulta IDCONSULTA, con.IDINSTITUCION IDINSTITUCION");
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA mpc");
 		sql.INNER_JOIN("CON_CONSULTA con ON con.idconsulta = mpc.idconsulta");
 		sql.WHERE("mpc.idmodelocomunicacion =" + idModeloComunicacion.toString(),
