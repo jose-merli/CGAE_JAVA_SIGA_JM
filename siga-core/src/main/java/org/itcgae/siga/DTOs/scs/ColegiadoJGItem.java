@@ -4,17 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ColegiadoJGItem {
 
-	private int idInstitucion;
+	private String idInstitucion;
 	private String nColegiado;
 	private String idPersona;
+	private String nifcif;
 	private String nombre;
 
 	@JsonProperty("idInstitucion")
-	public int getIdInstitucion() {
+	public String getIdInstitucion() {
 		return idInstitucion;
 	}
 
-	public void setIdInstitucion(int idInstitucion) {
+	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
 
@@ -45,9 +46,17 @@ public class ColegiadoJGItem {
 		this.nombre = nombre;
 	}
 
+	@JsonProperty("nifcif")
+	public String getNifcif() {
+		return nifcif;
+	}
+
+	public void setNifcif(String nifcif) {
+		this.nifcif = nifcif;
+	}
+
 	@Override
 	public String toString() {
-		return "ColegiadoJGItem [idInstitucion=" + idInstitucion + ", nColegiado=" + nColegiado + ", idPersona="
-				+ idPersona + ", nombre=" + nombre + "]";
+		return "ColegiadoJGItem [idInstitucion=" + idInstitucion + ", nColegiado=" + nColegiado + ", idPersona=" + idPersona + ", nifcif=" + nifcif + ", nombre=" + nombre + "]";
 	}
 }

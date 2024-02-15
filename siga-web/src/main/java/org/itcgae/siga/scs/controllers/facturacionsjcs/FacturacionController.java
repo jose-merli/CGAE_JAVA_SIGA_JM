@@ -52,11 +52,28 @@ public class FacturacionController {
     ResponseEntity<FacturacionDeleteDTO> eliminarFacturaciones(@RequestBody FacturacionItem facturacionItem,
                                                                HttpServletRequest request) {
         FacturacionDeleteDTO response = facturacionServices.eliminarFacturaciones(facturacionItem, request);
-        //if (response.getStatus() == SigaConstants.OK) {
-            return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.OK);
-        //} else {
-        //    return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //}
+        return new ResponseEntity<FacturacionDeleteDTO>(response, HttpStatus.OK);
+
+    }
+    
+    @RequestMapping(value = "/facturacionsjcs/archivarFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<UpdateResponseDTO> archivarFacturacion(@RequestBody List<FacturacionItem> facturacionItems, HttpServletRequest request) {
+    	UpdateResponseDTO response = facturacionServices.archivarFacturacion(facturacionItems, request, true);
+        if (response.getStatus().equals("403")) {
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+        } else {
+        	return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        }
+    }
+    
+    @RequestMapping(value = "/facturacionsjcs/desarchivarFacturacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<UpdateResponseDTO> desarchivarFacturacion(@RequestBody List<FacturacionItem> facturacionItems, HttpServletRequest request) {
+    	UpdateResponseDTO response = facturacionServices.archivarFacturacion(facturacionItems, request, false);
+        if (response.getStatus().equals("403")) {
+            return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+        } else {
+        	return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+        }
     }
 
     @RequestMapping(value = "/facturacionsjcs/datosfacturacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

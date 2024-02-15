@@ -575,16 +575,27 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.WHERE("PERSONA.IDPERSONA = '" + idPersona + "'");
 		return sql.toString();
 	}
-	public String busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion) {
+	
+	public String busquedaColegiadoExpress(String nColegiado, String nifcif, String idInstitucion) {
 		SQL sql = new SQL();
-		sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,0,COLEGIADO.NCOLEGIADO,COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
-		sql.SELECT("COLEGIADO.IDPERSONA");
-		sql.SELECT("(PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2 || ' ' || PERSONA.NOMBRE) AS NOMBRE");
+		
+		sql.SELECT("PERSONA.IDPERSONA AS IDPERSONA");
+		sql.SELECT("DECODE(COLEGIADO.COMUNITARIO,  0, COLEGIADO.NCOLEGIADO, COLEGIADO.NCOMUNITARIO) AS NCOLEGIADO");
+		sql.SELECT("PERSONA.NIFCIF AS NIFCIF");
+		sql.SELECT("PERSONA.APELLIDOS1 || ' ' || PERSONA.APELLIDOS2 || ' ' || PERSONA.NOMBRE AS NOMBRE");
 		sql.FROM("CEN_PERSONA PERSONA");
 		sql.INNER_JOIN("CEN_CLIENTE CLIENTE ON PERSONA.IDPERSONA = CLIENTE.IDPERSONA");
 		sql.INNER_JOIN("CEN_COLEGIADO COLEGIADO ON PERSONA.IDPERSONA = COLEGIADO.IDPERSONA AND CLIENTE.IDINSTITUCION = COLEGIADO.IDINSTITUCION");
-		sql.WHERE("CLIENTE.idinstitucion = '"+idInstitucion+"'");
-		sql.WHERE("((colegiado.comunitario = 0 and COLEGIADO.ncolegiado = '"+colegiadoJGItem+"') OR (colegiado.comunitario = 1 and COLEGIADO.NCOMUNITARIO = '"+colegiadoJGItem+"'))");
+		if(idInstitucion != null && idInstitucion != "") {
+			sql.WHERE("CLIENTE.IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		if(nColegiado != null && nColegiado != "") {
+			sql.WHERE("((COLEGIADO.COMUNITARIO = 0 AND COLEGIADO.NCOLEGIADO = '" + nColegiado + "') OR (COLEGIADO.COMUNITARIO = 1 AND  COLEGIADO.NCOMUNITARIO = '" + nColegiado + "'))");
+		}
+		if(nifcif != null && nifcif != "") {
+			sql.WHERE("PERSONA.NIFCIF = '" + nifcif + "'");
+		}
+		
 		return sql.toString();
 	}
 	

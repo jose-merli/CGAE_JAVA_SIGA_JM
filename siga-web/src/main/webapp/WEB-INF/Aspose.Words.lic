@@ -1,18 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <License>
   <Data>
-    <LicensedTo>CONSEJO GENERAL DE LA ABOGACIA ESPAÑOLA</LicensedTo>
-    <LicenseType>Developer OEM</LicenseType>
-    <LicenseNote>Limited to 1 developer.</LicenseNote>
-    <OrderID>140314092147</OrderID>
-    <OEM>This is a redistributable license</OEM>
+    <LicensedTo>RedAbogacia</LicensedTo>
+    <EmailTo>lfuente@redabogacia.org</EmailTo>
+    <LicenseType>Developer Small Business</LicenseType>
+    <LicenseNote>1 Developer And 1 Deployment Location</LicenseNote>
+    <OrderID>240117125904</OrderID>
+    <UserID>576032</UserID>
+    <OEM>This is not a redistributable license</OEM>
     <Products>
       <Product>Aspose.Words for Java</Product>
     </Products>
-    <EditionType>Enterprise</EditionType>
-    <SerialNumber>fef36695-f056-44ea-a5c8-e29e2fef7f12</SerialNumber>
-    <SubscriptionExpiry>20150314</SubscriptionExpiry>
-    <LicenseVersion>2.2</LicenseVersion>
+    <EditionType>Professional</EditionType>
+    <SerialNumber>910fd257-ad70-4970-a6d4-a281c91ede02</SerialNumber>
+    <SubscriptionExpiry>20250117</SubscriptionExpiry>
+    <LicenseVersion>3.0</LicenseVersion>
+    <LicenseInstructions>https://purchase.aspose.com/policies/use-license</LicenseInstructions>
   </Data>
-  <Signature>yMBpzESJKuGFsggNAuA5tL1Q6gHj9Ye7rlqUTBVjzi+4/5zpESShWKuRp8JyUoTH2gVKx+HALRB2Cke+egvpDEp2gQQXm6GPLSTYleT8Xf+QrGtK9piGYjs6+fGBJzX65xRxDOi8gzQB5VCnKKaZ92NHttjOD2Z2U+/uLH3EiG4=</Signature>
+  <Signature>av1db4xpuMOrR6JXEmyy5Kh1hsiYXHLN8UOAwtbqs+tn0s+GmBo/6D2vHL2ReH69q4qM5cbJGrcx/qPhck+xSOFWCFCB9ASdIt9WaA4vpFEehS6YuEh1mYcMHGfJZxeoQfXG1spMlcdocPZn3Y/QQjmEwUigPKMY1kLBcPpEfrJwr64ABBTuPoHGaU6vuK+VkE9Mln6vz2yKEws2TzpXcoJO4CrDnz5d1eVuqcoy7Q4HQZfUjfNmoGp/mmJjXD3SOxUuZzENDhnziKgTR/kyb4LU9teNWU6kongniOHqphu/t5oXv+EmgnXhB21Ci4XUWMMipEW0EGaGmsTmq7vgfA==</Signature>
 </License>

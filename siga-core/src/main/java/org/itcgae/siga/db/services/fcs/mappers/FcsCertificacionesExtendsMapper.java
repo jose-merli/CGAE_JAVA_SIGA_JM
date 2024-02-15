@@ -84,6 +84,7 @@ public interface FcsCertificacionesExtendsMapper extends FcsCertificacionesMappe
             @Result(column = "TURNO", property = "importeOficio", jdbcType = JdbcType.VARCHAR),
             @Result(column = "GUARDIA", property = "importeGuardia", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTESOJ", property = "importeSoj", jdbcType = JdbcType.VARCHAR),
+            @Result(column = "PREVISION", property = "prevision", jdbcType = JdbcType.VARCHAR),
             @Result(column = "IMPORTEEJG", property = "importeEjg", jdbcType = JdbcType.VARCHAR),
     })
     List<FacturacionItem> getFactCertificaciones(String idCertificacion, String idInstitucion, Integer tamMax, String idLenguaje);

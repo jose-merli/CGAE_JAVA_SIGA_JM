@@ -570,8 +570,7 @@ public interface ScsDesignacionesExtendsMapper extends ScsDesignaMapper {
 	List<ComboItem> comboAcreditacionesPorModulo(Short idInstitucion, String idModulo);
 	
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "existeDesginaJuzgadoProcedimiento")
-	@Results({@Result(column = "NUM", property = "existeDesignaJuzgadoProcedimiento", jdbcType = JdbcType.VARCHAR), })
-	DesignaItem existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa);
+	String existeDesginaJuzgadoProcedimiento(Short idInstitucion, DesignaItem designa);
 
 	@SelectProvider(type = ScsDesignacionesSqlExtendsProvider.class, method = "getDatosAdicionales")
 	@Results({ @Result(column = "FECHAOFICIOJUZGADO", property = "fechaOficioJuzgado", jdbcType = JdbcType.DATE),

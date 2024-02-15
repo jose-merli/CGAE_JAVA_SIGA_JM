@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.aspose.words.IMailMergeDataSource;
+import com.aspose.words.ref.Ref;
 
 
 /**
@@ -79,6 +80,13 @@ public class DataMailMergeDataSource implements IMailMergeDataSource{
 			throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	@Override
+	public boolean getValue(String arg0, Ref<Object> arg1) throws Exception {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

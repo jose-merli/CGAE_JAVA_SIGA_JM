@@ -14,6 +14,8 @@ import org.itcgae.siga.DTOs.cen.ComboSubtiposCVDTO;
 import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGDTO;
+import org.itcgae.siga.DTOs.scs.ColegiadoJGItem;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
@@ -104,11 +106,23 @@ public class BusquedaColegiadosController {
 		ColegiadoDTO response = busquedaColegiadosService.searchColegiadoFicha(colegiadoItem, request);
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/busquedaColegiado/tipoPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadoDTO> searchTipoPersona(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
+		ColegiadoDTO response = busquedaColegiadosService.searchTipoPersona(colegiadoItem, request);
+		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/busquedaColegiado/getSituacionGlobalColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> searchColegiado(@RequestBody String idPersona, HttpServletRequest request) {
 		ComboDTO response = busquedaColegiadosService.getSituacionGlobalColegiado(idPersona, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/busquedaColegiado/busquedaColegiadoExpress", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadoJGDTO> busquedaColegiadosExpress(@RequestBody ColegiadoJGItem colegiado, HttpServletRequest request) {
+		ColegiadoJGDTO response = busquedaColegiadosService.busquedaColegiadoExpress(colegiado, request);
+		return new ResponseEntity<ColegiadoJGDTO>(response, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "busquedaColegiados/getCurricularTypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

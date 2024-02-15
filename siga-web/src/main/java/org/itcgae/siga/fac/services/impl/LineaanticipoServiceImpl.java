@@ -106,9 +106,9 @@ public class LineaanticipoServiceImpl implements ILineaanticipoService {
                     filtroMonederoItem.setIdPersonaColegiado(people.get(0).getIdpersona().toString());
                     List<ListaMonederosItem> walletDTOs = pysLineaanticipoExtendsMapper.selectByPersonIdAndCreationDate(institutionId, filtroMonederoItem);
                     ListaMonederoDTO walletListDTO = new ListaMonederoDTO();
-//                    walletListDTO.setMonederoItems(walletDTOs);
+                    walletListDTO.setMonederoItems(walletDTOs);
                     error.setCode(200);
-//                    walletListDTO.setError(error);
+                    walletListDTO.setError(error);
 
                     return walletListDTO;
                 }

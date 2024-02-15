@@ -2523,7 +2523,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						boolean nigValido = utilOficio.validaNIG(designaItem.getNig(), request);
 						
-						if (scsDesigna.getIdpretension() == 0) {
+						if (scsDesigna.getIdpretension() == null || scsDesigna.getIdpretension() == 0) {
 							scsDesigna.setIdpretension(null);
 					      }
 
@@ -3345,7 +3345,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					designa.setIdturno(designaItem.getIdTurno());
 
 					Calendar cal = Calendar.getInstance();
-					short year = (short) cal.get(Calendar.YEAR);
+					short year = (short) designaItem.getAno();
 					designa.setAnio(year);
 
 					// CALCULO CAMPO CODIGO (NUMERO EN FRONT)
@@ -3357,16 +3357,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					StringDTO parametros = new StringDTO();
 					Integer longitudDesigna;
 
-					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
-							idInstitucion.toString());
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
 
 					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
 					// la institucion 0
 					if (parametros != null && parametros.getValor() != null) {
 						longitudDesigna = Integer.parseInt(parametros.getValor());
 					} else {
-						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA",
-								"0");
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
 						longitudDesigna = Integer.parseInt(parametros.getValor());
 					}
 
@@ -3396,8 +3394,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					// Limitacion campo numero en updateDesigna
 
 					// Obtenemos el ultimo numero + 1
-					String numeroDesigna = scsDesignacionesExtendsMapper
-							.obtenerNumeroDesigna(String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
+					String numeroDesigna = scsDesignacionesExtendsMapper.obtenerNumeroDesigna(String.valueOf(idInstitucion), String.valueOf(designaItem.getAno()));
 
 					if (numeroDesigna == null || numeroDesigna.isEmpty()) {
 						numeroDesigna = "1";
@@ -3464,8 +3461,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						CenColegiadoExample cenColegExample = new CenColegiadoExample();
 						cenColegExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andNcolegiadoEqualTo(numeroColegiado);
-						List<CenColegiado> resCenColegiado = this.cenColegiadoExtendsMapper
-								.selectByExample(cenColegExample);
+						List<CenColegiado> resCenColegiado = this.cenColegiadoExtendsMapper.selectByExample(cenColegExample);
 						CenColegiado cenColeg = CollectionUtils.isNotEmpty(resCenColegiado) ? resCenColegiado.get(0)
 								: null;
 
@@ -3489,8 +3485,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 								for (ScsInscripcionturno scsTurnoInscrito : resInscLetrado) {
 									ScsTurnoExample turnoExample = new ScsTurnoExample();
 									turnoExample.createCriteria().andIdturnoEqualTo(scsTurnoInscrito.getIdturno());
-									List<ScsTurno> turnoInscritoIt = this.scsTurnosExtendsMapper
-											.selectByExample(turnoExample);
+									List<ScsTurno> turnoInscritoIt = this.scsTurnosExtendsMapper.selectByExample(turnoExample);
 
 									if (CollectionUtils.isNotEmpty(turnoInscritoIt)
 											&& turnoInscritoIt.get(0).getIdtipoturno() != null
@@ -3528,12 +3523,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 						if(idPersona == null || idPersona.isEmpty()) {
 							if (idInstitucion == designaItem.getIdInstitucion() || designaItem.getIdInstitucion() == 0) {
-								idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(),
-										numeroColegiado);
+								idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumCol(idInstitucion.toString(), numeroColegiado);
 	
 								if (idPersona == null || idPersona == "") {
-									idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumComunitario(
-											designa.getIdinstitucion().toString(), numeroColegiado);
+									idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumComunitario(designa.getIdinstitucion().toString(), numeroColegiado);
 								}
 	//
 	//							if(idPersona == null || idPersona == "") {
@@ -3552,11 +3545,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 						InsertResponseDTO responseNColegiado = new InsertResponseDTO();
 						if (idPersona == null || idPersona == "") {
-							idPersona = scsDesignacionesExtendsMapper
-									.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
+							idPersona = scsDesignacionesExtendsMapper.obtenerIdPersonaByNumColNColegiado(designaItem.getNif());
 							if (idPersona == null || idPersona.isEmpty()) {
-								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(
-										String.valueOf(designaItem.getIdInstitucion()), idPersona);
+								idPersona = scsDesignacionesExtendsMapper.obtenerNumNoColegiado(String.valueOf(designaItem.getIdInstitucion()), idPersona);
 							}
 							NoColegiadoItem noColegiadoItem = new NoColegiadoItem();
 							noColegiadoItem.setIdTipoIdentificacion("10");
@@ -3658,8 +3649,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						scgi.setSaltoCompensacion("S");
 						scgi.setMotivo("Creado en la designacion D"+designa.getAnio().toString()+"/"+designa.getCodigo());
 
-						nuevoId = scsSaltoscompensacionesExtendsMapper
-								.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
+						nuevoId = scsSaltoscompensacionesExtendsMapper.selectNuevoIdSaltosCompensaciones(scgi, idInstitucion.toString());
 
 						int	respSalto = scsSaltoscompensacionesExtendsMapper.guardarSaltosCompensaciones(
 								scgi, idInstitucion.toString(), Long.toString(nuevoId.getIdMax()), usuario);
@@ -5088,9 +5078,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	}
 
 	@Override
-	public DesignaItem existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request) {
+	public String existeDesginaJuzgadoProcedimiento(DesignaItem designa, HttpServletRequest request) {
 		// DesignaItem result = new DesignaItem();
-		DesignaItem designas = null;
+		String designas = null;
 		// List<GenParametros> tamMax = null;
 		// Integer tamMaximo = null;
 
@@ -5133,6 +5123,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				try {
 					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa);
+					
+					if (designas == null) {
+						designas = "0";
+					}
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.getDatosAdicionales -> Salida del servicio");
@@ -5477,6 +5471,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Error error = new Error();
 		int response = 0;
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("YYYY-MM-dd");
 		Boolean letradoDesigSinTurno = Boolean.FALSE;
 
 		if (idInstitucion != null) {
@@ -5511,7 +5506,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				designaLetradoNueva.setAnio(designa.getAnio());
 				designaLetradoNueva.setIdturno(designa.getIdturno());
 				designaLetradoNueva.setNumero(designa.getNumero());
-				designaLetradoNueva.setFechadesigna(letradoEntrante.getFechadesigna());
+				designaLetradoNueva.setFechadesigna(sdf2.parse(sdf2.format(letradoEntrante.getFechadesigna())));
 				designaLetradoNueva.setFechamodificacion(new Date());
 				designaLetradoNueva.setManual((short) 0);
 				designaLetradoNueva.setLetradodelturno("S");
@@ -5559,7 +5554,6 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 				} else {
 					designaLetradoNueva.setIdpersona(letradoEntrante.getIdpersona());
-					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 					// Recuperamos ultima asignacion sin renuncia del letrado para saber su turno y
 					// comparar (Deberia ser misma busqueda que en buscador colegiados para asignar)
@@ -8255,6 +8249,20 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setNumerodesigna((long) designasCodigo.get(0).getNumero());
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
+					
+					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+					asisExample.createCriteria().andDesignaAnioEqualTo((short) designaItem.getAno()).andDesignaNumeroEqualTo((long) designaItem.getNumero())
+					.andIdinstitucionEqualTo(idInstitucion);
+					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+					if(asis.size() > 0) {
+						ScsAsistencia asistencia = asis.get(0);
+						asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
+						asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+						asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
+						scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+					}
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
 				} catch (Exception e) {

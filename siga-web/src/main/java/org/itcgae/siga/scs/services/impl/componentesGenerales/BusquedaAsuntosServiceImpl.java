@@ -1737,8 +1737,21 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				List<ScsDefendidosdesigna> defendidosDesigna = scsDefendidosdesignaMapper
 						.selectByExample(defendidosDesignaExample);
 
-				for (ScsDefendidosdesigna interesado : defendidosDesigna) {
+				for (ScsDefendidosdesigna interesado : defendidosDesigna) { // calidad O
+					if(interesado.getCalidad().equalsIgnoreCase("O")) {
+						//actualizamos el ejg con el solicitante
+						ScsEjgKey ejgKey2 = new ScsEjgKey();
 
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setAnio(item.getAnioejg());
+						ejgKey.setIdtipoejg(item.getIdtipoejg());
+						ejgKey.setNumero(item.getNumeroejg());
+
+						ScsEjg ejg2 = scsEjgMapper.selectByPrimaryKey(ejgKey);
+						ejg2.setIdpersonajg(interesado.getIdpersona());
+
+						scsEjgMapper.updateByPrimaryKey(ejg2);
+					}
 					// Se crea el familiar que se introducira en la unidad familiar del EJG
 					ScsUnidadfamiliarejg familiar = new ScsUnidadfamiliarejg();
 
@@ -1941,7 +1954,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 			designaItem.setIdTurno(Integer.parseInt(item.get(3)));
 		} else {
 			TurnosItem turnosItem = new TurnosItem();
-			turnosItem.setAbreviatura(item.get(3));
+			turnosItem.setIdturno(item.get(3).toString());
 			List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuario.getIdlenguaje());
 			designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 		}

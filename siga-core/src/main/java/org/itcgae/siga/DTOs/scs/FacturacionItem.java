@@ -34,6 +34,18 @@ public class FacturacionItem {
 	private String importeGuardia;
 	private String importeSoj;
 	private String importeEjg;
+	private String borrarPorGrupo;
+	private String borrarPorEstado;
+	private boolean archivada;
+
+	@JsonProperty("archivada")
+	public boolean isArchivada() {
+		return archivada;
+	}
+
+	public void setArchivada(boolean archivada) {
+		this.archivada = archivada;
+	}
 
 	@JsonProperty("idGrupo")
 	public String getIdGrupo() {
@@ -291,6 +303,24 @@ public class FacturacionItem {
 	public void setImporteEjg(String importeEjg) {
 		this.importeEjg = importeEjg;
 	}
+	
+	@JsonProperty("borrarPorGrupo")
+	public String getBorrarPorGrupo() {
+		return borrarPorGrupo;
+	}
+
+	public void setBorrarPorGrupo(String borrarPorGrupo) {
+		this.borrarPorGrupo = borrarPorGrupo;
+	}
+
+	@JsonProperty("borrarPorEstado")
+	public String getBorrarPorEstado() {
+		return borrarPorEstado;
+	}
+
+	public void setBorrarPorEstado(String borrarPorEstado) {
+		this.borrarPorEstado = borrarPorEstado;
+	}
 
 	@Override
 	public int hashCode() {
@@ -323,7 +353,9 @@ public class FacturacionItem {
 		result = prime * result + ((importeOficio == null) ? 0 : importeOficio.hashCode());
 		result = prime * result + ((importeGuardia == null) ? 0 : importeGuardia.hashCode());
 		result = prime * result + ((importeSoj == null) ? 0 : importeSoj.hashCode());
-		result = prime * result + ((importeEjg == null) ? 0 : importeEjg.hashCode());
+		result = prime * result + ((importeEjg == null) ? 0 : importeEjg.hashCode());	
+		result = prime * result + ((borrarPorGrupo == null) ? 0 : borrarPorGrupo.hashCode());
+		result = prime * result + ((borrarPorEstado == null) ? 0 : borrarPorEstado.hashCode());
 		return result;
 	}
 
@@ -476,6 +508,20 @@ public class FacturacionItem {
 				return false;
 		} else if (!importeEjg.equals(other.importeEjg))
 			return false;
+		if (borrarPorGrupo == null) {
+			if (other.borrarPorGrupo != null)
+				return false;
+		} else if (!borrarPorGrupo.equals(other.borrarPorGrupo))
+			return false;
+		if (borrarPorEstado == null) {
+			if (other.borrarPorEstado != null)
+				return false;
+		} else if (!borrarPorEstado.equals(other.borrarPorEstado)) {
+			return false;
+		}
+		if(archivada != other.archivada) {
+			return false;
+		}
 		return true;
 	}
 
@@ -493,6 +539,8 @@ public class FacturacionItem {
 				+ ", importeOficio=" + importeOficio
 				+ ", importeGuardia=" + importeGuardia
 				+ ", importeSoj=" + importeSoj
-				+ ", importeEjg=" + importeEjg+"]";
+				+ ", importeEjg=" + importeEjg
+				+ ", borrarPorGrupo=" + borrarPorGrupo
+				+ ", borrarPorEstado=" + borrarPorEstado+", archivada=" + (archivada ? "true": "false") + "]";
 	}
 }

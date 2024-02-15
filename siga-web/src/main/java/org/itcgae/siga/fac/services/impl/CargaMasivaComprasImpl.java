@@ -423,7 +423,7 @@ public class CargaMasivaComprasImpl implements ICargaMasivaComprasService {
 							
 							ficha.setnSolicitud(String.valueOf(pysPeticioncomprasuscripcionExtendsMapper.getNewIdPet(pet)));
 							
-							gestionFichaCompraSuscripcionServiceImpl.solicitarCompra(request, ficha);
+							gestionFichaCompraSuscripcionServiceImpl.solicitarCompra(request, ficha, false);
 
 
 							LOGGER.info(
