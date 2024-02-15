@@ -2,6 +2,7 @@ package org.itcgae.siga.DTOs.com;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ConsultaItem {
 	private String idInstitucion;
@@ -43,6 +44,8 @@ public class ConsultaItem {
 	private String idioma;
 	
 	private ArrayList<CampoDinamicoItem> camposDinamicos = new ArrayList<CampoDinamicoItem>();
+	
+	private List<String> idiomasPlantillas = new ArrayList<String>();
 
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -298,6 +301,14 @@ public class ConsultaItem {
 
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
+	}
+
+	public List<String> getIdiomasPlantillas() {
+		return idiomasPlantillas;
+	}
+
+	public void setIdiomasPlantillas(List<String> idiomasPlantillas) {
+		this.idiomasPlantillas = idiomasPlantillas;
 	}
 	
 
