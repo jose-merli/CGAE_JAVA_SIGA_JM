@@ -161,7 +161,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					}
 					Short idInstitucion = Short.parseShort(plantillaDoc.getIdInstitucion());
 					Long idModeloComunicacion = Long.parseLong(plantillaDoc.getIdModeloComunicacion());
-					Long idInforme = Long.parseLong(plantillaDoc.getIdInforme());
+					//Long idInforme = Long.parseLong(plantillaDoc.getIdInforme());
 
 					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(
 							idInstitucion, idModeloComunicacion,  usuario.getIdlenguaje(), historico);
@@ -178,7 +178,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								consulta.setSentencia(consultaEntity.getSentencia());
 							}
 							
-							obtenerIdiomasPlantillasConsultas(idInstitucion, idModeloComunicacion, idInforme, consulta);
+							obtenerIdiomasPlantillasConsultas(idInstitucion, idModeloComunicacion, consulta);
 						}
 						respuesta.setConsultaItem(listaConsultaItem);
 					}
@@ -197,7 +197,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return respuesta;
 	}
 
-	private void obtenerIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idInforme,
+	private void obtenerIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion,
 			ConsultaItem consulta) {
 		List<String> idiomas = modPlantillaDocumentoConsultaExtendsMapper.selectIdiomasPlantillasConsultas(idInstitucion,idModeloComunicacion, Long.valueOf(consulta.getIdConsulta()));
 		consulta.setIdiomasPlantillas(idiomas);		
@@ -352,7 +352,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						}
 					}
 
-					if (listaItems != null && consultasValidas && plantillaDoc.getIdInforme() != null) {
+					if (listaItems != null && consultasValidas ) {
 						// Por cada plantilla asociada hay que guardar sus consultas
 						ModModeloPlantilladocumentoExample modModeloPlantillaExample = new ModModeloPlantilladocumentoExample();
 						modModeloPlantillaExample.createCriteria()
@@ -427,7 +427,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper
 										.selectConsultaByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()),
 												Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-												Long.parseLong(plantillaDoc.getIdInforme()),
 												Long.parseLong(consultaItem.getIdConsultaAnterior()), null);
 								for (ConsultaItem consultaBorrar : listaConsultasBorrar) {
 									ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
@@ -1335,7 +1334,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper
 								.selectConsultaByIdConsulta(Short.parseShort(consulta.getIdInstitucion()),
 										Long.parseLong(consulta.getIdModeloComunicacion()),
-										Long.parseLong(consulta.getIdInforme()),
 										Long.parseLong(consulta.getIdConsulta()), null);
 						for (ConsultaItem consultaBorrar : listaConsultasBorrar) {
 							ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();

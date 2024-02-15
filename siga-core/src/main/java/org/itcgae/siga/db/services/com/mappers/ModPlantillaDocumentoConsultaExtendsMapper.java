@@ -70,7 +70,7 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 		@Result(column = "IDPLANTILLACONSULTA", property = "idPlantillaConsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REGION", property = "region", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ConsultaItem> selectConsultaByIdConsulta(Short idInstitucion, Long idModeloComunicacion, Long idInforme, Long idConsulta, Long idPlantillaDocumento);
+	List<ConsultaItem> selectConsultaByIdConsulta(Short idInstitucion, Long idModeloComunicacion, Long idConsulta, Long idPlantillaDocumento);
 	
 	
 	/**

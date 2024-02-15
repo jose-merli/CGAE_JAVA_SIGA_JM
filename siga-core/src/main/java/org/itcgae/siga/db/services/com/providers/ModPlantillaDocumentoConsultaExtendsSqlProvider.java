@@ -167,7 +167,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		return sql.toString();
 	}
 
-	public String selectConsultaByIdConsulta(Short idInstitucion, Long idModeloComunicacion, Long idInforme,
+	public String selectConsultaByIdConsulta(Short idInstitucion, Long idModeloComunicacion,
 			Long idConsulta, Long idPlantillaDocumento) {
 		SQL sql = new SQL();
 
@@ -178,7 +178,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.INNER_JOIN(
 				"MOD_MODELO_PLANTILLADOCUMENTO modelo ON consulta.idplantilladocumento=modelo.idplantilladocumento");
 		sql.WHERE("consulta.idinstitucion = " + idInstitucion + " AND modelo.idmodelocomunicacion = "
-				+ idModeloComunicacion + " AND modelo.idinforme = " + idInforme + " AND consulta.IDCONSULTA = "
+				+ idModeloComunicacion + " AND consulta.IDCONSULTA = "
 				+ idConsulta);
 		sql.WHERE("consulta.FECHABAJA IS NULL");
 
