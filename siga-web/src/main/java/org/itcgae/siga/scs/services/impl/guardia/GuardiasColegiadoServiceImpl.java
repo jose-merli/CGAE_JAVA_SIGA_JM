@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl.guardia;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +29,6 @@ import org.itcgae.siga.DTOs.scs.ComboGuardiasFuturasItem;
 import org.itcgae.siga.DTOs.scs.DatosCalendarioItem;
 import org.itcgae.siga.DTOs.scs.GuardiasDTO;
 import org.itcgae.siga.DTOs.scs.GuardiasItem;
-import org.itcgae.siga.DTOs.scs.PermutaDTO;
 import org.itcgae.siga.DTOs.scs.PermutaDTO2;
 import org.itcgae.siga.DTOs.scs.PermutaItem;
 import org.itcgae.siga.DTOs.scs.PermutaItem2;
@@ -41,7 +42,6 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBajastemporalesExample;
 import org.itcgae.siga.db.entities.FcsFactApunte;
 import org.itcgae.siga.db.entities.FcsFactApunteExample;
-import org.itcgae.siga.db.entities.FcsFactApunteKey;
 import org.itcgae.siga.db.entities.FcsFactGuardiascolegiadoExample;
 import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.entities.ScsActuacionasistenciaKey;
@@ -903,7 +903,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 				String idTurno = datos[0];
 				String idGuardia = datos[1];
-				Long fechadesde = Long.parseLong(datos[2]);
+				Date fechaDesde = null;
 				String idPersona = datos[3];
 				String newLetrado = datos[4];
 				String fechaSustitucion = datos[5];
@@ -911,7 +911,16 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 				String saltoOcompensacion = datos[7];
 				String calendarioGuardias = datos[8];
 				Boolean borrarGuardiaSustituida = Boolean.parseBoolean(datos[10]);
-
+				
+				// Parseamos las fechas
+				try {
+			        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+					fechaDesde = sdf.parse(datos[2]);
+				} catch (ParseException e) {
+					e.printStackTrace();
+					LOGGER.info("sustituirGuardiaColeg() ->  Error al parsear la fecha desde");
+				}
+				
 				//-------------------------------------------------------------------------------------------------------
 				// Obtenemos todas las guardias del letrado que solicita la sustitucion(saliente) para las que la fecha
 				// de inicio sea mayor que la actual. La informacion se saca de la tabla SCS_CABECERAGUARDIAS
@@ -924,7 +933,7 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 						.andIdturnoEqualTo(Integer.parseInt(idTurno))
 						.andIdguardiaEqualTo(Integer.parseInt(idGuardia))
 						.andIdpersonaEqualTo(Long.parseLong(idPersona))
-						.andFechainicioEqualTo(new Date(fechadesde));
+						.andFechainicioEqualTo(fechaDesde);
 
 				List<ScsCabeceraguardias> cabeceraguardias = scsCabeceraguardiasExtendsMapper.selectByExample(cabeceraguardiasExample);
 				if (cabeceraguardias != null) {
@@ -1312,21 +1321,29 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 		String idTurno = datos[0];
 		String idGuardia = datos[1];
-		Long fechadesde = Long.parseLong(datos[2]);
 		String idPersona = datos[3];
-		Long fechahasta = Long.parseLong(datos[9]);
+		String fechaDesde = datos[2];
+		String fechaHasta = datos[9];
 
 		ScsGuardiascolegiadoKey guardiascolegiadoKey = new ScsGuardiascolegiadoKey();
 		guardiascolegiadoKey.setIdinstitucion(idInstitucion);
 		guardiascolegiadoKey.setIdturno(Integer.parseInt(idTurno));
 		guardiascolegiadoKey.setIdguardia(Integer.parseInt(idGuardia));
 		guardiascolegiadoKey.setIdpersona(Long.parseLong(idPersona));
-		guardiascolegiadoKey.setFechainicio(new Date(fechadesde));
-		guardiascolegiadoKey.setFechafin(new Date(fechahasta));
+		
+		// Parseamos las fechas
+		try {
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+			guardiascolegiadoKey.setFechainicio(sdf.parse(fechaDesde));
+			guardiascolegiadoKey.setFechafin(sdf.parse(fechaHasta));
+		} catch (ParseException e) {
+			e.printStackTrace();
+			LOGGER.info("existeFacturacionGuardiaColegiado() ->  Error al parsear las fechas");
+		}
 
 		ScsGuardiascolegiado guardiascolegiado = scsGuardiascolegiadoExtendsMapper.selectByPrimaryKey(guardiascolegiadoKey);
 
-		if (guardiascolegiadoKey == null) {
+		if (guardiascolegiado == null) {
 			error.setCode(200);
 			responseDataDTO.setData("0");
 			return responseDataDTO;
@@ -1364,21 +1381,31 @@ public class GuardiasColegiadoServiceImpl implements GuardiasColegiadoService {
 
 		String idTurno = datos[0];
 		String idGuardia = datos[1];
-		Long fechadesde = Long.parseLong(datos[2]);
 		String idPersona = datos[3];
-		Long fechahasta = Long.parseLong(datos[9]);
-
+		String fechaDesde = datos[2];
+		String fechaHasta = datos[9];
+		
 		ScsGuardiascolegiadoKey guardiascolegiadoKey = new ScsGuardiascolegiadoKey();
 		guardiascolegiadoKey.setIdinstitucion(idInstitucion);
 		guardiascolegiadoKey.setIdturno(Integer.parseInt(idTurno));
 		guardiascolegiadoKey.setIdguardia(Integer.parseInt(idGuardia));
 		guardiascolegiadoKey.setIdpersona(Long.parseLong(idPersona));
-		guardiascolegiadoKey.setFechainicio(new Date(fechadesde));
-		guardiascolegiadoKey.setFechafin(new Date(fechahasta));
+		
+		// Parseamos las fechas
+		try {
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+			guardiascolegiadoKey.setFechainicio(sdf.parse(fechaDesde));
+			guardiascolegiadoKey.setFechafin(sdf.parse(fechaHasta));
+		} catch (ParseException e) {
+			e.printStackTrace();
+			LOGGER.info("existeAsistenciasGuardiaColegiado() ->  Error al parsear las fechas");
+
+		}
+
 
 		ScsGuardiascolegiado guardiascolegiado = scsGuardiascolegiadoExtendsMapper.selectByPrimaryKey(guardiascolegiadoKey);
 
-		if (guardiascolegiadoKey == null) {
+		if (guardiascolegiado == null) {
 			error.setCode(200);
 			responseDataDTO.setData("0");
 			return responseDataDTO;

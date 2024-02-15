@@ -20,6 +20,6 @@ public interface ModRelPlantillaSufijoExtendsMapper {
 		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRESUFIJO", property = "nombreSufijo", jdbcType = JdbcType.VARCHAR)
 	})
-	List<SufijoItem> selectSufijosPlantilla(Long idModeloComunicacion, Long idInforme, String idLenguaje);
+	List<SufijoItem> selectSufijosPlantilla(Long idModeloComunicacion, Long idInforme, Long idPlantillaDocumento, String idLenguaje);
 	
 }

@@ -3608,14 +3608,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					}
 
 					// Marcamos por defecto la partida presupuestaria del turno
-					ScsTurnoExample scsTurnoExample = new ScsTurnoExample();
-					scsTurnoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdturnoEqualTo(designa.getIdturno());
+					ScsTurnoKey scsTurnoKey = new ScsTurnoKey();
+					scsTurnoKey.setIdinstitucion(idInstitucion);
+					scsTurnoKey.setIdturno(designa.getIdturno());
 
-					List<ScsTurno> listaTurnos = scsTurnoMapper.selectByExample(scsTurnoExample);
+					ScsTurno turno = scsTurnoMapper.selectByPrimaryKey(scsTurnoKey);
+					
 
-					if (!listaTurnos.isEmpty() && null != listaTurnos.get(0).getIdpartidapresupuestaria()) {
-						designa.setIdpartidapresupuestaria(listaTurnos.get(0).getIdpartidapresupuestaria());
+					if ( null != turno.getIdpartidapresupuestaria()) {
+						designa.setIdpartidapresupuestaria(turno.getIdpartidapresupuestaria());
 					}
 
 					LOGGER.info(
@@ -5189,28 +5190,27 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info(
 					"DesignacionesServiceImpl.getDatosAdicionales -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-//			GenParametrosExample genParametrosExample = new GenParametrosExample();
-//			genParametrosExample.createCriteria().andModuloEqualTo("CEN")
-//					.andParametroEqualTo("TAM_MAX_BUSQUEDA_COLEGIADO")
-//					.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_0_SHORT, idInstitucion));
-//			genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-//			LOGGER.info(
-//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-//			LOGGER.info(
-//					"searchColegiado() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-//			if (tamMax != null) {
-//				tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-//			} else {
-//				tamMaximo = null;
-//			}
-
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info(
 						"DesignacionesServiceImpl.getDatosAdicionales -> Entrada a servicio para la busqueda de datos adicionales de una designa");
 
 				try {
-					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa);
+					
+					// Obtenemos el parametro de limite para el campo CODIGO en BBDD
+					StringDTO parametros = new StringDTO();
+					Integer longitudDesigna;
+
+					parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", idInstitucion.toString());
+					// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+					// la institucion 0
+					if (parametros != null && parametros.getValor() != null) {
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					} else {
+						parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+						longitudDesigna = Integer.parseInt(parametros.getValor());
+					}
+					
+					designas = scsDesignacionesExtendsMapper.existeDesginaJuzgadoProcedimiento(idInstitucion, designa, longitudDesigna);
 					
 					if (designas == null) {
 						designas = "0";
@@ -8230,6 +8230,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		Error error = new Error();
 		int response = 0;
+		List<RelacionesItem> relacionesItem = null;
 
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -8280,6 +8281,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							designaItem.setIdTurno(Integer.parseInt(turnos.get(0).getIdturno()));
 						}
 					}
+					
 
 					// EJG a asociar
 					EjgItem ejg = new EjgItem();
@@ -8287,7 +8289,9 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					ejg.setAnnio(item.get(1));
 					ejg.setTipoEJG(item.get(2));
 					ejg.setNumero(item.get(5));
-
+					ejg.setidInstitucion(idInstitucion.toString());;
+					
+					
 					// Objeto que vamos a insertar en la base de datos
 					ScsEjgdesigna record = new ScsEjgdesigna();
 
@@ -8299,6 +8303,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setNumeroejg(Long.parseLong(ejg.getNumero()));
 					record.setIdturno(designaItem.getIdTurno());
 					record.setAniodesigna((short) designaItem.getAno());
+					
 					// record.setNumerodesigna((long) designaItem.getNumero());
 
 					// Debido a que no podemos obtener el numero de la designacion sino su codigo,
@@ -8340,6 +8345,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					record.setNumerodesigna((long) designasCodigo.get(0).getNumero());
 
 					response = scsEjgdesignaMapper.insert(record);
+					
+					// Inserta defensa juridica en Designa si el Ejg tiene asociado una asistencia y la defensa juridica de la designa es null
+					relacionesItem = scsEjgExtendsMapper.getRelacionesEJG(ejg);
+					
+					
+					if(relacionesItem.size() > 0) {
+						int nAsistencias = 0;
+						int posicionAsistencia = 0;
+						for (int i = 0; i < relacionesItem.size(); i++) {
+							RelacionesItem objeto = relacionesItem.get(i);
+							if (objeto.getSjcs() != null && objeto.getSjcs().trim().toUpperCase().startsWith("A")) {
+								nAsistencias++;
+								posicionAsistencia = i;
+				            }
+						}
+						if(nAsistencias == 1) {
+							ScsAsistenciaKey asistenciaKey = new ScsAsistenciaKey();
+
+							asistenciaKey.setIdinstitucion(idInstitucion);
+							asistenciaKey.setAnio(Short.parseShort(relacionesItem.get(posicionAsistencia).getAnio()));
+							asistenciaKey.setNumero(Long.parseLong(relacionesItem.get(posicionAsistencia).getNumero()));
+
+							ScsAsistencia asistenciaRelacion = scsAsistenciaMapper.selectByPrimaryKey(asistenciaKey);
+							ScsDesignaKey designaKey = new ScsDesignaKey();
+
+							designaKey.setIdinstitucion(idInstitucion);
+							designaKey.setIdturno(Integer.valueOf(item.get(3)));
+							designaKey.setAnio((short) designaItem.getAno());
+							designaKey.setNumero((long) designasCodigo.get(0).getNumero());
+
+							ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+							
+							if(designa.getDefensajuridica() == null) {
+								designa.setDefensajuridica(asistenciaRelacion.getDatosdefensajuridica());
+								scsDesignaMapper.updateByPrimaryKey(designa);
+							}
+
+						}
+					}
+					
+					
+					
+					
 					
 					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
 					

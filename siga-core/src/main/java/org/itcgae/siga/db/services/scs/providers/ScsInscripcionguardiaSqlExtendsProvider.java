@@ -144,7 +144,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 				+ "                        cola.*\r\n"
 				+ "                    FROM\r\n"
 				+ "                        (\r\n"
-				+ "                            SELECT\r\n"
+				+ "                            SELECT DISTINCT\r\n"
 				+ "                                per.idpersona                                                  idp,\r\n"
 				+ "                                gua.idpersona_ultimo,\r\n"
 				+ "                                '1'                                                            activo,\r\n"
@@ -204,7 +204,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sqlp1 += " AND TO_DATE('" + fecha + "', 'DD/MM/YYYY')";
 		
-		sqlp1 += " BETWEEN nvl(ins.fechavalidacion, '31/12/2999') AND nvl(ins.fechabaja, '31/12/2999')\r\n"
+		sqlp1 += " BETWEEN nvl(ins.fechavalidacion,  TO_DATE( '31/12/2999', 'DD/MM/YYYY')) AND nvl(ins.fechabaja,  TO_DATE( '31/12/2999', 'DD/MM/YYYY'))\r\n"
 				+ "                ORDER BY "
 				+ ordenaciones
 				+ "                        ) cola\r\n"
@@ -224,7 +224,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 						+ "                        cola.*\r\n"
 						+ "                    FROM\r\n"
 						+ "                        (\r\n"
-						+ "                            SELECT\r\n"
+						+ "                            SELECT DISTINCT\r\n"
 						+ "                                per.idpersona                                                  idp,\r\n"
 						+ "                                gua.idpersona_ultimo,\r\n"
 						+ "                                '1'                                                            activo,\r\n"
@@ -284,7 +284,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sqlp1 += " AND TO_DATE('" + fecha + "', 'DD/MM/YYYY')";
 		
-		sqlp1 += " BETWEEN nvl(ins.fechavalidacion, '31/12/2999') AND nvl(ins.fechabaja, '31/12/2999')\r\n"
+		sqlp1 += " BETWEEN nvl(ins.fechavalidacion,  TO_DATE( '31/12/2999', 'DD/MM/YYYY')) AND nvl(ins.fechabaja,  TO_DATE( '31/12/2999', 'DD/MM/YYYY'))\r\n"
 				+ "                ORDER BY "
 				+ ordenaciones
 				+ "                        ) cola\r\n"
@@ -812,7 +812,7 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 		
 		sqlp1 += " AND TO_DATE('" + fecha + "', 'DD/MM/YYYY')";
 		
-		sqlp1 += " BETWEEN nvl(ins.fechavalidacion, '31/12/2999') AND nvl(ins.fechabaja, '31/12/2999')\r\n"
+		sqlp1 += " BETWEEN nvl(ins.fechavalidacion,  TO_DATE('31/12/2999', 'DD/MM/YYYY') ) AND nvl(ins.fechabaja,  TO_DATE('31/12/2999', 'DD/MM/YYYY') )\r\n"
 				+ "                ORDER BY "
 				+ ordenaciones
 				+ "            ) cola\r\n"

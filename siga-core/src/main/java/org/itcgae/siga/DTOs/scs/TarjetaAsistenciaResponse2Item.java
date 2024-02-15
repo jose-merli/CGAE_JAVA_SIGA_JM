@@ -50,6 +50,7 @@ public class TarjetaAsistenciaResponse2Item implements Comparable<TarjetaAsisten
 	private boolean diaDespuesDisabled;
 	private String guardiaRequeridaValidacion;
 	private String salto;
+	private String fechaNacimiento;
 
 	public String getSalto() {
 		return salto;
@@ -620,6 +621,14 @@ public class TarjetaAsistenciaResponse2Item implements Comparable<TarjetaAsisten
 	}
 
 
+
+	public String getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+
+	public void setFechaNacimiento(String fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
 
 	@Override
 	public int hashCode() {

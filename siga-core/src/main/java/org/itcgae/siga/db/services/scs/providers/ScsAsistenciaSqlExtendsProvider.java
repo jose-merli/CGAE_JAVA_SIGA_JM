@@ -279,6 +279,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.SELECT("apellido2");
 		sql.SELECT("nif");
 		sql.SELECT("sexo");
+		sql.SELECT("fechanacimiento");
 		sql.SELECT("aa.fechajustificacion");
 		sql.SELECT("aa.fecha fechaActuacion");
 		sql.SELECT("aa.numeroasunto");

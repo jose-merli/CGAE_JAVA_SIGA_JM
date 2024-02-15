@@ -1037,11 +1037,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 								LOGGER.info("updateJusticiable() / scsTelefonosPersonaExtendsMapper.deleteByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para eliminar telefonos al justiciable");
 								response = scsTelefonosPersonaExtendsMapper.deleteByPrimaryKey(keyTel);
-								LOGGER.info("updateJusticiable() / scsTelefonosPersonaExtendsMapper.deleteByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para eliminar telefonos al justiciable");
+								LOGGER.info("updateJusticiable() / scsTelefonosPersonaExtendsMapper.deleteByExample() -> Salida de scsTelefonosPersonaExtendsMapper para eliminar telefonos al justiciable");
 							}
 						}
 
-						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0 && datosGenerales) {
+						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0 && datosGenerales && !checkTelefonoPorDefecto(justiciableItem.getTelefonos().get(0))){
 
 							// Añadimos los telefonos nuevos
 							for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
@@ -1093,6 +1093,22 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		updateResponseDTO.setError(error);
 		LOGGER.info("updateJusticiable() -> Salida del servicio para modificar un justiciable");
 		return updateResponseDTO;
+	}
+
+	private boolean checkTelefonoPorDefecto(JusticiableTelefonoItem justiciableTelefonoItem) {
+		boolean telefonoPorDefecto = false;
+		
+		if (justiciableTelefonoItem.getIdInstitucion() == null
+			&& justiciableTelefonoItem.getIdPersona() == null
+			&& justiciableTelefonoItem.getIdTelefono() == null
+			&& justiciableTelefonoItem.getNombreTelefono() == null
+			&& justiciableTelefonoItem.getNumeroTelefono() == null
+			&& "0".equals(justiciableTelefonoItem.getPreferenteSms())
+			&& justiciableTelefonoItem.getFechaModificacion() == null) {
+			telefonoPorDefecto = true;
+		}
+		
+		return telefonoPorDefecto;
 	}
 
 	private void inicializarValidaciones() {

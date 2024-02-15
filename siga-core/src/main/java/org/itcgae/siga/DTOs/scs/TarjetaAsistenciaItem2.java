@@ -30,6 +30,7 @@ public class TarjetaAsistenciaItem2 {
 	private String lugar;
 	private String numeroAsunto;
 	private String nombre, sexo, apellido1, apellido2, nif, comisariaJuzgado;
+	private String fechaNacimiento;
 
 	public String getIdTipoEjg() {
 		return idTipoEjg;
@@ -295,6 +296,16 @@ public class TarjetaAsistenciaItem2 {
 	public void setIdTurno(String idTurno) {
 		this.idTurno = idTurno;
 	}
+	
+	
+	public String getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+
+	public void setFechaNacimiento(String fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(anio, anioNumero, asistido, ejgAnio, ejgAnioNumero,

@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
+import org.itcgae.siga.DTOs.com.FichasPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
@@ -164,6 +165,13 @@ public class ModelosYComunicacionesController {
 		
 		PlantillasDocumentosDTO response = _modelosYcomunicacionesService.obtenerInformes(request, modelo.getIdInstitucion(), modelo.getIdModeloComunicacion());
 		return new ResponseEntity<PlantillasDocumentosDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/detalle/fichasPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FichasPlantillaDocumentoDTO> obtenerFichasPlantilla(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
+		
+		FichasPlantillaDocumentoDTO response = _modelosYcomunicacionesService.obtenerFichasPlantillaDocumento(request, modelo.getIdInstitucion(), modelo.getIdModeloComunicacion());
+		return new ResponseEntity<FichasPlantillaDocumentoDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/detalle/informes/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
