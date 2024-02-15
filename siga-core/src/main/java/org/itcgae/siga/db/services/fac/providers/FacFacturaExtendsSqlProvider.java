@@ -225,12 +225,14 @@ public class FacFacturaExtendsSqlProvider extends FacFacturaSqlProvider {
         //fecha emision
         if (item.getFechaEmisionDesde() != null) {
             fecha = dateFormat.format(item.getFechaEmisionDesde());
-            facturas.WHERE("f.fechaemision >= TO_DATE('" + fecha + "', 'DD/MM/YYYY')");
+            facturas.WHERE("TRUNC(f.fechaemision) >= TRUNC(TO_DATE('" + fecha + "', 'DD/MM/YYYY'))");
         }
         if (item.getFechaEmisionHasta() != null) {
             fecha = dateFormat.format(item.getFechaEmisionHasta());
-            facturas.WHERE("f.fechaemision <= TO_DATE('" + fecha + "', 'DD/MM/YYYY')");
+            facturas.WHERE("TRUNC(f.fechaemision) <= TRUNC(TO_DATE('" + fecha + "', 'DD/MM/YYYY'))");
         }
+
+        
 
         //importe facturado
         if (item.getImportefacturadoDesde() != null && !item.getImportefacturadoDesde().isEmpty()) {
