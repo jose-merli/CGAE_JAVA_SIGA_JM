@@ -128,176 +128,150 @@ public class ScsInscripcionguardiaSqlExtendsProvider extends ScsInscripcionguard
 	
 	public String getColaGuardiasNueva(String idGuardia, String idTurno, String ordenaciones, String fecha,String posicionColaUltimo, String idInstitucion) {
 		SQL sql = new SQL();
+		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
+		SQL sql1sub1 = new SQL();
+		SQL sql1sub2 = new SQL();
+		SQL sql2sub1 = new SQL();
+		SQL sql2sub2 = new SQL();
 		
-		String sqlp1 = "SELECT\r\n"
-				+ "    *\r\n"
-				+ "FROM\r\n"
-				+ "    (\r\n"
-				+ "        (\r\n"
-				+ "            SELECT\r\n"
-				+ "                1 AS bloque,\r\n"
-				+ "                trozo_cola.*\r\n"
-				+ "            FROM\r\n"
-				+ "                (\r\n"
-				+ "                    SELECT\r\n"
-				+ "                        ROWNUM orden_cola,\r\n"
-				+ "                        cola.*\r\n"
-				+ "                    FROM\r\n"
-				+ "                        (\r\n"
-				+ "                            SELECT DISTINCT\r\n"
-				+ "                                per.idpersona                                                  idp,\r\n"
-				+ "                                gua.idpersona_ultimo,\r\n"
-				+ "                                '1'                                                            activo,\r\n"
-				+ "                                ins.idinstitucion,\r\n"
-				+ "                                ins.idturno,\r\n"
-				+ "                                ins.idguardia,\r\n"
-				+ "                                sg2.idgrupoguardia                                             AS grupo,"
-				+ "                                sg.idgrupoguardia                                              AS idgrupoguardiacolegiado,"
-				+ "                                to_char(ins.fechavalidacion, 'DD/MM/YYYY')                     AS fechavalidacion,\r\n"
-				+ "                                to_char(ins.fechabaja, 'DD/MM/YYYY')                           AS fechabaja,\r\n"
-				+ "                                ins.fechasuscripcion,\r\n"
-				+ "                                per.nifcif,\r\n"
-				+ "                                per.idpersona,\r\n"
-				+ "                                per.nombre,\r\n"
-				+ "                                per.apellidos1,\r\n"
-				+ "                                decode(per.apellidos2, NULL, '', ' ' || per.apellidos2)        apellidos2,\r\n"
-				+ "                                decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) ncolegiado,\r\n"
-				+ "                                per.apellidos1\r\n"
+		// primera sql
+		
+		sql1sub2.SELECT("DISTINCT\r\n"
+				+ "             per.idpersona idp,\r\n"
+				+ "				gua.idpersona_ultimo,\r\n"
+				+ "				'1' activo,\r\n"
+				+ "				ins.idinstitucion,\r\n"
+				+ "				ins.idturno,\r\n"
+				+ "				ins.idguardia,\r\n"
+				+ "				sg2.idgrupoguardia AS grupo,\r\n"
+				+ "				sg.idgrupoguardia AS idgrupoguardiacolegiado,\r\n"
+				+ "				to_char(ins.fechavalidacion, 'DD/MM/YYYY') AS fechavalidacion,\r\n"
+				+ "				to_char(ins.fechabaja, 'DD/MM/YYYY') AS fechabaja,\r\n"
+				+ "				ins.fechasuscripcion,\r\n"
+				+ "				per.nifcif,\r\n"
+				+ "				per.idpersona,\r\n"
+				+ "				per.nombre,\r\n"
+				+ "				per.apellidos1,\r\n"
+				+ "				decode(per.apellidos2, NULL, '', ' ' || per.apellidos2) apellidos2,\r\n"
+				+ "				decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) ncolegiado,\r\n"
+				+ "				per.apellidos1\r\n"
 				+ "                                || decode(per.apellidos2, NULL, '', ' ' || per.apellidos2)\r\n"
 				+ "                                || ' '\r\n"
-				+ "                                || per.nombre                                                  alfabetico,\r\n"
-				+ "                                decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) numerocolegiado,\r\n"
-				+ "                                trunc(per.fechanacimiento)                                     fechanacimiento /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
-				+ "                                ,\r\n"
-				+ "                                trunc(ins.fechavalidacion)                                     antiguedadcola /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
-				+ "                                ,\r\n"
-				+ "                                sg2.numerogrupo,\r\n"
-				+ "                                sg.orden AS ordengrupo,\r\n"
-				+ "                                to_char(sg2.numerogrupo * 100000 + sg.orden, '0000000000')     ordenmanual\r\n"
-				+ "                            FROM\r\n"
-				+ "                                     scs_guardiasturno gua\r\n"
-				+ "                                INNER JOIN scs_ordenacioncolas       so ON gua.idordenacioncolas = so.idordenacioncolas\r\n"
-				+ "                                INNER JOIN scs_inscripcionguardia    ins ON ins.idinstitucion = gua.idinstitucion\r\n"
-				+ "                                                                         AND ins.idturno = gua.idturno\r\n"
-				+ "                                                                         AND ins.idguardia = gua.idguardia\r\n"
-				+ "                                LEFT OUTER JOIN scs_grupoguardiacolegiado sg ON ins.idinstitucion = sg.idinstitucion\r\n"
-				+ "                                                                                AND ins.idturno = sg.idturno\r\n"
-				+ "                                                                                AND ins.idguardia = sg.idguardia\r\n"
-				+ "                                                                                AND ins.idpersona = sg.idpersona\r\n"
-				+ "                                                                                AND ins.fechasuscripcion = sg.fechasuscripcion\r\n"
-				+ "                                LEFT OUTER JOIN scs_grupoguardia          sg2 ON sg2.idinstitucion = sg.idinstitucion\r\n"
-				+ "                                                                        AND sg2.idturno = sg.idturno\r\n"
-				+ "                                                                        AND sg2.idguardia = sg.idguardia\r\n"
-				+ "                                                                        AND sg2.idgrupoguardia = sg.idgrupoguardia\r\n"
-				+ "                                INNER JOIN cen_colegiado             col ON ins.idinstitucion = col.idinstitucion\r\n"
-				+ "                                                                AND ins.idpersona = col.idpersona\r\n"
-				+ "                                INNER JOIN cen_persona               per ON col.idpersona = per.idpersona\r\n"
-				+ "                            WHERE\r\n"
-				+ "                                    1 = 1\r\n"
-				+ "                                AND ins.fechavalidacion IS NOT NULL";
+				+ "                                || per.nombre alfabetico,\r\n"
+				+ "				decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) numerocolegiado,\r\n"
+				+ "				trunc(per.fechanacimiento) fechanacimiento /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
+				+ "				,\r\n"
+				+ "				trunc(ins.fechavalidacion) antiguedadcola /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
+				+ "				,\r\n"
+				+ "				sg2.numerogrupo,\r\n"
+				+ "				sg.orden AS ordengrupo,\r\n"
+				+ "				to_char(sg2.numerogrupo * 100000 + sg.orden, '0000000000') ordenmanual");
+		sql1sub2.FROM("scs_guardiasturno gua");
+		sql1sub2.INNER_JOIN("scs_ordenacioncolas so ON gua.idordenacioncolas = so.idordenacioncolas");
+		sql1sub2.INNER_JOIN("scs_inscripcionguardia ins ON"
+				+ " ins.idinstitucion = gua.idinstitucion"
+				+ " AND ins.idturno = gua.idturno"
+				+ " AND ins.idguardia = gua.idguardia");
+		sql1sub2.LEFT_OUTER_JOIN("scs_grupoguardiacolegiado sg ON"
+				+ "	ins.idinstitucion = sg.idinstitucion"
+				+ "	AND ins.idturno = sg.idturno"
+				+ "	AND ins.idguardia = sg.idguardia"
+				+ "	AND ins.idpersona = sg.idpersona"
+				+ "	AND ins.fechasuscripcion = sg.fechasuscripcion");
+		sql1sub2.LEFT_OUTER_JOIN("scs_grupoguardia sg2 ON"
+				+ "	sg2.idinstitucion = sg.idinstitucion"
+				+ "	AND sg2.idturno = sg.idturno"
+				+ "	AND sg2.idguardia = sg.idguardia"
+				+ "	AND sg2.idgrupoguardia = sg.idgrupoguardia");
+		sql1sub2.INNER_JOIN("cen_colegiado col ON ins.idinstitucion = col.idinstitucion AND ins.idpersona = col.idpersona");
+		sql1sub2.INNER_JOIN("cen_persona per ON col.idpersona = per.idpersona");
+		sql1sub2.WHERE(" 1 = 1 ");
+		sql1sub2.WHERE(" ins.fechavalidacion IS NOT NULL ");
+		sql1sub2.WHERE(" gua.idinstitucion = "+ idInstitucion);
+		sql1sub2.WHERE(" gua.idturno = " + idTurno);
+		sql1sub2.WHERE(" gua.idguardia = "+ idGuardia);
+		sql1sub2.WHERE(" TO_DATE('" + fecha + "', 'DD/MM/YYYY') BETWEEN TO_DATE( ins.fechavalidacion, 'DD/MM/YYYY') AND nvl(ins.fechabaja, TO_DATE( '31/12/2999', 'DD/MM/YYYY'))");
+		sql1sub2.ORDER_BY(ordenaciones);
 		
-		sqlp1 += " AND gua.idinstitucion = " + idInstitucion;
+		sql1sub1.SELECT("ROWNUM orden_cola, cola.* ");
+		sql1sub1.FROM("("+sql1sub2.toString() +") cola");
 		
-		sqlp1 += " AND gua.idturno = " + idTurno;
+		sql1.SELECT("1 AS bloque, trozo_cola.* ");
+		sql1.FROM("("+ sql1sub1.toString()+") trozo_cola");
+		sql1.WHERE("orden_cola > nvl("+ posicionColaUltimo  +", 0)");
 		
-		sqlp1 += " AND gua.idguardia = " + idGuardia;
+		// segunda Sql
+		sql2sub2.SELECT("DISTINCT\r\n"
+				+ "                                per.idpersona idp,\r\n"
+				+ "			gua.idpersona_ultimo,\r\n"
+				+ "			'1' activo,\r\n"
+				+ "			ins.idinstitucion,\r\n"
+				+ "			ins.idturno,\r\n"
+				+ "			ins.idguardia,\r\n"
+				+ "			sg2.idgrupoguardia AS grupo,\r\n"
+				+ "			sg.idgrupoguardia AS idgrupoguardiacolegiado,\r\n"
+				+ "			to_char(ins.fechavalidacion, 'DD/MM/YYYY') AS fechavalidacion,\r\n"
+				+ "			to_char(ins.fechabaja, 'DD/MM/YYYY') AS fechabaja,\r\n"
+				+ "			ins.fechasuscripcion,\r\n"
+				+ "			per.nifcif,\r\n"
+				+ "			per.idpersona,\r\n"
+				+ "			per.nombre,\r\n"
+				+ "			per.apellidos1,\r\n"
+				+ "			decode(per.apellidos2, NULL, '', ' ' || per.apellidos2) apellidos2,\r\n"
+				+ "			decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) ncolegiado,\r\n"
+				+ "			per.apellidos1\r\n"
+				+ "                                || decode(per.apellidos2, NULL, '', ' ' || per.apellidos2)\r\n"
+				+ "                                || ' '\r\n"
+				+ "                                || per.nombre alfabetico,\r\n"
+				+ "			decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) numerocolegiado,\r\n"
+				+ "			trunc(per.fechanacimiento) fechanacimiento /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
+				+ "			,\r\n"
+				+ "			trunc(ins.fechavalidacion) antiguedadcola /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
+				+ "			,\r\n"
+				+ "			sg2.numerogrupo,\r\n"
+				+ "			sg.orden AS ordengrupo,\r\n"
+				+ "			to_char(sg2.numerogrupo * 100000 + sg.orden, '0000000000') ordenmanual");
+		sql2sub2.FROM("scs_guardiasturno gua");
+		sql2sub2.INNER_JOIN("scs_ordenacioncolas so ON gua.idordenacioncolas = so.idordenacioncolas");
+		sql2sub2.INNER_JOIN("scs_inscripcionguardia ins ON ins.idinstitucion = gua.idinstitucion AND ins.idturno = gua.idturno\r\n"
+				+ "	AND ins.idguardia = gua.idguardia");
+		sql2sub2.LEFT_OUTER_JOIN("scs_grupoguardiacolegiado sg ON"
+				+ " ins.idinstitucion = sg.idinstitucion"
+				+ " AND ins.idturno = sg.idturno"
+				+ " AND ins.idguardia = sg.idguardia"
+				+ "	AND ins.idpersona = sg.idpersona"
+				+ "	AND ins.fechasuscripcion = sg.fechasuscripcion");
+		sql2sub2.LEFT_OUTER_JOIN("scs_grupoguardia sg2 ON"
+				+ "	sg2.idinstitucion = sg.idinstitucion"
+				+ "	AND sg2.idturno = sg.idturno"
+				+ "	AND sg2.idguardia = sg.idguardia"
+				+ "	AND sg2.idgrupoguardia = sg.idgrupoguardia");
+		sql2sub2.INNER_JOIN("cen_colegiado col ON ins.idinstitucion = col.idinstitucion AND ins.idpersona = col.idpersona");
+		sql2sub2.INNER_JOIN("cen_persona per ON col.idpersona = per.idpersona");
+		sql2sub2.WHERE(" 1 = 1 ");
+		sql2sub2.WHERE(" ins.fechavalidacion IS NOT NULL ");
+		sql2sub2.WHERE(" gua.idinstitucion =  "+ idInstitucion);
+		sql2sub2.WHERE(" gua.idturno = "+ idTurno);
+		sql2sub2.WHERE(" gua.idguardia = "+ idGuardia);
+		sql2sub2.WHERE(" TO_DATE('" + fecha + "', 'DD/MM/YYYY') BETWEEN TO_DATE( ins.fechavalidacion, 'DD/MM/YYYY') AND nvl(ins.fechabaja, TO_DATE( '31/12/2999', 'DD/MM/YYYY')) ");
+		sql2sub2.ORDER_BY(ordenaciones);
 		
-		sqlp1 += " AND TO_DATE('" + fecha + "', 'DD/MM/YYYY')";
+		sql2sub1.SELECT("ROWNUM orden_cola, cola.* ");
+		sql2sub1.FROM("("+sql2sub2.toString() +") cola");
 		
-		sqlp1 += " BETWEEN TO_DATE( ins.fechavalidacion, 'DD/MM/YYYY') AND nvl(ins.fechabaja,  TO_DATE( '31/12/2999', 'DD/MM/YYYY'))\r\n"
-				+ "                ORDER BY "
-				+ ordenaciones
-				+ "                        ) cola\r\n"
-				+ "                ) trozo_cola\r\n"
-				+ "            WHERE\r\n"
-				+ "                orden_cola > nvl(" + posicionColaUltimo  + ", 0)\r\n"
-						+ "        )\r\n"
-						+ "        UNION\r\n"
-						+ "        (\r\n"
-						+ "            SELECT\r\n"
-						+ "                2 AS bloque,\r\n"
-						+ "                trozo_cola.*\r\n"
-						+ "            FROM\r\n"
-						+ "                (\r\n"
-						+ "                    SELECT\r\n"
-						+ "                        ROWNUM orden_cola,\r\n"
-						+ "                        cola.*\r\n"
-						+ "                    FROM\r\n"
-						+ "                        (\r\n"
-						+ "                            SELECT DISTINCT\r\n"
-						+ "                                per.idpersona                                                  idp,\r\n"
-						+ "                                gua.idpersona_ultimo,\r\n"
-						+ "                                '1'                                                            activo,\r\n"
-						+ "                                ins.idinstitucion,\r\n"
-						+ "                                ins.idturno,\r\n"
-						+ "                                ins.idguardia,\r\n"
-						+ "                                sg2.idgrupoguardia                                             AS grupo,"
-						+ "                                sg.idgrupoguardia                                              AS idgrupoguardiacolegiado,"
-						+ "                                to_char(ins.fechavalidacion, 'DD/MM/YYYY')                     AS fechavalidacion,\r\n"
-						+ "                                to_char(ins.fechabaja, 'DD/MM/YYYY')                           AS fechabaja,\r\n"
-						+ "                                ins.fechasuscripcion,\r\n"
-						+ "                                per.nifcif,\r\n"
-						+ "                                per.idpersona,\r\n"
-						+ "                                per.nombre,\r\n"
-						+ "                                per.apellidos1,\r\n"
-						+ "                                decode(per.apellidos2, NULL, '', ' ' || per.apellidos2)        apellidos2,\r\n"
-						+ "                                decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) ncolegiado,\r\n"
-						+ "                                per.apellidos1\r\n"
-						+ "                                || decode(per.apellidos2, NULL, '', ' ' || per.apellidos2)\r\n"
-						+ "                                || ' '\r\n"
-						+ "                                || per.nombre                                                  alfabetico,\r\n"
-						+ "                                decode(col.comunitario, '1', col.ncomunitario, col.ncolegiado) numerocolegiado,\r\n"
-						+ "                                trunc(per.fechanacimiento)                                     fechanacimiento /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
-						+ "                                ,\r\n"
-						+ "                                trunc(ins.fechavalidacion)                                     antiguedadcola /*OJO: para el orden es necesario no usar TO_CHAR*/\r\n"
-						+ "                                ,\r\n"
-						+ "                                sg2.numerogrupo,\r\n"
-						+ "                                sg.orden AS ordengrupo,\r\n"
-						+ "                                to_char(sg2.numerogrupo * 100000 + sg.orden, '0000000000')     ordenmanual\r\n"
-						+ "                            FROM\r\n"
-						+ "                                     scs_guardiasturno gua\r\n"
-						+ "                                INNER JOIN scs_ordenacioncolas       so ON gua.idordenacioncolas = so.idordenacioncolas\r\n"
-						+ "                                INNER JOIN scs_inscripcionguardia    ins ON ins.idinstitucion = gua.idinstitucion\r\n"
-						+ "                                                                         AND ins.idturno = gua.idturno\r\n"
-						+ "                                                                         AND ins.idguardia = gua.idguardia\r\n"
-						+ "                                LEFT OUTER JOIN scs_grupoguardiacolegiado sg ON ins.idinstitucion = sg.idinstitucion\r\n"
-						+ "                                                                                AND ins.idturno = sg.idturno\r\n"
-						+ "                                                                                AND ins.idguardia = sg.idguardia\r\n"
-						+ "                                                                                AND ins.idpersona = sg.idpersona\r\n"
-						+ "                                                                                AND ins.fechasuscripcion = sg.fechasuscripcion\r\n"
-						+ "                                LEFT OUTER JOIN scs_grupoguardia          sg2 ON sg2.idinstitucion = sg.idinstitucion\r\n"
-						+ "                                                                        AND sg2.idturno = sg.idturno\r\n"
-						+ "                                                                        AND sg2.idguardia = sg.idguardia\r\n"
-						+ "                                                                        AND sg2.idgrupoguardia = sg.idgrupoguardia\r\n"
-						+ "                                INNER JOIN cen_colegiado             col ON ins.idinstitucion = col.idinstitucion\r\n"
-						+ "                                                                AND ins.idpersona = col.idpersona\r\n"
-						+ "                                INNER JOIN cen_persona               per ON col.idpersona = per.idpersona\r\n"
-						+ "                            WHERE\r\n"
-						+ "                                    1 = 1\r\n"
-						+ "                                AND ins.fechavalidacion IS NOT NULL";
+		sql2.SELECT("2 AS bloque, trozo_cola.*");
+		sql2.FROM("("+ sql2sub1.toString()+") trozo_cola");
+		sql2.WHERE("orden_cola <= nvl("+ posicionColaUltimo  +", 0)");
 		
-		sqlp1 += " AND gua.idinstitucion = " + idInstitucion;
+		// Union
 		
-		sqlp1 += " AND gua.idturno = " + idTurno;
+		sql.SELECT(" * ");
+		sql.FROM("( ("+ sql1.toString() +") UNION (" + sql2.toString() +") )");
+		sql.ORDER_BY("bloque, orden_cola");
 		
-		sqlp1 += " AND gua.idguardia = " + idGuardia;
 		
-		sqlp1 += " AND TO_DATE('" + fecha + "', 'DD/MM/YYYY')";
-		
-		sqlp1 += " BETWEEN TO_DATE( ins.fechavalidacion, 'DD/MM/YYYY') AND nvl(ins.fechabaja,  TO_DATE( '31/12/2999', 'DD/MM/YYYY'))\r\n"
-				+ "                ORDER BY "
-				+ ordenaciones
-				+ "                        ) cola\r\n"
-				+ "                ) trozo_cola\r\n"
-				+ "            WHERE\r\n"
-				+ "                orden_cola <= nvl(" + posicionColaUltimo + ", 0)\r\n"
-						+ "        )\r\n"
-						+ "    )\r\n"
-						+ "ORDER BY\r\n"
-						+ "    bloque,\r\n"
-						+ "    orden_cola";
-		
-		return sqlp1;
+		return sql.toString();
 	}
 
 	public String getColaGuardiasByNumColegiado(String idGuardia, String idTurno, String fechaIni, String fechaFin, String idInstitucion, String numCol) {
