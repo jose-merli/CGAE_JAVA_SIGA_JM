@@ -224,6 +224,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 	private static final String RET_OK = "0";
 	
 	private static final String FACTURA = "FACTURA";
+	private static final String ABONO = "ABONO";
 	
     protected static final String FACTURACION_DIRECTORIO_FISICO_LOG_PROGRAMACION = "facturacion.directorioFisicoLogProgramacion";
 
@@ -2397,7 +2398,7 @@ public class FacturacionPySServiceImpl implements IFacturacionPySService {
 				facturaDTO.setFacturasItems(items);
 			}
 
-			if (tipo.equalsIgnoreCase("ABONO")) {
+			if (tipo.equalsIgnoreCase(ABONO)) {
 				List<FacturaItem> items = facAbonoExtendsMapper.getAbono(idAbono,
 						usuario.getIdinstitucion().toString(),usuario.getIdlenguaje());
 

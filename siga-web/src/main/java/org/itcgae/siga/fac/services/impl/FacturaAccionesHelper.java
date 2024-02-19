@@ -168,7 +168,22 @@ public class FacturaAccionesHelper {
 
         // Obtener los datos de pago del abono
         abono = facAbonoExtendsMapper.selectByPrimaryKey(abonoKey);
-        BigDecimal cantidadPendiente = abono.getImppendienteporabonar();
+        
+        BigDecimal cantidadPendienteAux = abono.getImppendienteporabonar();
+        BigDecimal cantidadAbonadaAux = abono.getImptotalabonado();
+        
+        if (cantidadPendienteAux == null) {
+        	if (cantidadAbonadaAux == null) {
+        		cantidadPendienteAux = abono.getImptotal();
+        		cantidadAbonadaAux = new BigDecimal(0);
+        	} else {
+        		cantidadPendienteAux = abono.getImptotal().subtract(cantidadAbonadaAux);
+        	}
+        	
+        }
+        
+        BigDecimal cantidadPendiente = cantidadPendienteAux;
+        BigDecimal cantidadAbonada = cantidadAbonadaAux;
         BigDecimal cantidadOriginal = cantidadPendiente;
 
         if (importeFactura.compareTo(BigDecimal.ZERO) > 0) {
@@ -201,14 +216,14 @@ public class FacturaAccionesHelper {
             if (abono.getEstado().equals(SigaConstants.FAC_ABONO_ESTADO_PAGADO) || cantidadPendiente.compareTo(BigDecimal.ZERO) <= 0)
                 throw new BusinessException("facturacionSJCS.abonosSJCS.compensacion.deshabilitado");
 
-            BigDecimal importePendientePorAbonar = abono.getImppendienteporabonar().subtract(importeCompensado);
-            BigDecimal importeTotalAbonado = abono.getImptotalabonado().add(importeCompensado);
+            BigDecimal importePendientePorAbonar = cantidadPendiente.subtract(importeCompensado);
+            BigDecimal importeTotalAbonado = cantidadAbonada.add(importeCompensado);
 
             abono.setImppendienteporabonar(importePendientePorAbonar.setScale(2, RoundingMode.DOWN));
             abono.setImptotalabonado(importeTotalAbonado.setScale(2, RoundingMode.DOWN));
             abono.setImptotalabonadoefectivo(importeCompensado.setScale(2, RoundingMode.DOWN));
 
-            if (abono.getImppendienteporabonar().doubleValue() <= 0.0) {
+            if (cantidadPendiente.doubleValue() <= 0.0) {
                 abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PAGADO);
             } else if (abono.getIdcuenta() != null) {
                 abono.setEstado(SigaConstants.FAC_ABONO_ESTADO_PENDIENTE_BANCO);
