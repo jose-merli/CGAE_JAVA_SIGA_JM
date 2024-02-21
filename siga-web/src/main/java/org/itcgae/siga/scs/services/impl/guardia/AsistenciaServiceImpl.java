@@ -754,6 +754,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										idInstitucion, usuarios.get(0));
 								// Como es una nueva Asistencia, le ponemos estado ACTIVO
 								asistenciaBBDD.setIdestadoasistencia((short) 1);
+								asistenciaBBDD.setFechaestadoasistencia(new Date());
 								asistenciaBBDD.setIdorigenasistencia((short) 30); // 30 - Es una asistencia expres
 								
 								int responseAsistencia = scsAsistenciaExtendsMapper.insertSelective(asistenciaBBDD);
@@ -796,6 +797,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								// Actualizamos asistencia y actuaciones
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia2(asistencia,
 										null, null, tipoAsistenciaGeneral, idPersona, idInstitucion, usuarios.get(0));
+								asistenciaBBDD.setIdestadoasistencia((short) 1);
+								asistenciaBBDD.setFechaestadoasistencia(new Date());
+								asistenciaBBDD.setIdorigenasistencia((short) 30); // 30 - Es una asistencia expres
 								scsAsistenciaExtendsMapper.updateByPrimaryKey(asistenciaBBDD);
 								int responseAsistencia = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(asistenciaBBDD);
 								
@@ -1769,6 +1773,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion,
 									usuarios.get(0));
+							asistencia.setFechaestadoasistencia(new Date());
 							int inserted = scsAsistenciaExtendsMapper.insertSelective(asistencia);
 
 							// Si viene de una preasistencia, la pasamos a confirmada
