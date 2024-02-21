@@ -2392,7 +2392,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		
 		return dia;
 	}
-
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
@@ -2420,6 +2420,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		if (null != usuarios && usuarios.size() > 0) {
 			try {
+				
+				
 				// Comprobamos cual es el último grupo para cambiar el último letrado
 				OptionalInt maxGrupo = inscripciones.stream()
 						.filter(item -> !UtilidadesString.esCadenaVacia(item.getNumeroGrupo()))
@@ -2436,7 +2438,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 				for (InscripcionGuardiaItem item : inscripciones) {
 					if (UtilidadesString.esCadenaVacia(item.getOrden())
 							&& UtilidadesString.esCadenaVacia(item.getNumeroGrupo())
-							&& !UtilidadesString.esCadenaVacia(item.getIdGrupoGuardiaColegiado())) {
+							&& !UtilidadesString.esCadenaVacia(item.getIdGrupoGuardiaColegiado())
+							) {
 						// Elimina grupo guardia colegiado
 						scsGrupoguardiacolegiadoExtendsMapper
 								.deleteByPrimaryKey(Long.parseLong(item.getIdGrupoGuardiaColegiado()));
@@ -2552,8 +2555,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 			Date fechaValidacion, Integer numeroGrupo, Integer ordenGrupo, String idGrupoGuardiaColegiado,
 			Integer idUsuario) {
 		Long idGrupoGuardia = null;
-
-		// Buscamos el idGrupo que corresponde con el numero del grupo
+		ScsGrupoguardiacolegiadoExample grupoGuardiaColegiadoExample  = null;
+		boolean duplicadoError = false;
+		// Buscamos el idGrupoGuardia que corresponde con el numero del grupo
 		ScsGrupoguardiaExample grupoExample = new ScsGrupoguardiaExample();
 		grupoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(idTurno)
 				.andIdguardiaEqualTo(idGuardia).andNumerogrupoEqualTo(numeroGrupo);
@@ -2589,15 +2593,27 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 
 		ScsGrupoguardiacolegiado recordGrupoGuardiaColegiado = new ScsGrupoguardiacolegiado();
-		
-		if (nuevoGrupoGuardiaColegiado) {
-			recordGrupoGuardiaColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idGrupoGuardiaColegiado) + 1);
+
+		if (!nuevoGrupoGuardiaColegiado) {
+			grupoGuardiaColegiadoExample = new ScsGrupoguardiacolegiadoExample();
+			grupoGuardiaColegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					.andIdturnoEqualTo(idTurno).andIdguardiaEqualTo(idGuardia).andIdpersonaEqualTo(idPersona)
+					.andIdgrupoguardiaEqualTo(Long.parseLong(idGrupoGuardiaColegiado));
+
+			List<ScsGrupoguardiacolegiado> grupoGuardiaColegiado = scsGrupoguardiacolegiadoMapper
+					.selectByExample(grupoGuardiaColegiadoExample);
+			if (grupoGuardiaColegiado.size() > 0) {
+				duplicadoError = true;
+			} else {
+				idGrupoGuardiaColegiado = String.valueOf(grupoGuardiaColegiado.get(0).getIdgrupoguardiacolegiado());
+				recordGrupoGuardiaColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idGrupoGuardiaColegiado));
+			}
 		} else {
-			recordGrupoGuardiaColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idGrupoGuardiaColegiado));
+			recordGrupoGuardiaColegiado.setIdgrupoguardiacolegiado(Long.parseLong(idGrupoGuardiaColegiado) + 1);
 		}
 		
 		recordGrupoGuardiaColegiado.setIdpersona(idPersona);
-		recordGrupoGuardiaColegiado.setOrden(1);
+		recordGrupoGuardiaColegiado.setOrden(ordenGrupo);
 		recordGrupoGuardiaColegiado.setIdgrupoguardia(idGrupoGuardia);
 		recordGrupoGuardiaColegiado.setIdinstitucion(idInstitucion);
 		recordGrupoGuardiaColegiado.setIdturno(idTurno);
@@ -2609,9 +2625,11 @@ public class GuardiasServiceImpl implements GuardiasService {
 		recordGrupoGuardiaColegiado.setUsumodificacion(idUsuario);
 
 		if (nuevoGrupoGuardiaColegiado && ordenGrupo == 0) {
+			recordGrupoGuardiaColegiado.setOrden(1);
 			scsGrupoguardiacolegiadoMapper.insert(recordGrupoGuardiaColegiado); // ESTE ES EL INSERT QUE LO EXPLOTA TODO
-		} else {
-			scsGrupoguardiacolegiadoMapper.updateByPrimaryKey(recordGrupoGuardiaColegiado);
+		} else if(!duplicadoError) {
+			scsGrupoguardiacolegiadoMapper.updateByExampleSelective(recordGrupoGuardiaColegiado, grupoGuardiaColegiadoExample);
+			//scsGrupoguardiacolegiadoMapper.updateByPrimaryKey(recordGrupoGuardiaColegiado);
 		}
 
 		// Actualizar cola guardia para evitar que el ultimo grupo quede a caballo
