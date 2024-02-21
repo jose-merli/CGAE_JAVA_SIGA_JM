@@ -2393,6 +2393,22 @@ public class GuardiasServiceImpl implements GuardiasService {
 		return dia;
 	}
 	
+	private void verificarDuplicadosNcolOrden(List<InscripcionGuardiaItem> inscripciones) throws Exception {
+		Map<String, List<InscripcionGuardiaItem>> inscripcionesPorGrupo = inscripciones.stream()
+				.collect(Collectors.groupingBy(InscripcionGuardiaItem::getNumeroGrupo));
+		for (Map.Entry<String, List<InscripcionGuardiaItem>> entry : inscripcionesPorGrupo.entrySet()) {
+			long countColUnicos = entry.getValue().stream().map(InscripcionGuardiaItem::getnColegiado).distinct().count();
+			long countOrdenUnicos = entry.getValue().stream().map(InscripcionGuardiaItem::getOrden).distinct().count();
+			
+			if (countColUnicos < entry.getValue().size()) {
+				throw new Exception("Se encontraron inscripciones duplicadas en el grupo: " + entry.getKey());
+			}
+			if (countOrdenUnicos < entry.getValue().size()) {
+				throw new Exception("Se encontraron órdenes duplicados en el grupo: " + entry.getKey());
+			}
+		}
+	}
+	
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public UpdateResponseDTO guardarColaGuardias(List<InscripcionGuardiaItem> inscripciones,
@@ -2420,7 +2436,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		if (null != usuarios && usuarios.size() > 0) {
 			try {
-				
+				verificarDuplicadosNcolOrden(inscripciones);
 				
 				// Comprobamos cual es el último grupo para cambiar el último letrado
 				OptionalInt maxGrupo = inscripciones.stream()
@@ -2531,7 +2547,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 				LOGGER.error(e);
 				response = 0;
 				error.setCode(400);
-				error.setDescription("general.mensaje.error.bbdd");
+				//error.setDescription("general.mensaje.error.bbdd");
+				error.setDescription(e.getMessage());
+				updateResponseDTO.setError(error);
 				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
 
@@ -2602,7 +2620,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			List<ScsGrupoguardiacolegiado> grupoGuardiaColegiado = scsGrupoguardiacolegiadoMapper
 					.selectByExample(grupoGuardiaColegiadoExample);
-			if (grupoGuardiaColegiado.size() > 0) {
+			if (grupoGuardiaColegiado.size() > 1) {
 				duplicadoError = true;
 			} else {
 				idGrupoGuardiaColegiado = String.valueOf(grupoGuardiaColegiado.get(0).getIdgrupoguardiacolegiado());
