@@ -2398,7 +2398,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				.collect(Collectors.groupingBy(InscripcionGuardiaItem::getNumeroGrupo));
 		for (Map.Entry<String, List<InscripcionGuardiaItem>> entry : inscripcionesPorGrupo.entrySet()) {
 			long countColUnicos = entry.getValue().stream().map(InscripcionGuardiaItem::getnColegiado).distinct().count();
-			long countOrdenUnicos = entry.getValue().stream().map(InscripcionGuardiaItem::getOrden).distinct().count();
+			long countOrdenUnicos = entry.getValue().stream().map(InscripcionGuardiaItem::getOrdenCola).distinct().count();
 			
 			if (countColUnicos < entry.getValue().size()) {
 				throw new Exception("Se encontraron inscripciones duplicadas en el grupo: " + entry.getKey());
@@ -2598,16 +2598,14 @@ public class GuardiasServiceImpl implements GuardiasService {
 			recordGrupoGuardia.setUsucreacion(idUsuario);
 			recordGrupoGuardia.setFechamodificacion(new Date());
 			recordGrupoGuardia.setUsumodificacion(idUsuario);
-			if(ordenGrupo == 0) {
-				scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
-			}
+			scsGrupoguardiaExtendsMapper.insert(recordGrupoGuardia);
 			
 		}
 
 		boolean nuevoGrupoGuardiaColegiado = false;
 		if (idGrupoGuardiaColegiado == null || idGrupoGuardiaColegiado.isEmpty()) {
 			nuevoGrupoGuardiaColegiado = true;
-			idGrupoGuardiaColegiado = scsGrupoguardiacolegiadoExtendsMapper.getLastId().getNewId();
+			idGrupoGuardiaColegiado = scsGrupoguardiacolegiadoExtendsMapper.getLastId().getNewId() + 1;
 		}
 
 		ScsGrupoguardiacolegiado recordGrupoGuardiaColegiado = new ScsGrupoguardiacolegiado();
