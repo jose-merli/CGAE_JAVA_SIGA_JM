@@ -5,9 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -79,9 +76,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Service
 @Transactional(timeout=2400)
 public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoService {
-	
-	private static final Collection<String> validFormats = Collections.unmodifiableList(Arrays.asList("doc","docx","xls","xlsx","fo"));
- 
+
 	private Logger LOGGER = Logger.getLogger(PlantillasDocumentoServiceImpl.class);
 
 	@Autowired
@@ -971,7 +966,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
 					for (TarjetaPlantillaDocumentoDTO plantillaDoc : plantillasDoc) {
-						procesaPlantilla(request, usuario, plantillaDoc, respuesta);
+						procesaPlantilla(usuario, plantillaDoc, respuesta);
 						if(respuesta.getError()!=null) {
 							break;
 						}
@@ -989,141 +984,51 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				"guardarModPlantillasDocumento() -> Salida del servicio para guardar los datos de la plantilla de documento");
 		return respuesta;
 	}
-	
 
-	private void tratarAdjunto(AdmUsuarios usuario, MultipartFile file, ResponseDataListDTO response, TarjetaPlantillaDocumentoDTO plantillaDoc, ModModeloPlantilladocumento modPlantillaDoc, ModPlantilladocumento mPlantillaDoc) {
-		// crear path para almacenar el fichero
-		GenPropertiesKey key = new GenPropertiesKey();
-		key.setFichero(SigaConstants.FICHERO_SIGA);
-		key.setParametro(SigaConstants.parametroRutaPlantillas);
-
-		GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
-		
-		
-		
-		String rutaPlantillaClase = generarRutaPlantillaClase( plantillaDoc);
-
-		String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator
-				+ rutaPlantillaClase + SigaConstants.pathSeparator;
-
-		String pathFichero = rutaPlantilla;
-
-		// 1. Coger archivo del request
-		LOGGER.debug("uploadFile() -> Coger documento del request");
-
-		String fileName = file.getOriginalFilename();
-		String extension = getExtension(fileName);
-		String nombreFichero = getName(fileName);
-		
-		if (validFormats.contains(extension)) {
-			try {
-				String idPlantilla = plantillaDoc.getIdPlantillaDocumento();
-				String newNombreFichero = nombreFichero + "_" + idPlantilla + "." + extension;
-
-				File aux = new File(pathFichero);
-				// creo directorio si no existe
-				aux.mkdirs();
-				File serverFile = new File(pathFichero, newNombreFichero);
-				FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
-				
-				mPlantillaDoc.setFechamodificacion(new Date());
-				mPlantillaDoc.setPlantilla(nombreFichero);
-				mPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-				
-				modPlantilladocumentoMapper.updateByPrimaryKey(mPlantillaDoc);
-				
-			} catch (IOException ioe) {
-				Error error = new Error();
-				error.setCode(500);
-				error.setDescription(ioe.getMessage());
-				response.setError(error);
-				LOGGER.error(
-						"uploadFile() -> Error al guardar la plantilla de documento en el directorio indicado",
-						ioe);
-			} finally {
-				// close the stream
-				LOGGER.debug("uploadFile() -> Cierre del stream del documento");
-				// stream.close();
-			}
-		} else {
-			Error error = new Error();
-			error.setCode(400);
-			error.setDescription("El fichero " +fileName + " no es válido. Extensiones permitidas: " + validFormats.stream().collect(Collectors.joining(",")));
-			response.setError(error);
-		}
-	}
-	
-	private String getName(String fileName) {
-		String name=fileName;
-		if(fileName.lastIndexOf(".")>-1)
-			name = fileName.substring(0, fileName.lastIndexOf("."));
-		return name;
-	}
-
-	private String getExtension(String fileName) {
-		String extension="";
-		if(fileName.lastIndexOf(".")>-1) {
-			extension = fileName.substring(fileName.lastIndexOf(".")+1, fileName.length()).toLowerCase();
-		}
-		return extension;
-	}
-
-	private String generarRutaPlantillaClase(TarjetaPlantillaDocumentoDTO plantillaDoc ) {
-		ModClasecomunicaciones modClase = null;
-		// OBtenemos la ruta de las plantillas
-				String rutaPlantillaClase = "";
-				
-				if (plantillaDoc.getIdClaseComunicacion() != null) {
-					modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(plantillaDoc.getIdClaseComunicacion()));
-					if (modClase != null) {
-						rutaPlantillaClase = modClase.getRutaplantilla();
-					}
-				}
-
-				if (rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
-					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
-				} else {
-					rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO
-							+ SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO,
-							String.valueOf(plantillaDoc.getIdInstitucion()));
-				}
-				return rutaPlantillaClase;
-	}
-
-	private void procesaPlantilla(MultipartHttpServletRequest request, AdmUsuarios usuario,
-			TarjetaPlantillaDocumentoDTO plantillaDoc, ResponseDataListDTO respuesta) {
+	private void procesaPlantilla(AdmUsuarios usuario, TarjetaPlantillaDocumentoDTO plantillaDoc, ResponseDataListDTO respuesta) {
 		Error error = new Error();
 		Long idInforme = (long) 0;
 		List<Long> listaPlantillasIdAAsociar = new ArrayList<Long>();
-		ModPlantilladocumento modPlantillaDoc=null;
-		ModModeloPlantilladocumento modModeloPlantillaDoc=null;
 		
-
 		if (plantillaDoc.getIdModeloComunicacion() != null) {
-			idInforme = obtenerIdInforme(plantillaDoc);
-			if (plantillaDoc.getIdPlantillaDocumento() != null) {
-				ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
-				modeloPlantillaKey.setIdioma(plantillaDoc.getIdIdioma());
-				modeloPlantillaKey.setIdplantilladocumento(Long.parseLong(plantillaDoc.getIdPlantillaDocumento()));
-				modPlantillaDoc = modPlantillaDocumentoExtendsMapper.selectByPrimaryKey(modeloPlantillaKey);
-				ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
-				modModeloPlantillaDocKey
-						.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
-				modModeloPlantillaDocKey.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
-				modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(modModeloPlantillaDocKey);
-			}
 
-			if (modModeloPlantillaDoc == null) { // hay que crear un nuevo modeloplantilla
-				modModeloPlantillaDoc = crearModeloPlantillaDoc(usuario, listaPlantillasIdAAsociar, plantillaDoc, idInforme);
-				modPlantillaDoc = crearPlantillaDoc(usuario, modModeloPlantillaDoc, plantillaDoc);
-			} else {
-				actualizarModeloPlantillaDoc(usuario,modModeloPlantillaDoc,plantillaDoc);
-			}
-		
-			MultipartFile ficheroAdjunto = request.getFile("uploadFile_"+plantillaDoc.getIdIdioma());
-			if(ficheroAdjunto!=null)
-			{
-			tratarAdjunto(usuario, ficheroAdjunto, respuesta,plantillaDoc, modModeloPlantillaDoc, modPlantillaDoc);
+			if (plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0) {
+
+				idInforme = obtenerIdInforme(plantillaDoc);
+
+
+				List<DocumentoPlantillaItem> listaPlantillas = new ArrayList<>(plantillaDoc.getPlantillas().stream()
+						.collect(Collectors.toMap(
+								DocumentoPlantillaItem::getIdIdioma,
+								x -> x,
+								(plantiA,plantiB) -> plantiA
+								)).values()
+						);
+				for (DocumentoPlantillaItem idPlantillaDoc : listaPlantillas) {
+
+					ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
+
+					modeloPlantillaKey.setIdioma(idPlantillaDoc.getIdIdioma());
+					modeloPlantillaKey.setIdplantilladocumento(
+							Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
+					ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
+							.selectByPrimaryKey(modeloPlantillaKey);
+
+					if (modPlantillaDoc != null) {
+						ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
+						modModeloPlantillaDocKey.setIdmodelocomunicacion(
+								Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+						modModeloPlantillaDocKey
+								.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+
+						ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper
+								.selectByPrimaryKey(modModeloPlantillaDocKey);
+
+						if (modModeloPlantillaDoc == null) {
+							trataModModeloPlantillaDoc(usuario,listaPlantillasIdAAsociar,plantillaDoc, idInforme,modPlantillaDoc, modModeloPlantillaDoc);
+						}
+					}
+				}
 			}
 			respuesta.getDataList().add(String.valueOf(idInforme));
 		} else {
@@ -1132,26 +1037,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			error.setMessage("Error al guardar la plantilla de documento");
 			respuesta.setError(error);
 		}
-	}
-
-	private ModPlantilladocumento crearPlantillaDoc(AdmUsuarios usuario, ModModeloPlantilladocumento modModeloPlantillaDoc, TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		ModPlantilladocumento modPlantillaDoc = new ModPlantilladocumento();
-		modPlantillaDoc.setFechamodificacion(new Date());
-		modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-		modPlantillaDoc.setIdioma(plantillaDoc.getIdIdioma());
-		modPlantillaDoc.setIdplantilladocumento(modModeloPlantillaDoc.getIdplantilladocumento());
-		modPlantilladocumentoMapper.insert(modPlantillaDoc);
-		return modPlantillaDoc;
-	}
-
-	private void actualizarModeloPlantillaDoc(AdmUsuarios usuario, ModModeloPlantilladocumento modModeloPlantillaDoc,
-			TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		modModeloPlantillaDoc.setFechamodificacion(new Date());
-		modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
-		modModeloPlantillaDoc
-				.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
-		modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-		modModeloPlantilladocumentoMapper.updateByPrimaryKey(modModeloPlantillaDoc);
+		
 	}
 
 	private Long obtenerIdInforme(TarjetaPlantillaDocumentoDTO plantillaDoc) {
@@ -1172,26 +1058,21 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return idInforme;
 	}
 
-	private ModModeloPlantilladocumento crearModeloPlantillaDoc(AdmUsuarios usuario, List<Long> listaPlantillasIdAAsociar, TarjetaPlantillaDocumentoDTO plantillaDoc, Long idInforme) {
-		ModModeloPlantilladocumento modModeloPlantillaDoc = new ModModeloPlantilladocumento();
-		
-		Long idPlantillaDoc = Long.getLong(modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento().getNewId())+1l;
-		
+	private void trataModModeloPlantillaDoc(AdmUsuarios usuario, List<Long> listaPlantillasIdAAsociar, TarjetaPlantillaDocumentoDTO plantillaDoc, Long idInforme, ModPlantilladocumento modPlantillaDoc, ModModeloPlantilladocumento modModeloPlantillaDoc) {
+		modModeloPlantillaDoc = new ModModeloPlantilladocumento();
 		modModeloPlantillaDoc.setFechamodificacion(new Date());
 		modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
 		modModeloPlantillaDoc
 				.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
 		modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 		modModeloPlantillaDoc
-				.setIdplantilladocumento(idPlantillaDoc);
+				.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
 		modModeloPlantillaDoc.setIdmodelocomunicacion(
 				Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 		modModeloPlantillaDoc.setFechaasociacion(new Date());
 		modModeloPlantillaDoc.setIdinforme(idInforme);
 
 		modModeloPlantilladocumentoMapper.insert(modModeloPlantillaDoc);
-
-		
 		listaPlantillasIdAAsociar.add(modModeloPlantillaDoc.getIdplantilladocumento());
 
 		// Si el informe ya tiene asociadas consultas se las asociamos para esta
@@ -1204,7 +1085,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		if (listaConsultas != null && listaConsultas.size() > 0) {
 			trataListaConsultas(usuario,plantillaDoc, modModeloPlantillaDoc, listaConsultas);
 		}
-		return modModeloPlantillaDoc;	
+		
 	}
 
 	private void trataListaConsultas(AdmUsuarios usuario, TarjetaPlantillaDocumentoDTO plantillaDoc, ModModeloPlantilladocumento modModeloPlantillaDoc, List<ConsultaItem> listaConsultas) {

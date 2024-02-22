@@ -6,7 +6,6 @@ import java.util.List;
 
 public class PlantillaModeloDocumentoDTO {
 	private String nombreFicheroSalida;
-	private String nombreDocumento;
 	private String idModeloComunicacion;
 	private String idPlantillaDocumento;
 	private String sufijo;
@@ -126,13 +125,6 @@ public class PlantillaModeloDocumentoDTO {
 	public void setIdIdioma(String idIdioma) {
 		this.idIdioma = idIdioma;
 	}
-	public String getNombreDocumento() {
-		return nombreDocumento;
-	}
-	public void setNombreDocumento(String nombreDocumento) {
-		this.nombreDocumento = nombreDocumento;
-	}
-	
 	
 	
 	
