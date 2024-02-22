@@ -424,11 +424,13 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
             sql.SET("IDINSTITUCION_COMIS = #{idinstitucionComis,jdbcType=DECIMAL}");
             sql.SET("IDINSTITUCION_JUZG = NULL");
             sql.SET("IDJUZGADO = NULL");
+            sql.SET("IDTIPOACTUACION =  #{idtipoactuacion,jdbcType=DECIMAL}");
         }else if (record.getIdjuzgado() != null) {
             sql.SET("IDINSTITUCION_JUZG = #{idinstitucionJuzg,jdbcType=DECIMAL}");
             sql.SET("IDJUZGADO = #{idjuzgado,jdbcType=DECIMAL}");
             sql.SET("IDCOMISARIA = NULL");
             sql.SET("IDINSTITUCION_COMIS = NULL");
+            sql.SET("IDTIPOACTUACION =  #{idtipoactuacion,jdbcType=DECIMAL}");
         }else {
         	sql.SET("IDINSTITUCION_JUZG = NULL");
             sql.SET("IDJUZGADO = NULL");
