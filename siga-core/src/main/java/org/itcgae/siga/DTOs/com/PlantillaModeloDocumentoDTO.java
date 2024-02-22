@@ -16,7 +16,6 @@ public class PlantillaModeloDocumentoDTO {
 	private int datos;
 	private Date fechaAsociacion;
 	private String idioma;
-	private String idIdioma;
 	private String idInforme;
 	private String idPlantillas;
 	private String idFormatoSalida;
@@ -119,12 +118,7 @@ public class PlantillaModeloDocumentoDTO {
 	public void setIdFormatoSalida(String idFormatoSalida) {
 		this.idFormatoSalida = idFormatoSalida;
 	}
-	public String getIdIdioma() {
-		return idIdioma;
-	}
-	public void setIdIdioma(String idIdioma) {
-		this.idIdioma = idIdioma;
-	}
+	
 	
 	
 	
