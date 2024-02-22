@@ -123,7 +123,7 @@ public class PlantillasDocumentoController {
 	}	
 	
 	@RequestMapping(value = "/guardarPlantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ResponseDataListDTO> guardarPlantillasDocumento(MultipartHttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO[] plantillaDoc) {
+	ResponseEntity<ResponseDataListDTO> guardarPlantillasDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO[] plantillaDoc) {
 		
 		ResponseDataListDTO response = _plantillasDocumentoService.guardarModPlantillasDocumento(request, plantillaDoc);
 		if(response.getError() == null)
