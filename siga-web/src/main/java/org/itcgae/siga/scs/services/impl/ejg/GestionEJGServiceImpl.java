@@ -2062,7 +2062,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		}
 
 		// tenemos q ver si devuleve id o nombre de tipo ejg
-		if (item.getTipoEJG() != null) {
+		if (item.getTipoEJG() != null && !item.getTipoEJG().isEmpty()){
 
 			result.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 		}
@@ -5785,11 +5785,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				eejgPeticion.setNumerointentospendienteinfo(Short.parseShort("0"));
 				eejgPeticion.setNumerointentossolicitud(Short.parseShort("0"));
 				String lenguaje = "es_ES";
-				if (institucion.getIdlenguaje().equals(2)) {
+				if (institucion.getIdlenguaje().equals("2")) {
 					lenguaje = "ca_ES";
-				} else if (institucion.getIdlenguaje().equals(3)) {
+				} else if (institucion.getIdlenguaje().equals("3")) {
 					lenguaje = "eu_ES";
-				} else if (institucion.getIdlenguaje().equals(4)) {
+				} else if (institucion.getIdlenguaje().equals("4")) {
 					lenguaje = "gl_ES";
 				}
 				eejgPeticion.setIdioma(lenguaje);

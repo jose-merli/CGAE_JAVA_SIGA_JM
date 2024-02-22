@@ -61,6 +61,11 @@ import java.util.zip.ZipOutputStream;
 public class AsistenciaServiceImpl implements AsistenciaService {
 
 	private final Logger LOGGER = Logger.getLogger(AsistenciaServiceImpl.class);
+	
+	private final static String TIPO_JUZGADO =  "J";
+	
+	private final static String TIPO_COMISARIA =  "C";
+	
 	@Autowired
 	private ScsGuardiascolegiadoExtendsMapper scsGuardiascolegiadoExtendsMapper;
 
@@ -543,6 +548,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 									responseItem.setApellido2(actuacion.getApellido2());
 									responseItem.setNif(actuacion.getNif());
 									responseItem.setSexo(actuacion.getSexo());
+									responseItem.setFechaNacimiento(actuacion.getFechaNacimiento());
 									
 									// Seteamos los datos de la asistencia
 									responseItem.setFechaAsistencia(actuacion.getFechaAsistencia());
@@ -717,7 +723,8 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 						}
 
 						asistencias.forEach((TarjetaAsistenciaResponse2Item asistencia) -> {
-
+							// si faltan datos en asistencia: Juzgado, comisaria, nº procedimiento o nº diligencia. Se completan esos campos con las actuaciones
+							completarValoresComisariaJuzgado(asistencia);
 							// Comprobamos si existe el justiciable, si no, lo insertamos en scs_personajg y
 							// devolvemos idPersona
 							LOGGER.info("guardarAsistenciasExpres() / Comprobamos si existe el justiciable");
@@ -747,6 +754,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 										idInstitucion, usuarios.get(0));
 								// Como es una nueva Asistencia, le ponemos estado ACTIVO
 								asistenciaBBDD.setIdestadoasistencia((short) 1);
+								asistenciaBBDD.setFechaestadoasistencia(new Date());
 								asistenciaBBDD.setIdorigenasistencia((short) 30); // 30 - Es una asistencia expres
 								
 								int responseAsistencia = scsAsistenciaExtendsMapper.insertSelective(asistenciaBBDD);
@@ -789,6 +797,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 								// Actualizamos asistencia y actuaciones
 								ScsAsistencia asistenciaBBDD = fromTarjetaAsistenciaItemToScsAsistencia2(asistencia,
 										null, null, tipoAsistenciaGeneral, idPersona, idInstitucion, usuarios.get(0));
+								asistenciaBBDD.setIdestadoasistencia((short) 1);
+								asistenciaBBDD.setFechaestadoasistencia(new Date());
+								asistenciaBBDD.setIdorigenasistencia((short) 30); // 30 - Es una asistencia expres
 								scsAsistenciaExtendsMapper.updateByPrimaryKey(asistenciaBBDD);
 								int responseAsistencia = scsAsistenciaExtendsMapper.updateByPrimaryKeySelective(asistenciaBBDD);
 								
@@ -913,6 +924,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			personajgToUpdate.setApellido2(asistencia.getApellido2());
 			personajgToUpdate.setNombre(asistencia.getNombre());
 			personajgToUpdate.setSexo(asistencia.getSexo());
+			personajgToUpdate.setFechanacimiento(parseStringToDate(asistencia.getFechaNacimiento()));
 			personajgToUpdate.setIdinstitucion(idInstitucion);
 			personajgToUpdate.setFechamodificacion(new Date());
 			personajgToUpdate.setUsumodificacion(usuario.getIdusuario());
@@ -932,6 +944,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 			newPersonajg.setIdinstitucion(idInstitucion);
 			newPersonajg.setFechamodificacion(new Date());
 			newPersonajg.setUsumodificacion(usuario.getIdusuario());
+			newPersonajg.setFechanacimiento(parseStringToDate(asistencia.getFechaNacimiento()));
 
 			response = scsPersonajgExtendsMapper.insertSelective(newPersonajg);
 
@@ -943,6 +956,21 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 		}
 		return idPersona;
 	}
+	
+	private Date parseStringToDate(String fecha) {
+		Date date = null;
+		if (fecha != null && !fecha.isEmpty()) {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			try {
+				date = sdf.parse(fecha);
+			} catch (ParseException e) {
+				LOGGER.error("parseStringToDate() ERROR: " + e.getMessage(), e);
+			}
+		}
+		return date;
+	}
+	
+	
 
 	/**
 	 * 
@@ -1278,8 +1306,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				actuacionBBDD.setUsucreacion(usuario.getIdusuario());
 				actuacionBBDD.setFechacreacion(new Date());
 				actuacionBBDD.setAcuerdoextrajudicial((short) 0);
-				actuacionBBDD.setIdtipoactuacion(Short.parseShort(getTipoActuacionPorDefecto(usuario, idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado)));
 			}
+			
+			actuacionBBDD.setIdtipoactuacion(Short.parseShort(getTipoActuacionPorDefecto(usuario, idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado)));
 			
 			// Se valida la actuación de  la asistencia
 			actuacionBBDD.setFechavalidacion(new Date());
@@ -1745,6 +1774,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 							comprobacionIncompatibilidades(tarjetaAsistenciaResponseItem, idInstitucion,
 									usuarios.get(0));
+							asistencia.setFechaestadoasistencia(new Date());
 							int inserted = scsAsistenciaExtendsMapper.insertSelective(asistencia);
 
 							// Si viene de una preasistencia, la pasamos a confirmada
@@ -6957,6 +6987,53 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 			scsEjgdesignaMapper.insert(record);
 		}	
+	}
+	
+	private void completarValoresComisariaJuzgado(TarjetaAsistenciaResponse2Item aistencia) {
+		List<ActuacionAsistenciaItem> actuaciones = aistencia.getActuaciones();
+		// completar juzgado de la asistencia con las actuaciones
+		if (aistencia.getJuzgado() == null || aistencia.getJuzgado().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_JUZGADO.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getLugar() != null && !actuacion.getLugar().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setJuzgado(result.get().getLugar());
+			}
+			
+		}
+		// completar num procedimiento de la asistencia con las actuaciones
+		if (aistencia.getNumProcedimiento() == null || aistencia.getNumProcedimiento().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_JUZGADO.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getNumeroAsunto() != null && !actuacion.getNumeroAsunto().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setNumProcedimiento(result.get().getNumeroAsunto());
+			}
+		}
+		// completar comisaria de la asistencia con las actuaciones
+		if (aistencia.getComisaria() == null || aistencia.getComisaria().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_COMISARIA.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getLugar() != null && !actuacion.getLugar().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setComisaria(result.get().getLugar());
+			}
+			
+		}
+		// completar num diligencia de la asistencia con las actuaciones
+		if (aistencia.getNumDiligencia()== null || aistencia.getNumDiligencia().isEmpty()) {
+			// obtenemos actuación juzgado
+			Optional<ActuacionAsistenciaItem> result =actuaciones.stream()
+					.filter(actuacion -> TIPO_COMISARIA.equalsIgnoreCase(actuacion.getComisariaJuzgado()) && actuacion.getNumeroAsunto() != null && !actuacion.getNumeroAsunto().isEmpty())
+					.findFirst();
+			if (result.isPresent()) {
+				aistencia.setNumDiligencia(result.get().getNumeroAsunto());
+			}
+		}
+		
 	}
 
 }

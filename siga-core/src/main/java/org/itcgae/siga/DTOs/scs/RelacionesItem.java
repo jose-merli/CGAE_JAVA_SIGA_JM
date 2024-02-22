@@ -20,8 +20,9 @@ public class RelacionesItem {
     private Date fechaDesignacion;
     private String datosinteres;
     private String idsjcs;
+    private Boolean art27;
 
-    private String impugnacion;
+	private String impugnacion;
     private Date fechaimpugnacion;
     private String dictamen;
     private Date fechadictamen;
@@ -329,13 +330,14 @@ public class RelacionesItem {
                 Objects.equals(fechaasunto, that.fechaasunto) &&
                 Objects.equals(dilnigproc, that.dilnigproc) &&
                 Objects.equals(idpersonajg, that.idpersonajg) &&
-        		Objects.equals(idExpedienteExt, that.idExpedienteExt);
+        		Objects.equals(idExpedienteExt, that.idExpedienteExt) &&
+        		Objects.equals(art27, that.art27);
 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sjcs, idinstitucion, anio, numero, idletrado, letrado, interesado, idturno, idturnodesigna, idtipo, codigo, descturno, destipo, fechaDesignacion, datosinteres, idsjcs, impugnacion, fechaimpugnacion, dictamen, fechadictamen, resolucion, fecharesolucion, centrodetencion, fechaasunto, dilnigproc, idpersonajg, idExpedienteExt);
+        return Objects.hash(sjcs, idinstitucion, anio, numero, idletrado, letrado, interesado, idturno, idturnodesigna, idtipo, codigo, descturno, destipo, fechaDesignacion, datosinteres, idsjcs, impugnacion, fechaimpugnacion, dictamen, fechadictamen, resolucion, fecharesolucion, centrodetencion, fechaasunto, dilnigproc, idpersonajg, idExpedienteExt, art27);
     }
 
     @Override
@@ -368,6 +370,7 @@ public class RelacionesItem {
                 ", dilnigproc='" + dilnigproc + '\'' +
                 ", idpersonajg='" + idpersonajg + '\'' +
                 ", idExpedienteExt='" + idExpedienteExt + '\'' +
+                ", art27='" + art27 + '\'' +
                 '}';
     }
 
@@ -397,6 +400,11 @@ public class RelacionesItem {
 	public void setNifInteresado(String nifInteresado) {
 		this.nifInteresado = nifInteresado;
 	}
-
+	public Boolean getArt27() {
+		return art27;
+	}
+	public void setArt27(Boolean art27) {
+		this.art27 = art27;
+	}
 
 }

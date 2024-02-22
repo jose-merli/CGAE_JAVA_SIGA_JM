@@ -135,7 +135,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         return sqlAbonos.toString();
     }
 
-    public String getAbono(String idFactura, String idInstitucion,String idLenguaje) {
+    public String getAbono(String idAbono, String idInstitucion,String idLenguaje) {
 
     	SQL sqlEstadoAbono = new SQL();
         //Descripcion estado
@@ -162,7 +162,7 @@ public class FacAbonoExtendsSqlProvider extends FacFacturaSqlProvider {
         query.LEFT_OUTER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS M ON (M.IDPERSONA = A.IDPERSONADEUDOR AND M.IDINSTITUCION = A.IDINSTITUCION AND M.IDMANDATO = 1)");
         query.LEFT_OUTER_JOIN("CEN_COLEGIADO COL ON (COL.IDPERSONA = P.IDPERSONA AND COL.IDINSTITUCION = A.IDINSTITUCION)");
 
-        query.WHERE("A.IDABONO ="+idFactura);
+        query.WHERE("A.IDABONO ="+idAbono);
         query.WHERE("A.IDINSTITUCION ="+idInstitucion);
 
         return query.toString();
