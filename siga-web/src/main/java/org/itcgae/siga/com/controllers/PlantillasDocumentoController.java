@@ -14,7 +14,6 @@ import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
-import org.itcgae.siga.DTOs.com.ResponseDataListDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -120,16 +119,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}	
-	
-	@RequestMapping(value = "/guardarPlantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ResponseDataListDTO> guardarPlantillasDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO[] plantillaDoc) {
-		
-		ResponseDataListDTO response = _plantillasDocumentoService.guardarModPlantillasDocumento(request, plantillaDoc);
-		if(response.getError() == null)
-			return new ResponseEntity<ResponseDataListDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ResponseDataListDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
 	@RequestMapping(value = "/guardar/datosSalida",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
