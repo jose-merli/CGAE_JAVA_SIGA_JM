@@ -1017,13 +1017,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						designasFinal = scsDesignacionesExtendsMapper.busquedaDesignacionesFinal(ids, idInstitucion,
 								tamMaximo);
 					}
-					if ((designasFinal != null) && tamMaximo != null
-							&& designasFinal.size() >= tamMaximo) {
+					if (designasFinal != null && tamMaximo != null && designasFinal.size() >= tamMaximo) {
 						error.setCode(200);
 						error.setDescription("La consulta devuelve más de " + tamMaximo
 								+ " resultados, pero se muestran sólo los " + tamMaximo
 								+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 						designasFinal.get(0).setError(error);
+					}else if (designasFinal == null) {
+						designasFinal = new ArrayList<DesignaItem>();
 					}
 
 				} catch (Exception e) {
