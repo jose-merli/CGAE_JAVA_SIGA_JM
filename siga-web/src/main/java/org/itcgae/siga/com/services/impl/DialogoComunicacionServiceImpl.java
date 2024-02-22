@@ -1685,7 +1685,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			// Obtenemos los sufijos del documento
 			String sufijo = "";
-			List<SufijoItem> sufijos = _modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(Long.parseLong(idModeloComunicacion), Long.parseLong(plantilla.getIdInforme()), Long.parseLong(plantilla.getIdPlantillaDocumento()), idLenguaje);
+			List<SufijoItem> sufijos = _modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(Long.parseLong(idModeloComunicacion), Long.parseLong(plantilla.getIdInforme()), idLenguaje);
 			
 			if(hDatosGenerales.get("row") != null){
 				hashMapRow = (HashMap<String, Object>) hDatosGenerales.get("row");

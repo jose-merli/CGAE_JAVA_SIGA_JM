@@ -684,7 +684,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 							// Recuperamos Sufijo
 							List<SufijoItem> sufijos = modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(
-									Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()), Long.parseLong(informeItem.getIdPlantillaDocumento()),
+									Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()),
 									usuario.getIdlenguaje());
 							informeItem.setSufijos(sufijos);
 							
@@ -836,7 +836,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		// Recuperamos Sufijo
 		List<SufijoItem> sufijos = modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(
-				Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()),Long.parseLong(informeItem.getIdPlantillaDocumento()),
+				Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()),
 				usuario.getIdlenguaje());
 		
 		ficha.setSufijos(sufijos);

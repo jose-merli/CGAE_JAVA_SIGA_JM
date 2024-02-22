@@ -4,7 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
 
@@ -21,6 +27,7 @@ import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.scs.DocumentoDesignaItem;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -35,9 +42,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -159,7 +163,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ResponseDataListDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
-	@Deprecated // utilizar guardarPlantillas desde SIGAARNV-3896
 	@RequestMapping(value = "/guardar/datosSalida",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> guardarDatosSalida(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
@@ -170,7 +173,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
-	@Deprecated // utilizar guardarPlantillas desde SIGAARNV-3896
 	@RequestMapping(value = "/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request, @QueryParam("idClaseComunicacion") String idClaseComunicacion) throws Exception{
 		
