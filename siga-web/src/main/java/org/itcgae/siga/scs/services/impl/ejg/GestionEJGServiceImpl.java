@@ -2062,7 +2062,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		}
 
 		// tenemos q ver si devuleve id o nombre de tipo ejg
-		if (item.getTipoEJG() != null) {
+		if (item.getTipoEJG() != null && !item.getTipoEJG().isEmpty()){
 
 			result.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 		}
