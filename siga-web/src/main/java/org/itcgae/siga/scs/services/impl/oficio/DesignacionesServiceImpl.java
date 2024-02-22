@@ -8390,10 +8390,12 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					
 					
 					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
-					
 					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
-					asisExample.createCriteria().andDesignaAnioEqualTo((short) designaItem.getAno()).andDesignaNumeroEqualTo((long) designaItem.getNumero())
-					.andIdinstitucionEqualTo(idInstitucion);
+					asisExample.createCriteria()
+						.andDesignaAnioEqualTo((short) designaItem.getAno())
+						.andDesignaNumeroEqualTo((long) designaItem.getNumero())
+						.andDesignaTurnoGreaterThan(designaItem.getIdTurno())
+						.andIdinstitucionEqualTo(idInstitucion);
 					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
 					if(asis.size() > 0) {
 						ScsAsistencia asistencia = asis.get(0);
