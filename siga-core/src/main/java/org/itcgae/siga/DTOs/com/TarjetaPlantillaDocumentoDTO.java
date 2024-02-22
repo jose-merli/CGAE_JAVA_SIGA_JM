@@ -1,13 +1,9 @@
 package org.itcgae.siga.DTOs.com;
 
 import java.util.ArrayList;
-
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TarjetaPlantillaDocumentoDTO {
 	private String idModeloComunicacion;
 	private String idPlantillaDocumento;
@@ -25,8 +21,6 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String plantilla;
 	private String idConsulta;
 	private String idInforme;
-	private String idSufijo;
-	private String nombreFichero;
 	
 	private List<DocumentoPlantillaItem> plantillas = new ArrayList<DocumentoPlantillaItem>();
 	private List<SufijoItem> sufijos = new ArrayList<SufijoItem>();
@@ -147,19 +141,6 @@ public class TarjetaPlantillaDocumentoDTO {
 	public void setIdFormatoSalida(String idFormatoSalida) {
 		this.idFormatoSalida = idFormatoSalida;
 	}
-	public String getIdSufijo() {
-		return idSufijo;
-	}
-	public void setIdSufijo(String idSufijo) {
-		this.idSufijo = idSufijo;
-	}
-	public String getNombreFichero() {
-		return nombreFichero;
-	}
-	public void setNombreFichero(String nombreFIchero) {
-		this.nombreFichero = nombreFIchero;
-	}
-
 	
 	
 }
