@@ -159,11 +159,12 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							&& plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
 						plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
 					}
+					Short idInstitucion = Short.parseShort(plantillaDoc.getIdInstitucion());
+					Long idModeloComunicacion = Long.parseLong(plantillaDoc.getIdModeloComunicacion());
+					//Long idInforme = Long.parseLong(plantillaDoc.getIdInforme());
 
 					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(
-							Short.parseShort(plantillaDoc.getIdInstitucion()),
-							Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-							Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), historico);
+							idInstitucion, idModeloComunicacion,  usuario.getIdlenguaje(), historico);
 					if (listaConsultaItem != null && listaConsultaItem.size() > 0) {
 						for (ConsultaItem consulta : listaConsultaItem) {
 
@@ -176,6 +177,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							if (consultaEntity != null) {
 								consulta.setSentencia(consultaEntity.getSentencia());
 							}
+							
+							obtenerIdiomasPlantillasConsultas(idInstitucion, idModeloComunicacion, consulta);
 						}
 						respuesta.setConsultaItem(listaConsultaItem);
 					}
@@ -192,6 +195,12 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		LOGGER.info(
 				"obtenerConsultasPlantilla() -> Salida del servicio para obtener las consultas de una plantilla de documento");
 		return respuesta;
+	}
+
+	private void obtenerIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion,
+			ConsultaItem consulta) {
+		List<String> idiomas = modPlantillaDocumentoConsultaExtendsMapper.selectIdiomasPlantillasConsultas(idInstitucion,idModeloComunicacion, Long.valueOf(consulta.getIdConsulta()));
+		consulta.setIdiomasPlantillas(idiomas);		
 	}
 
 	@Override
@@ -343,11 +352,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						}
 					}
 
-					if (listaItems != null && consultasValidas && plantillaDoc.getIdInforme() != null) {
+					if (listaItems != null && consultasValidas ) {
 						// Por cada plantilla asociada hay que guardar sus consultas
 						ModModeloPlantilladocumentoExample modModeloPlantillaExample = new ModModeloPlantilladocumentoExample();
 						modModeloPlantillaExample.createCriteria()
-								.andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme()))
 								.andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
 								.andFechabajaIsNull();
 						List<ModModeloPlantilladocumento> listaPlantillaDoc = modModeloPlantilladocumentoMapper
@@ -419,7 +427,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper
 										.selectConsultaByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()),
 												Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-												Long.parseLong(plantillaDoc.getIdInforme()),
 												Long.parseLong(consultaItem.getIdConsultaAnterior()), null);
 								for (ConsultaItem consultaBorrar : listaConsultasBorrar) {
 									ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
@@ -883,7 +890,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 												.selectConsultasByInforme(
 														Short.parseShort(plantillaDoc.getIdInstitucion()),
 														Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-														idInforme, usuario.getIdlenguaje(), false);
+														 usuario.getIdlenguaje(), false);
 										if (listaConsultas != null && listaConsultas.size() > 0) {
 											for (ConsultaItem consulta : listaConsultas) {
 												// Obtenemos la sentencia
@@ -1038,7 +1045,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		
 		if (validFormats.contains(extension)) {
 			try {
-				String idPlantilla = plantillaDoc.getIdPlantillaDocumento();
+				String idPlantilla = mPlantillaDoc.getIdplantilladocumento().toString();
 				String newNombreFichero = nombreFichero + "_" + idPlantilla + "." + extension;
 
 				File aux = new File(pathFichero);
@@ -1131,11 +1138,13 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			}
 
 			if (modModeloPlantillaDoc == null) { // hay que crear un nuevo modeloplantilla
-				modModeloPlantillaDoc = crearModeloPlantillaDoc(usuario, listaPlantillasIdAAsociar, plantillaDoc, idInforme);
-				modPlantillaDoc = crearPlantillaDoc(usuario, modModeloPlantillaDoc, plantillaDoc);
-			} else {
+				modPlantillaDoc = crearPlantillaDoc(usuario, plantillaDoc);
+				modModeloPlantillaDoc = crearModeloPlantillaDoc(usuario, listaPlantillasIdAAsociar, plantillaDoc,modPlantillaDoc, idInforme);
+				
+			}else {
 				actualizarModeloPlantillaDoc(usuario,modModeloPlantillaDoc,plantillaDoc);
 			}
+			 
 			
 			tratarSufijos(usuario, modModeloPlantillaDoc, modPlantillaDoc, plantillaDoc);
 		
@@ -1211,12 +1220,11 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return true;
 	}
 
-	private ModPlantilladocumento crearPlantillaDoc(AdmUsuarios usuario, ModModeloPlantilladocumento modModeloPlantillaDoc, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+	private ModPlantilladocumento crearPlantillaDoc(AdmUsuarios usuario, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		ModPlantilladocumento modPlantillaDoc = new ModPlantilladocumento();
 		modPlantillaDoc.setFechamodificacion(new Date());
 		modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 		modPlantillaDoc.setIdioma(plantillaDoc.getIdIdioma());
-		modPlantillaDoc.setIdplantilladocumento(modModeloPlantillaDoc.getIdplantilladocumento());
 		modPlantilladocumentoMapper.insert(modPlantillaDoc);
 		return modPlantillaDoc;
 	}
@@ -1249,18 +1257,16 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return idInforme;
 	}
 
-	private ModModeloPlantilladocumento crearModeloPlantillaDoc(AdmUsuarios usuario, List<Long> listaPlantillasIdAAsociar, TarjetaPlantillaDocumentoDTO plantillaDoc, Long idInforme) {
+	private ModModeloPlantilladocumento crearModeloPlantillaDoc(AdmUsuarios usuario, List<Long> listaPlantillasIdAAsociar, TarjetaPlantillaDocumentoDTO plantillaDoc, ModPlantilladocumento modPlantillaDoc, Long idInforme) {
 		ModModeloPlantilladocumento modModeloPlantillaDoc = new ModModeloPlantilladocumento();
-		
-		Long idPlantillaDoc = Long.valueOf(modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento().getNewId())+1l;
-		
+			
 		modModeloPlantillaDoc.setFechamodificacion(new Date());
 		modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
 		modModeloPlantillaDoc
 				.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
 		modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 		modModeloPlantillaDoc
-				.setIdplantilladocumento(idPlantillaDoc);
+				.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
 		modModeloPlantillaDoc.setIdmodelocomunicacion(
 				Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 		modModeloPlantillaDoc.setFechaasociacion(new Date());
@@ -1274,10 +1280,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		// Si el informe ya tiene asociadas consultas se las asociamos para esta
 		// plantilla
 		List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper
-				.selectConsultasByInforme(
+				.selectAllConsultasByIdInstitucionAndIdModelo(
 						Short.parseShort(plantillaDoc.getIdInstitucion()),
-						Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-						idInforme, usuario.getIdlenguaje(), false);
+						modModeloPlantillaDoc.getIdmodelocomunicacion());
 		if (listaConsultas != null && listaConsultas.size() > 0) {
 			trataListaConsultas(usuario,plantillaDoc, modModeloPlantillaDoc, listaConsultas);
 		}
@@ -1286,16 +1291,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 	private void trataListaConsultas(AdmUsuarios usuario, TarjetaPlantillaDocumentoDTO plantillaDoc, ModModeloPlantilladocumento modModeloPlantillaDoc, List<ConsultaItem> listaConsultas) {
 		for (ConsultaItem consulta : listaConsultas) {
-			// Obtenemos la sentencia
-			ConConsultaKey key = new ConConsultaKey();
-			key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
-			key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
-			ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
-
-			if (consultaEntity != null) {
-				consulta.setSentencia(consultaEntity.getSentencia());
-			}
-
 			ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
 			plantillaConsulta.setIdplantilladocumento(
 					modModeloPlantillaDoc.getIdplantilladocumento());
@@ -1339,7 +1334,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper
 								.selectConsultaByIdConsulta(Short.parseShort(consulta.getIdInstitucion()),
 										Long.parseLong(consulta.getIdModeloComunicacion()),
-										Long.parseLong(consulta.getIdInforme()),
 										Long.parseLong(consulta.getIdConsulta()), null);
 						for (ConsultaItem consultaBorrar : listaConsultasBorrar) {
 							ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
@@ -1796,7 +1790,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 											.selectConsultasByInforme(
 													Short.parseShort(plantillaDoc.getIdInstitucion()),
 													Long.parseLong(plantillaDoc.getIdModeloComunicacion()),
-													idInforme, usuario.getIdlenguaje(), false);
+													 usuario.getIdlenguaje(), false);
 									if (listaConsultas != null && listaConsultas.size() > 0) {
 										for (ConsultaItem consulta : listaConsultas) {
 											// Obtenemos la sentencia

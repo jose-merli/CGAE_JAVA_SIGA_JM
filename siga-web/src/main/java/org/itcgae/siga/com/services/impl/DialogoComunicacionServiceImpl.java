@@ -2558,7 +2558,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											}								
 										}
 										//Miramos si la consulta tiene region
-										List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdinforme(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
+										List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
 										
 										ConsultaItem consultaConRegion = listaPlantillaDocConsulta.get(0);
 										
@@ -2687,7 +2687,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								}								
 							}
 							//Miramos si la consulta tiene region
-							List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdinforme(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
+							List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
 							
 							ConsultaItem consultaConRegion = listaPlantillaDocConsulta.get(0);
 							
