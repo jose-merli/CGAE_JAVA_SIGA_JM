@@ -1306,8 +1306,9 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 				actuacionBBDD.setUsucreacion(usuario.getIdusuario());
 				actuacionBBDD.setFechacreacion(new Date());
 				actuacionBBDD.setAcuerdoextrajudicial((short) 0);
-				actuacionBBDD.setIdtipoactuacion(Short.parseShort(getTipoActuacionPorDefecto(usuario, idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado)));
 			}
+			
+			actuacionBBDD.setIdtipoactuacion(Short.parseShort(getTipoActuacionPorDefecto(usuario, idInstitucion, asistencia.getFiltro().getIdTipoAsistenciaColegiado(), comisariaJuzgado)));
 			
 			// Se valida la actuación de  la asistencia
 			actuacionBBDD.setFechavalidacion(new Date());
