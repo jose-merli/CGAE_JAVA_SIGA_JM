@@ -23,15 +23,5 @@ public class SufijoItem {
 	public void setNombreSufijo(String nombreSufijo) {
 		this.nombreSufijo = nombreSufijo;
 	}
-	public SufijoItem(String idSufijo, String orden, String nombreSufijo) {
-		super();
-		this.idSufijo = idSufijo;
-		this.orden = orden;
-		this.nombreSufijo = nombreSufijo;
-	}
-	public SufijoItem() {
-		super();
-	}
 		
-	
 }

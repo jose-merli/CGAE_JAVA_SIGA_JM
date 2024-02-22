@@ -671,42 +671,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		LOGGER.info("obtenerPlantillasInforme() -> Salida del servicio las plantillas asociadas a un informe");
 		return response;
 	}
-	
-	public enum SufijosAgrupados {
-		I_NASUNTO("1", "1", "N. Asunto"), II_NASUNTO_NCOL_APENOMBRE("2", "2", "N. Asunto - N. Col - Apellidos, Nombre"),
-		III_NCOL_APENOMBRE("3", "3", "N. Col - Apellidos, Nombre"),
-		IV_NCOL_APENOMBRE_NASUNTO("4", "4", "N. Col - Apellidos Nombre - N. Asunto");
 
-		String id;
-		String orden;
-		String nombre;
-
-		SufijosAgrupados(String id, String orden, String nombre) {
-			this.id = id;
-			this.nombre = nombre;
-			this.orden = orden;
-		};
-		
-	}
-
-	@Override
-	public ComboSufijoDTO obtenerSufijosAgrupados(HttpServletRequest request) {
-		LOGGER.info("obtenerSufijosAgrupados() -> Entrada al servicio para obtener combo sufijos agrupados");
-
-		ComboSufijoDTO comboDTO = new ComboSufijoDTO();
-		List<SufijoItem> comboItems = new ArrayList<SufijoItem>();
-		
-		for(SufijosAgrupados s: SufijosAgrupados.values()) {
-			comboItems.add(new SufijoItem(s.id,s.orden,s.nombre));
-		}		
-		
-		comboDTO.setSufijos(comboItems);
-
-		LOGGER.info("obtenerSufijosAgrupados() -> Salida del servicio para obtener combo sufijos");
-
-		return comboDTO;
-	}
-	
 	@Override
 	public ComboSufijoDTO obtenerSufijos(HttpServletRequest request) {
 		LOGGER.info("obtenerSufijos() -> Entrada al servicio para obtener combo sufijos");

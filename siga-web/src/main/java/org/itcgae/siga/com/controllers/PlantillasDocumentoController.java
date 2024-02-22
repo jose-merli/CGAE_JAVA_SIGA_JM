@@ -83,16 +83,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/combo/sufijosAgrupados",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboSufijoDTO> obtenerSufijosAgrupados(HttpServletRequest request) {
-		
-		ComboSufijoDTO response = _plantillasDocumentoService.obtenerSufijosAgrupados(request);
-		if(response.getError() == null)
-			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
 	@RequestMapping(value = "/consultas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ConsultasDTO> obtenerConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
