@@ -133,7 +133,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@Deprecated // utilizar guardarPlantillas desde SIGAARNV-3896
 	@RequestMapping(value = "/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		

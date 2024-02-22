@@ -81,7 +81,6 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.itcgae.siga.DTOs.com.SufijoItem.SufijosAgrupados;
 
 @Service
 @Transactional(timeout=2400)
@@ -687,8 +686,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 									Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()),
 									usuario.getIdlenguaje());
 							informeItem.setSufijos(sufijos);
-							
-							trataSufijos(informeItem);
 
 							// Recuepramos nombre consultas
 							List<ConsultaItem> consultasItem = modPlantillaDocumentoConsultaExtendsMapper
@@ -747,14 +744,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 	
 	
-	private void trataSufijos(PlantillaModeloDocumentoDTO informeItem) {
-		List<String> lStrSufijos = informeItem.getSufijos().stream().map(s->s.getIdSufijo()).collect(Collectors.toList());
-		SufijosAgrupados sufi = SufijosAgrupados.getSufijoAgrupadoEquivalente(lStrSufijos);
-		if(sufi!=null) {
-			informeItem.setSufijo(sufi.getId());
-		}
-	}
-
 	@Override
 	public FichasPlantillaDocumentoDTO obtenerFichasPlantillaDocumento(HttpServletRequest request, String idInstitucion,
 			String idModeloComunicacion) {
