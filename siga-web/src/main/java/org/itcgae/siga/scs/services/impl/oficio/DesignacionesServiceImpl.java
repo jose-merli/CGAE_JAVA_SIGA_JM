@@ -6063,6 +6063,67 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("busquedaRelaciones() -> Salida del servicio para obtener relaciones");
 		return relacionesDTO;
 	}
+	
+	@Override
+	public RelacionesDTO busquedaRelacionesConIdExpedienteExt(List<String> relaciones, HttpServletRequest request) {
+		LOGGER.info("busquedaRelacionesConIdExpedienteExt() -> Entrada al servicio para obtener relaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		RelacionesDTO relacionesDTO = new RelacionesDTO();
+		List<RelacionesItem> relacionesItem = null;
+		String resolucionEJG = "";
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaRelacionesConIdExpedienteExt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaRelacionesConIdExpedienteExt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"busquedaRelacionesConIdExpedienteExt() -> Entrada a scsDesignacionesExtendsMapper para obtener las relaciones");
+
+				String[] parts = relaciones.get(0).split("/");
+				String anio = parts[0].substring(1);
+				String num = relaciones.get(3);
+				String idTurno = relaciones.get(1);
+				String idinstitucion = relaciones.get(2);
+				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelaciones(anio, num, idTurno, idinstitucion);
+				int idLenguaje = Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue();
+				
+				//Poner la resolución del ejg asignado a la asistencia
+				for(RelacionesItem relacion: relacionesItem) {//recorremos toooodas las relaciones
+					
+					if(relacion.getSjcs().startsWith("A")) {
+						resolucionEJG = scsDesignacionesExtendsMapper.busquedaResolucionEjgAsistencia(relacion.getAnio(), relacion.getNumero(), idInstitucion, idLenguaje);
+						if(resolucionEJG!=null) {
+							relacion.setResolucion(resolucionEJG);
+						}
+					}
+					
+				}
+
+				LOGGER.info(
+						"busquedaRelacionesConIdExpedienteExt() / scsDesignacionesExtendsMapper.busquedaRelaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las relaciones");
+
+				if (relacionesItem != null) {
+					relacionesDTO.setRelacionesItem(relacionesItem);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaRelacionesConIdExpedienteExt() -> Salida del servicio para obtener relaciones");
+		return relacionesDTO;
+	}
 
 	@Override
 	public DeleteResponseDTO eliminarRelacion(List<String> datos, HttpServletRequest request) {
