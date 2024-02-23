@@ -6097,7 +6097,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				String num = relaciones.get(3);
 				String idTurno = relaciones.get(1);
 				String idinstitucion = relaciones.get(2);
-				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelaciones(anio, num, idTurno, idinstitucion);
+				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelacionesConIdExpedienteExt(anio, num, idTurno, idinstitucion);
 				int idLenguaje = Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue();
 				
 				//Poner la resolución del ejg asignado a la asistencia
