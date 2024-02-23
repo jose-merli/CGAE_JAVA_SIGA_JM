@@ -255,5 +255,7 @@ public interface IDesignacionesService {
 
 	public TurnosDTO busquedaColaOficioPrimerLetrado(TurnosItem turnosItem, HttpServletRequest request);
 
+	public RelacionesDTO busquedaRelacionesConIdExpedienteExt(List<String> relaciones, HttpServletRequest request);
+
 
 }
