@@ -8386,28 +8386,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 					
-					
-					
-					
-					
-					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
-					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
-					asisExample.createCriteria()
-						.andDesignaAnioEqualTo((short) designaItem.getAno())
-						.andDesignaNumeroEqualTo((long) designaItem.getNumero())
-						.andDesignaTurnoEqualTo(designaItem.getIdTurno())
-						.andIdinstitucionEqualTo(idInstitucion);
-					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
-					if(asis.size() > 0) {
-						ScsAsistencia asistencia = asis.get(0);
-						// solo se asocia si la asitencia no tiene ya asociado un EJG
-						if (asistencia.getEjgnumero() == null) {
-							asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
-							asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
-							asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
-							scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
-						}
-					}
+					asociarAsistenciAlEJGDesigna(designaItem, ejg, idInstitucion, request);
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
 				} catch (Exception e) {
@@ -10147,6 +10126,36 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 		}
 		return result;
+	}
+	
+	private void asociarAsistenciAlEJGDesigna(DesignaItem designaItem, EjgItem ejg, Short idInstitucion, HttpServletRequest request) {		
+		//Cuando se asiga EJG, si la designación está asociada a una asistencia, asociamos el ejg a la asistencia también
+		ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+		asisExample.createCriteria()
+			.andDesignaAnioEqualTo((short) designaItem.getAno())
+			.andDesignaNumeroEqualTo((long) designaItem.getNumero())
+			.andDesignaTurnoEqualTo(designaItem.getIdTurno())
+			.andIdinstitucionEqualTo(idInstitucion);
+		List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+		if(!asis.isEmpty()) {
+			ScsAsistencia asistencia = asis.get(0);
+			// solo se asocia si la asitencia no tiene ya asociado un EJG
+			if (asistencia.getEjgnumero() == null) {
+				asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
+				asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+				asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
+				scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+
+				ScsEjg scsEjg = getEJG(ejg, request);
+				// llevamos los datos de comisaria y nº Diligencia de la asistencia al EJG
+				if(asis.size() == 1 && scsEjg != null && asistencia.getComisaria() != null && scsEjg.getComisaria() == null) {
+					scsEjg.setComisaria(asistencia.getComisaria());
+					scsEjg.setNumerodiligencia(asistencia.getNumerodiligencia());
+					scsEjgMapper.updateByPrimaryKey(scsEjg);
+				}
+			}
+		}
+
 	}
 
 
