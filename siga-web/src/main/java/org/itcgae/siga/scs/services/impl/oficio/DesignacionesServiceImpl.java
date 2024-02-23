@@ -8439,6 +8439,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 							ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
 							
+							if (designa.getObservaciones() == null) {
+								designa.setObservaciones(asistenciaRelacion.getObservaciones());
+							}
+							
 							if(designa.getDefensajuridica() == null) {
 								designa.setDefensajuridica(asistenciaRelacion.getDatosdefensajuridica());
 								scsDesignaMapper.updateByPrimaryKey(designa);
