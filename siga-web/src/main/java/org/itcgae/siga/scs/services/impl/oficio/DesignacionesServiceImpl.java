@@ -8395,7 +8395,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					asisExample.createCriteria()
 						.andDesignaAnioEqualTo((short) designaItem.getAno())
 						.andDesignaNumeroEqualTo((long) designaItem.getNumero())
-						.andDesignaTurnoGreaterThan(designaItem.getIdTurno())
+						.andDesignaTurnoEqualTo(designaItem.getIdTurno())
 						.andIdinstitucionEqualTo(idInstitucion);
 					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
 					if(asis.size() > 0) {
