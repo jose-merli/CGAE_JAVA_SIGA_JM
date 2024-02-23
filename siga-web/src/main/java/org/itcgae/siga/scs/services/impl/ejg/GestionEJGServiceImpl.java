@@ -41,6 +41,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.DelitosEjgDTO;
+import org.itcgae.siga.DTOs.scs.DesignaItem;
 import org.itcgae.siga.DTOs.scs.EjgDTO;
 import org.itcgae.siga.DTOs.scs.EjgDesignaDTO;
 import org.itcgae.siga.DTOs.scs.EjgDocumentacionDTO;
@@ -5885,26 +5886,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					response = scsEjgdesignaMapper.insert(record);
 					
-					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
-					asisExample.createCriteria()
-						.andEjgnumeroEqualTo(record.getNumeroejg())
-						.andEjganioEqualTo(record.getAnioejg())
-						.andEjgidtipoejgEqualTo(record.getIdtipoejg())
-						.andIdinstitucionEqualTo(idInstitucion);
-					
-					//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
-					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
-					// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
-					if (!asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
-						ScsAsistencia scsAsistencia = asis.get(0);
-						scsAsistencia.setFechamodificacion(new Date());
-						scsAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
-						scsAsistencia.setDesignaAnio(record.getAniodesigna());
-						scsAsistencia.setDesignaNumero(record.getNumerodesigna());
-						scsAsistencia.setDesignaTurno(record.getIdturno());
-						
-						scsAsistenciaMapper.updateByPrimaryKey(scsAsistencia);
-					}
+					asociarAsistenciAlDesignaEJG(record, usuarios.get(0), request);
 					
 
 				} catch (Exception e) {
@@ -7216,5 +7198,43 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		LOGGER.info("guardarServiciosTramitacion() -> Salida del servicio para actualizar turno, guardia y letrado asociados a un EJG.");
 
 		return result;
+	}
+	
+	private void asociarAsistenciAlDesignaEJG(ScsEjgdesigna record, AdmUsuarios usuario, HttpServletRequest request) {
+		//Cuando se asiga Designa, si el EJG está asociado a una asistencia, asociamos el Designa a la asistencia también
+		ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+		asisExample.createCriteria()
+			.andEjgnumeroEqualTo(record.getNumeroejg())
+			.andEjganioEqualTo(record.getAnioejg())
+			.andEjgidtipoejgEqualTo(record.getIdtipoejg())
+			.andIdinstitucionEqualTo(record.getIdinstitucion());
+		
+		//obtenemos los datos completos para asignar a la asistencia el Designa del EJG
+		List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+		// insertamos los datos del Designa solo si la asistencia no tiene datos de Designa
+		if (!asis.isEmpty() && asis.get(0).getDesignaNumero() == null ) {
+			ScsAsistencia scsAsistencia = asis.get(0);
+			scsAsistencia.setFechamodificacion(new Date());
+			scsAsistencia.setUsumodificacion(usuario.getIdusuario());
+			scsAsistencia.setDesignaAnio(record.getAniodesigna());
+			scsAsistencia.setDesignaNumero(record.getNumerodesigna());
+			scsAsistencia.setDesignaTurno(record.getIdturno());
+			
+			scsAsistenciaMapper.updateByPrimaryKey(scsAsistencia);
+			// llevamos los datos de la observaciones de la asistencia al designa
+			ScsDesignaKey designaKey = new ScsDesignaKey();
+			designaKey.setAnio(record.getAniodesigna());
+			designaKey.setNumero(record.getNumerodesigna());
+			designaKey.setIdturno(record.getIdturno());
+			designaKey.setIdinstitucion(record.getIdinstitucion());
+			
+			ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
+			
+			if (asis.size() == 1 && designa != null && designa.getObservaciones() != null &&  designa.getObservaciones().isEmpty() ) {
+				designa.setObservaciones(scsAsistencia.getObservaciones());
+				scsDesignaMapper.updateByPrimaryKey(designa);
+			}
+			
+		}
 	}
 }

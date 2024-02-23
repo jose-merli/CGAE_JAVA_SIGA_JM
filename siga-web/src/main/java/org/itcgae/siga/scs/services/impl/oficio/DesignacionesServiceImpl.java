@@ -6063,6 +6063,67 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 		LOGGER.info("busquedaRelaciones() -> Salida del servicio para obtener relaciones");
 		return relacionesDTO;
 	}
+	
+	@Override
+	public RelacionesDTO busquedaRelacionesConIdExpedienteExt(List<String> relaciones, HttpServletRequest request) {
+		LOGGER.info("busquedaRelacionesConIdExpedienteExt() -> Entrada al servicio para obtener relaciones");
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		RelacionesDTO relacionesDTO = new RelacionesDTO();
+		List<RelacionesItem> relacionesItem = null;
+		String resolucionEJG = "";
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaRelacionesConIdExpedienteExt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaRelacionesConIdExpedienteExt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"busquedaRelacionesConIdExpedienteExt() -> Entrada a scsDesignacionesExtendsMapper para obtener las relaciones");
+
+				String[] parts = relaciones.get(0).split("/");
+				String anio = parts[0].substring(1);
+				String num = relaciones.get(3);
+				String idTurno = relaciones.get(1);
+				String idinstitucion = relaciones.get(2);
+				relacionesItem = scsDesignacionesExtendsMapper.busquedaRelacionesConIdExpedienteExt(anio, num, idTurno, idinstitucion);
+				int idLenguaje = Integer.valueOf(usuarios.get(0).getIdlenguaje()).intValue();
+				
+				//Poner la resolución del ejg asignado a la asistencia
+				for(RelacionesItem relacion: relacionesItem) {//recorremos toooodas las relaciones
+					
+					if(relacion.getSjcs().startsWith("A")) {
+						resolucionEJG = scsDesignacionesExtendsMapper.busquedaResolucionEjgAsistencia(relacion.getAnio(), relacion.getNumero(), idInstitucion, idLenguaje);
+						if(resolucionEJG!=null) {
+							relacion.setResolucion(resolucionEJG);
+						}
+					}
+					
+				}
+
+				LOGGER.info(
+						"busquedaRelacionesConIdExpedienteExt() / scsDesignacionesExtendsMapper.busquedaRelaciones() -> Salida a scsDesignacionesExtendsMapper para obtener las relaciones");
+
+				if (relacionesItem != null) {
+					relacionesDTO.setRelacionesItem(relacionesItem);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaRelacionesConIdExpedienteExt() -> Salida del servicio para obtener relaciones");
+		return relacionesDTO;
+	}
 
 	@Override
 	public DeleteResponseDTO eliminarRelacion(List<String> datos, HttpServletRequest request) {
@@ -8378,6 +8439,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 							ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
 							
+							if (designa.getObservaciones() == null) {
+								designa.setObservaciones(asistenciaRelacion.getObservaciones());
+							}
+							
 							if(designa.getDefensajuridica() == null) {
 								designa.setDefensajuridica(asistenciaRelacion.getDatosdefensajuridica());
 								scsDesignaMapper.updateByPrimaryKey(designa);
@@ -8386,28 +8451,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 						}
 					}
 					
-					
-					
-					
-					
-					//Si la designación está asociada a una asistencia asociamos el ejg a la asistencia también
-					ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
-					asisExample.createCriteria()
-						.andDesignaAnioEqualTo((short) designaItem.getAno())
-						.andDesignaNumeroEqualTo((long) designaItem.getNumero())
-						.andDesignaTurnoEqualThan(designaItem.getIdTurno())
-						.andIdinstitucionEqualTo(idInstitucion);
-					List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
-					if(asis.size() > 0) {
-						ScsAsistencia asistencia = asis.get(0);
-						// solo se asocia si la asitencia no tiene ya asociado un EJG
-						if (asistencia.getEjgnumero() == null) {
-							asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
-							asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
-							asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
-							scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
-						}
-					}
+					asociarAsistenciAlEJGDesigna(designaItem, ejg, idInstitucion, request);
 
 					LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Insert finalizado");
 				} catch (Exception e) {
@@ -10147,6 +10191,36 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			}
 		}
 		return result;
+	}
+	
+	private void asociarAsistenciAlEJGDesigna(DesignaItem designaItem, EjgItem ejg, Short idInstitucion, HttpServletRequest request) {		
+		//Cuando se asiga EJG, si la designación está asociada a una asistencia, asociamos el ejg a la asistencia también
+		ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
+		asisExample.createCriteria()
+			.andDesignaAnioEqualTo((short) designaItem.getAno())
+			.andDesignaNumeroEqualTo((long) designaItem.getNumero())
+			.andDesignaTurnoEqualTo(designaItem.getIdTurno())
+			.andIdinstitucionEqualTo(idInstitucion);
+		List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
+		if(!asis.isEmpty()) {
+			ScsAsistencia asistencia = asis.get(0);
+			// solo se asocia si la asitencia no tiene ya asociado un EJG
+			if (asistencia.getEjgnumero() == null) {
+				asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
+				asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
+				asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
+				scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+
+				ScsEjg scsEjg = getEJG(ejg, request);
+				// llevamos los datos de comisaria y nº Diligencia de la asistencia al EJG
+				if(asis.size() == 1 && scsEjg != null && asistencia.getComisaria() != null && scsEjg.getComisaria() == null) {
+					scsEjg.setComisaria(asistencia.getComisaria());
+					scsEjg.setNumerodiligencia(asistencia.getNumerodiligencia());
+					scsEjgMapper.updateByPrimaryKey(scsEjg);
+				}
+			}
+		}
+
 	}
 
 

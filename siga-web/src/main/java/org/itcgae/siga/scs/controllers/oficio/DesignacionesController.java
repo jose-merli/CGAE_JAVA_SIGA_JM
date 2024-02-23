@@ -937,6 +937,12 @@ public class DesignacionesController {
 		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/designas/busquedaRelacionesConIdExpedienteExt", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RelacionesDTO> busquedaRelacionesConIdExpedienteExt(@RequestBody List<String> procurador, HttpServletRequest request) {
+		RelacionesDTO response = designacionesService.busquedaRelacionesConIdExpedienteExt(procurador, request);
+		return new ResponseEntity<RelacionesDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/designas/eliminarRelacion",method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<DeleteResponseDTO> eliminarRelacion(
 			@RequestBody List<String> listaRelaciones, HttpServletRequest request) {
