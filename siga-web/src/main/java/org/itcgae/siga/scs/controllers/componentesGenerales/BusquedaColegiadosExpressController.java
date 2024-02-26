@@ -44,4 +44,10 @@ public class BusquedaColegiadosExpressController {
 		ComboDTO response = busquedaColegiadosExpressService.comboTurnos(pantalla, idTurno, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/componenteGeneralJG/getTipoTurno", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> comboTurnos(String idTurno, HttpServletRequest request) {
+		String response = busquedaColegiadosExpressService.getTipoTurnos( idTurno, request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
 }

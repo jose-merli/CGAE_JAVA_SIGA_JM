@@ -14,4 +14,6 @@ public interface IBusquedaColegiadosExpressService {
 	ColegiadosSJCSDTO busquedaColegiadoEJG(ColegiadosSJCSItem datos, HttpServletRequest request);
 	
 	ComboDTO comboTurnos(String pantalla, String idTurno, HttpServletRequest request);
+	
+	public String getTipoTurnos(String idTurno, HttpServletRequest request);
 }
