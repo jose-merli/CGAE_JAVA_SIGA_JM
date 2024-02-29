@@ -191,7 +191,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 	
 	public String selectIdiomasPlantillasConsultas(Short idInstitucion, Long idModeloComunicacion, Long idConsulta) {
 		SQL sql = new SQL();
-		sql.SELECT("i.nombre");
+		sql.SELECT("p.PLANTILLA");
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA PDC");
 		sql.INNER_JOIN("mod_plantilladocumento p ON p.IDPLANTILLADOCUMENTO = pdc.IDPLANTILLADOCUMENTO");
 		sql.INNER_JOIN("EC_IDIOMA i ON i.IDIDIOMA = p.IDIOMA");
