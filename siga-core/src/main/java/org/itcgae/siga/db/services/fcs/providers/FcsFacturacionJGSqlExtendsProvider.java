@@ -109,11 +109,6 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("FAC.NOMBRE", facturacionItem.getNombre().trim()));
 		}
 
-		// FILTRO POR PARTIDA PRESUPUESTARIA
-		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
-			sql2.WHERE("FAC.IDPARTIDAPRESUPUESTARIA IN ( " + facturacionItem.getIdPartidaPresupuestaria() + " )");
-		}
-
 		// FILTRO POR CONCEPTOS DE FACTURACIÓN Y POR GRUPOS DE FACTURACIÓN Y PARTIDA
 		// PRESUPUESTARIA
 		if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdConcepto())
@@ -121,10 +116,11 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 				|| !UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
 			SQL sql3 = new SQL();
 
-			sql3.SELECT("1");
+			sql3.SELECT("HIT.IDFACTURACION");
 			sql3.FROM("FCS_FACT_GRUPOFACT_HITO HIT");
 			sql3.WHERE("HIT.IDFACTURACION = FAC.IDFACTURACION");
 			sql3.WHERE("HIT.IDINSTITUCION = FAC.IDINSTITUCION");
+			sql3.WHERE("HIT.IDPARTIDAPRESUPUESTARIA IN ( " + facturacionItem.getIdPartidaPresupuestaria() + " )");
 
 			// FILTRO POR CONCEPTOS DE FACTURACION
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdConcepto())) {
@@ -134,8 +130,12 @@ public class FcsFacturacionJGSqlExtendsProvider extends FcsFacturacionjgSqlProvi
 			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdFacturacion())) {
 				sql3.WHERE("HIT.IDGRUPOFACTURACION IN ( " + facturacionItem.getIdFacturacion() + " )");
 			}
-
-			sql2.WHERE("EXISTS (" + sql3.toString() + ")");
+			
+			// FILTRO POR PARTIDA PRESUPUESTARIA
+			if (!UtilidadesString.esCadenaVacia(facturacionItem.getIdPartidaPresupuestaria())) {
+				sql2.WHERE("FAC.IDFACTURACION IN ( " + sql3.toString() + " )");
+			}
+			
 		}
 		
 		if(!facturacionItem.isArchivada()) {
