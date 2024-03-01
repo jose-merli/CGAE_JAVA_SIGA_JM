@@ -1055,7 +1055,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
 				
 				mPlantillaDoc.setFechamodificacion(new Date());
-				mPlantillaDoc.setPlantilla(nombreFichero);
+				mPlantillaDoc.setPlantilla(newNombreFichero);
 				mPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 				
 				modPlantilladocumentoMapper.updateByPrimaryKey(mPlantillaDoc);
