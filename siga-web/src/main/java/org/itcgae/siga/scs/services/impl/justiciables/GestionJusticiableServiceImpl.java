@@ -1013,33 +1013,29 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						LOGGER.info("updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para buscar al justiciable a editar");
 
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
-						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales, idInstitucion, justiciableItem);
+						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(new ScsPersonajg(), datosGenerales, idInstitucion, justiciableItem);
 						justiciable.setUsumodificacion(usuario.getIdusuario());
 						justiciable.setFechamodificacion(new Date());
 						if (justiciableItem.getDireccion() != null) {
-							justiciable.setExistedomicilio("S");
+							scsPersonajg.setExistedomicilio("S");
 						}			
-						ScsPersonajgKey key = new ScsPersonajgKey();
-						key.setIdpersona(Long.valueOf(justiciable.getIdpersona()));
-						key.setIdinstitucion(Short.valueOf(justiciable.getIdinstitucion()));
-						ScsPersonajg personajg = scsPersonajgExtendsMapper.selectByPrimaryKey(key);
+						scsPersonajg.setIdtipovia(justiciable.getIdtipovia());
+						scsPersonajg.setDireccion(justiciable.getDireccion());
+						scsPersonajg.setNumerodir(justiciable.getNumerodir());
+						scsPersonajg.setEscaleradir(justiciable.getEscaleradir());
+						scsPersonajg.setPisodir(justiciable.getPisodir());
+						scsPersonajg.setPuertadir(justiciable.getPuertadir());
+						scsPersonajg.setIdpais(justiciable.getIdpais());
+						scsPersonajg.setIdpaisdir1(justiciable.getIdpaisdir1());
+						scsPersonajg.setIdpaisdir2(justiciable.getIdpaisdir2());
+						scsPersonajg.setCodigopostal(justiciable.getCodigopostal());
+						scsPersonajg.setIdprovincia(justiciable.getIdprovincia());
+						scsPersonajg.setIdpoblacion(justiciable.getIdpoblacion());
+						scsPersonajg.setCorreoelectronico(justiciable.getCorreoelectronico());
+						scsPersonajg.setFax(justiciable.getFax());
+						scsPersonajg.setFechamodificacion(justiciable.getFechamodificacion());
 						
-						personajg.setIdtipovia(justiciable.getIdtipovia());
-						personajg.setDireccion(justiciable.getDireccion());
-						personajg.setNumerodir(justiciable.getNumerodir());
-						personajg.setEscaleradir(justiciable.getEscaleradir());
-						personajg.setPisodir(justiciable.getPisodir());
-						personajg.setPuertadir(justiciable.getPuertadir());
-						personajg.setIdpais(justiciable.getIdpais());
-						personajg.setIdpaisdir1(justiciable.getIdpaisdir1());
-						personajg.setIdpaisdir2(justiciable.getIdpaisdir2());
-						personajg.setCodigopostal(justiciable.getCodigopostal());
-						personajg.setIdprovincia(justiciable.getIdprovincia());
-						personajg.setIdpoblacion(justiciable.getIdpoblacion());
-						personajg.setCorreoelectronico(justiciable.getCorreoelectronico());
-						personajg.setFax(justiciable.getFax());
-						
-						response = scsPersonajgExtendsMapper.updateByPrimaryKey(personajg);
+						response = scsPersonajgExtendsMapper.updateByPrimaryKey(scsPersonajg);
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
 
 						LOGGER.info("updateJusticiable() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para buscar telefonos al justiciable");
