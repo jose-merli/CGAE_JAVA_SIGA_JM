@@ -138,6 +138,18 @@ public class JusticiablesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 
 	}
+	
+	@RequestMapping(value = "gestionJusticiables/updateJusticiable/datos/personales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateJusticiableDatosPersonales(@RequestBody JusticiableItem justiciableItem,
+			HttpServletRequest request) {
+
+		UpdateResponseDTO response = gestionJusticiableService.updateJusticiableDatosPersonales(justiciableItem, true, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+
+	}
 
 	@RequestMapping(value = "/gestionJusticiables/updateUnidadFamiliar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateUnidadFamiliar(@RequestBody UnidadFamiliarEJGItem unidadFamiliarItem,
