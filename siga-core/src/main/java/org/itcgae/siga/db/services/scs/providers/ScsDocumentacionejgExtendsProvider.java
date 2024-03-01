@@ -7,7 +7,15 @@ import org.itcgae.siga.db.mappers.ScsDocumentacionejgSqlProvider;
 public class ScsDocumentacionejgExtendsProvider extends ScsDocumentacionejgSqlProvider {
 	public String getDocumentacion(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje) {
 		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT("(f.IDINSTITUCION || '_' || f.IDFICHERO || '.' || f.EXTENSION) nombre_fichero");
+		sql2.FROM(" GEN_FICHERO f ");
+		sql2.WHERE("IDINSTITUCION = doc.idinstitucion");
+		sql2.WHERE("f.IDFICHERO = doc.IDFICHERO");
+		
 		sql.SELECT("doc.*," + 
+				" COALESCE (doc.NOMBREFICHERO, ("+ sql2.toString() +")) nombre_fichero," +
 				" catalogo.descripcion as presentadores," + 
 				" familiar.solicitante," + 
 				" catalogo2.descripcion as parentesco," + 
