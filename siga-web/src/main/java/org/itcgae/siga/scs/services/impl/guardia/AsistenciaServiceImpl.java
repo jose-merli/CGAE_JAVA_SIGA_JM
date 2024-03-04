@@ -2153,8 +2153,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 //										|| !"2".equals(tarjetaAsistenciaResponseItem.getEstado())) {
 							int rowsUpdated = 0;
 							ScsAsistencia scsAsistencia = new ScsAsistencia();
-							scsAsistencia.setFechaestadoasistencia(new SimpleDateFormat("dd/MM/yyyy")
-									.parse(tarjetaAsistenciaResponseItem.getFechaEstado()));
+							scsAsistencia.setFechaestadoasistencia(new Date());
 							scsAsistencia
 									.setIdestadoasistencia(Short.valueOf(tarjetaAsistenciaResponseItem.getEstado()));
 							scsAsistencia.setAnio(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()));
