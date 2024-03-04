@@ -3284,7 +3284,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					if (response == 0)
 						throw (new Exception("Error al eliminar los delitos asociados a la ficha pre-designacion del EJG"));
 				}
-				if (datos.getDelitosSeleccionados() != null) {
+				if (datos.getDelitosSeleccionados() != null && !datos.getDelitosSeleccionados().isEmpty()) {
 					String[] idDelitos = datos.getDelitosSeleccionados().split(",");
 					for (String idDelito : idDelitos) {
 						delitos.setIddelito(Short.parseShort(idDelito));
