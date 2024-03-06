@@ -10197,6 +10197,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 	private void asociarAsistenciDesignaAlEjg(DesignaItem designaItem, EjgItem ejg, Short idInstitucion, HttpServletRequest request) {		
 		//Cuando se asiga EJG, si la designación está asociada a una asistencia, asociamos el ejg a la asistencia también
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> Entrada llamada scsAsistenciaExtendsMapper para obtener asistencia del designa");
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> designaanio = " +(short) designaItem.getAno());
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> designaTurno = " + (long) designaItem.getNumero());
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> designaNumero = " + designaItem.getIdTurno());
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> Idinstitucion = "+ idInstitucion);
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> Ejganio = "+ Short.valueOf(ejg.getAnnio()) );
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> Ejgidtipoejg = "+ Short.valueOf(ejg.getTipoEJG()) );
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> Ejgnumero = "+ ejg.getNumero());
 		ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
 		asisExample.createCriteria()
 			.andDesignaAnioEqualTo((short) designaItem.getAno())
@@ -10205,13 +10213,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			.andIdinstitucionEqualTo(idInstitucion);
 		List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
 		if(!asis.isEmpty()) {
+			LOGGER.info("asociarAsistenciDesignaAlEjg() -> Asistencia del designa encontrada");
 			ScsAsistencia asistencia = asis.get(0);
 			// solo se asocia si la asitencia no tiene ya asociado un EJG
 			if (asistencia.getEjgnumero() == null) {
 				asistencia.setEjganio(Short.valueOf(ejg.getAnnio()));
 				asistencia.setEjgidtipoejg(Short.valueOf(ejg.getTipoEJG()));
 				asistencia.setEjgnumero(Long.valueOf(ejg.getNumero()));
-				scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+				int updaterows = scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
+				LOGGER.info("asociarAsistenciDesignaAlEjg -> Asistencias modificadas: "+ updaterows);
 
 				ScsEjg scsEjg = getEJG(ejg, request);
 				// llevamos los datos de comisaria y nº Diligencia de la asistencia al EJG
@@ -10219,14 +10229,24 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					scsEjg.setComisaria(asistencia.getComisaria());
 					scsEjg.setNumerodiligencia(asistencia.getNumerodiligencia());
 					scsEjgMapper.updateByPrimaryKey(scsEjg);
+					
 				}
 			}
 		}
+		LOGGER.info("asociarAsistenciDesignaAlEjg() -> Salida del servicio ");
 
 	}
 	
 	private void asociarAsistenciEjgAlDesigna(DesignaItem designaItem, EjgItem ejg, Short idInstitucion, HttpServletRequest request) {		
 		//Cuando se asiga EJG, si la designación está asociada a una asistencia, asociamos el ejg a la asistencia también
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> Entrada llamada scsAsistenciaExtendsMapper para obtener asistencia del designa");
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> designaanio = " +(short) designaItem.getAno());
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> designaTurno = " + (long) designaItem.getNumero());
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> designaNumero = " + designaItem.getIdTurno());
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> Idinstitucion = "+ idInstitucion);
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> Ejganio = "+ Short.valueOf(ejg.getAnnio()) );
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> Ejgidtipoejg = "+ Short.valueOf(ejg.getTipoEJG()) );
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> Ejgnumero = "+ ejg.getNumero());
 		ScsAsistenciaExample asisExample = new ScsAsistenciaExample();
 		asisExample.createCriteria()
 			.andEjganioEqualTo(Short.valueOf(ejg.getAnnio()))
@@ -10235,6 +10255,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			.andIdinstitucionEqualTo(idInstitucion);
 		List<ScsAsistencia> asis = scsAsistenciaExtendsMapper.selectByExample(asisExample);
 		if(!asis.isEmpty()) {
+			LOGGER.info("asociarAsistenciDesignaAlEjg() -> Asistencia del designa encontrada");
 			ScsAsistencia asistencia = asis.get(0);
 			// solo se asocia si la asitencia no tiene ya asociado un Designa
 			if (asistencia.getDesignaNumero() == null) {
@@ -10244,6 +10265,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 				scsAsistenciaExtendsMapper.updateByPrimaryKey(asistencia);
 			}
 		}
+		LOGGER.info("asociarAsistenciEjgAlDesigna() -> Salida del servicio ");
 
 	}
 
