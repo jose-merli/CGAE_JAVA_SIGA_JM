@@ -8438,13 +8438,18 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 							designaKey.setNumero((long) designasCodigo.get(0).getNumero());
 
 							ScsDesigna designa = scsDesignaMapper.selectByPrimaryKey(designaKey);
-							
+							boolean update = false;
 							if (designa.getObservaciones() == null) {
 								designa.setObservaciones(asistenciaRelacion.getObservaciones());
+								update = true;
 							}
 							
 							if(designa.getDefensajuridica() == null) {
 								designa.setDefensajuridica(asistenciaRelacion.getDatosdefensajuridica());
+								update = true;
+								
+							}
+							if (update) {
 								scsDesignaMapper.updateByPrimaryKey(designa);
 							}
 
