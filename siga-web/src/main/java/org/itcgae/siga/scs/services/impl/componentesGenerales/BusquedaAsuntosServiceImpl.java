@@ -1587,10 +1587,6 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 				}
 
-				if (delitosEjgString.equals(""))
-					ejg.setDelitos(null);
-				else
-					ejg.setDelitos(delitosEjgString);
 
 				response = scsEjgMapper.updateByPrimaryKey(ejg);
 				if (response == 0)
