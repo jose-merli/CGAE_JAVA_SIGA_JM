@@ -47,14 +47,14 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 		boolean validate =  true;
 		response.setContentType("application/json");
 		
-		if(!security) {
-			for (String pattern : authorizedRequests) {
-				if (new AntPathRequestMatcher(pattern).matches(request)){
-					validate =  false;
-					break;
-				}
+		//if(!security) {
+		for (String pattern : authorizedRequests) {
+			if (new AntPathRequestMatcher(pattern).matches(request)){
+				validate =  false;
+				break;
 			}
 		}
+		//}
 		
 		if(validate) {
 		
