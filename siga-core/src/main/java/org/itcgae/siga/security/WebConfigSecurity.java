@@ -72,6 +72,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 				loginUrl, 
 				"/loginDevelop",
 				"/validaInstitucion",
+				"/validaUsuario",
 				"/instituciones", 
 				"/perfilespost", 
 				"/perfiles",
