@@ -1,5 +1,6 @@
 package org.itcgae.siga.security;
 
+import org.itcgae.siga.logger.RequestLoggingFilter;
 import org.itcgae.siga.security.develop.DevAuthenticationFilter;
 import org.itcgae.siga.security.production.ProAuthenticationFilter;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
@@ -43,8 +44,8 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 	String loginMethod;
 
 	// 12 horas
-	//@Value("${security.token.expiration-time:43200000}")
-	long expirationTime = 120000;
+	@Value("${security.token.expiration-time:43200000}")
+	long expirationTime;
 
 	@Value("${security.token.sign-key:1234}")
 	String secretSignKey;
@@ -94,7 +95,8 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
             .anyRequest().authenticated().and()
             .addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop", tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
             .addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl, tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
-            .addFilter(new AuthorizationFilter(authenticationManager(), userDetailsService, authorizedRequests, yamlPermisosProperties, security)); 
+            .addFilter(new AuthorizationFilter(authenticationManager(), userDetailsService, authorizedRequests, yamlPermisosProperties, security))
+			.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 	
 		/*
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
