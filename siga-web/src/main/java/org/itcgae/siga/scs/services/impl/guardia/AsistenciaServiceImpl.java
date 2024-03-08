@@ -2153,8 +2153,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 //										|| !"2".equals(tarjetaAsistenciaResponseItem.getEstado())) {
 							int rowsUpdated = 0;
 							ScsAsistencia scsAsistencia = new ScsAsistencia();
-							scsAsistencia.setFechaestadoasistencia(new SimpleDateFormat("dd/MM/yyyy")
-									.parse(tarjetaAsistenciaResponseItem.getFechaEstado()));
+							scsAsistencia.setFechaestadoasistencia(new Date());
 							scsAsistencia
 									.setIdestadoasistencia(Short.valueOf(tarjetaAsistenciaResponseItem.getEstado()));
 							scsAsistencia.setAnio(Short.valueOf(tarjetaAsistenciaResponseItem.getAnio()));
@@ -6103,12 +6102,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 				affectedRows += scsDelitosejgMapper.insert(delitosejg);
 			}
-			// Seteamos el string de delitos para posteriormente updatear
-			if (!UtilidadesString.esCadenaVacia(delitosString)) {
-				scsEjg.setDelitos(delitosString);
-			} else {
-				scsEjg.setDelitos(null);
-			}
+			
 		}
 
 		// Copiamos los contrarios

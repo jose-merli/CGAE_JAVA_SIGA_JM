@@ -27,8 +27,7 @@ public class RequestLoggingFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		callId = new RandomString(21).nextString();
 
 		callId = callId.concat(getUserFromRequest(request));
@@ -45,8 +44,8 @@ public class RequestLoggingFilter implements Filter {
 	private String getUserFromRequest(ServletRequest request) {
 		String user = "";
 		try {
-			String jwtToken = ((HttpServletRequest)request).getHeader("Authorization");
-			
+			String jwtToken = ((HttpServletRequest) request).getHeader("Authorization");
+
 			return "||".concat(UserTokenUtils.getDniFromJWTToken(jwtToken));
 		} catch (Exception e) {
 			return user;

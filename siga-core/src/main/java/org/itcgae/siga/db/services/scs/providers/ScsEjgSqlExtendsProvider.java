@@ -1903,6 +1903,13 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				+ " AND designaletrado.NUMERO = LET2.NUMERO" + " AND TRUNC(LET2.Fechadesigna) <= TRUNC(SYSDATE))"
 				+ ") designaletrado2 on (designaletrado2.idinstitucion = ejgd.idinstitucion and designaletrado2.idturno = ejgd.idturno  and designaletrado2.anio = ejgd.anioejg and designaletrado2.numero = EJGD.NUMERODESIGNA)";
 
+		SQL sqlDelitos = new SQL();
+		sqlDelitos.SELECT("  LISTAGG(del.IDDELITO, ',') ");
+		sqlDelitos.FROM(" SCS_DELITOSEJG del ");
+		sqlDelitos.WHERE(" del.idinstitucion = ejg.idinstitucion ");
+		sqlDelitos.WHERE(" del.anio = ejg.anio ");
+		sqlDelitos.WHERE(" del.NUMERO = ejg.NUMERO ");
+		sqlDelitos.WHERE(" del.IDTIPOEJG = ejg.IDTIPOEJG ");
 		// select
 		sql.SELECT("EJG.IDPERSONA"); // IDpERSONA
 		sql.SELECT("EJG.IDPERSONAjg");
@@ -1980,6 +1987,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 
 		// Tarjeta Documentación: Enviar Documentación Adicional
 		sql.SELECT("ejg.idexpedienteext");
+		// buscar delitos
+		sql.SELECT("(" + sqlDelitos.toString() +") delitosSeleccionados");
 
 		// from
 		sql.FROM("scs_ejg ejg");

@@ -909,6 +909,7 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 				designa.setNumprocedimiento(ejg.getNumeroprocedimiento());
 				designa.setAnioprocedimiento(ejg.getAnioprocedimiento());
 				designa.setNig(ejg.getNig());
+				designa.setResumenasunto(ejg.getObservaciones());
 				designa.setObservaciones(ejg.getObservaciones());
 //				designa.setIdpretension(ejg.getIdpretension().shortValue());
 				designa.setIdpretension(ejg.getIdpretension() != null ? ejg.getIdpretension().shortValue() : null);
@@ -1586,10 +1587,6 @@ public class BusquedaAsuntosServiceImpl implements BusquedaAsuntosService {
 					}
 				}
 
-				if (delitosEjgString.equals(""))
-					ejg.setDelitos(null);
-				else
-					ejg.setDelitos(delitosEjgString);
 
 				response = scsEjgMapper.updateByPrimaryKey(ejg);
 				if (response == 0)
