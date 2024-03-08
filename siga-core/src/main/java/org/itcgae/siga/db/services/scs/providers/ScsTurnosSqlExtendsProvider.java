@@ -913,6 +913,18 @@ public class ScsTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 		return sqlFinal;
 	}
 	
+	public String getTipoTurno(Short idInstitucion, String idTurno) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTIPOTURNO");
+		sql.FROM("SCS_TURNO");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDTURNO = '" + idTurno + "'");
+
+		return sql.toString();
+	}
+	
 	public String comboEstados(Short idInstitucion) {
 
 		SQL sql = new SQL();

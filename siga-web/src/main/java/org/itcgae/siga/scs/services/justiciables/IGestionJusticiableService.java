@@ -35,6 +35,8 @@ public interface IGestionJusticiableService {
 	
 	public UpdateResponseDTO updateJusticiable(JusticiableItem justiciableItem, boolean datosGenerales, HttpServletRequest request);
 	
+	public UpdateResponseDTO updateJusticiableDatosPersonales(JusticiableItem justiciableItem, boolean datosGenerales, HttpServletRequest request);
+	
 	public JusticiableTelefonoDTO getTelefonos(JusticiableItem justiciableItem, HttpServletRequest request);
 	
 	public AsuntosJusticiableDTO searchAsuntosJusticiable(String idPersona, HttpServletRequest request, String origen);

@@ -241,6 +241,36 @@ public class BusquedaColegiadoExpressServiceImpl implements IBusquedaColegiadosE
 		LOGGER.info("busquedaColegiadosExpress.comboTurnos() -> Salida del servicio para obtener los turnos");
 		return comboDTO;
 	}
+	
+	@Override
+	public String getTipoTurnos(String idTurno, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				String idTipoTurno = null;
+				if (idInstitucion != null) {
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					LOGGER.info("getTipoTurnos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+					LOGGER.info("getTipoTurnos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+					if (usuarios != null && usuarios.size() > 0) {
+
+						LOGGER.info("busquedaColegiadosExpress.getTipoTurnos() -> Entrada al servicio para obtener el tipo del turnos");
+						List<String> tipoTurnos = scsTurnosextendsMapper.getTipoTurno(idInstitucion, idTurno);
+						if (!tipoTurnos.isEmpty()) {
+							idTipoTurno = tipoTurnos.get(0);
+						}
+						
+					}
+				}
+				LOGGER.info("busquedaColegiadosExpress.getTipoTurnos() -> Salida del servicio par aobtener el tipo del turnos");
+		return idTipoTurno;
+	}
 
 }
 

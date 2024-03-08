@@ -45,8 +45,8 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 	@Value("${security.login.method:POST}")
 	String loginMethod;
 
-	// 1 dia
-	@Value("${security.token.expiration-time:86400000}")
+	// 12 horas
+	@Value("${security.token.expiration-time:43200000}")
 	long expirationTime;
 
 	@Value("${security.token.sign-key:1234}")

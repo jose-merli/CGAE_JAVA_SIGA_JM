@@ -27,6 +27,7 @@ public class EjgDocumentacionItem {
 	private String idFichero;
 	private String nombreFichero;
 	private Short idMaestroPresentador;
+	private String idInstitucion;
 
    
 	 /**
@@ -215,6 +216,11 @@ public class EjgDocumentacionItem {
 	public void setPropietarioDes(String propietarioDes) {
 		this.propietarioDes = propietarioDes;
 	}
-	
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 
 }
