@@ -6102,12 +6102,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 
 				affectedRows += scsDelitosejgMapper.insert(delitosejg);
 			}
-			// Seteamos el string de delitos para posteriormente updatear
-			if (!UtilidadesString.esCadenaVacia(delitosString)) {
-				scsEjg.setDelitos(delitosString);
-			} else {
-				scsEjg.setDelitos(null);
-			}
+			
 		}
 
 		// Copiamos los contrarios
