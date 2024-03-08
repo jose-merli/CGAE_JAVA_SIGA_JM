@@ -181,7 +181,7 @@ public class ConConsultasExtendsSqlProvider {
 		sql.SELECT("REC.DESCRIPCION");
 		sql.FROM("CON_OBJETIVO OBJETIVO");
 		sql.JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = OBJETIVO.NOMBRE AND REC.IDLENGUAJE = '"+idLenguaje+"'");
-		sql.WHERE("OBJETIVO.IDOBJETIVO = "+idObjetivo);
+		sql.WHERE("OBJETIVO.IDOBJETIVO = '"+idObjetivo+"'");
 		
 		return sql.toString();
 	}

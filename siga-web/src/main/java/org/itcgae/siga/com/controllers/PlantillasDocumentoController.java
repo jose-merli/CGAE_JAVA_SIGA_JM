@@ -3,7 +3,6 @@ package org.itcgae.siga.com.controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
@@ -15,7 +14,6 @@ import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
-import org.itcgae.siga.DTOs.com.ResponseDataListDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -31,14 +29,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value = "/plantillasDoc")
@@ -73,16 +65,6 @@ public class PlantillasDocumentoController {
 	ResponseEntity<ComboSufijoDTO> obtenerSufijos(HttpServletRequest request) {
 		
 		ComboSufijoDTO response = _plantillasDocumentoService.obtenerSufijos(request);
-		if(response.getError() == null)
-			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/combo/sufijosAgrupados",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboSufijoDTO> obtenerSufijosAgrupados(HttpServletRequest request) {
-		
-		ComboSufijoDTO response = _plantillasDocumentoService.obtenerSufijosAgrupados(request);
 		if(response.getError() == null)
 			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.OK);
 		else
@@ -129,7 +111,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@Deprecated // utilizar guardarPlantillas desde SIGAARNV-3896
 	@RequestMapping(value = "/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
@@ -140,26 +121,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
-	@RequestMapping(value = "/guardarPlantillas",  method = RequestMethod.POST,   produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<ResponseDataListDTO> guardarPlantillasDocumento(MultipartHttpServletRequest request, @RequestParam("fichaPlantillaDocument") String fichaPlantillaDocumentStr) throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		TarjetaPlantillaDocumentoDTO[] plantillaDoc = null;
-		try {
-			
-			 plantillaDoc = objectMapper.readValue(fichaPlantillaDocumentStr, TarjetaPlantillaDocumentoDTO[].class);
-		} catch (JsonProcessingException  e) {
-		      e.printStackTrace();
-	          return new ResponseEntity<ResponseDataListDTO>(HttpStatus.BAD_REQUEST);
-		}
-		 
-		ResponseDataListDTO response = _plantillasDocumentoService.guardarModPlantillasDocumento(request, plantillaDoc);
-		if(response.getError() == null)
-			return new ResponseEntity<ResponseDataListDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ResponseDataListDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}	
-	
-	@Deprecated // utilizar guardarPlantillas desde SIGAARNV-3896
 	@RequestMapping(value = "/guardar/datosSalida",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> guardarDatosSalida(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
@@ -170,7 +131,6 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
-	@Deprecated // utilizar guardarPlantillas desde SIGAARNV-3896
 	@RequestMapping(value = "/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request, @QueryParam("idClaseComunicacion") String idClaseComunicacion) throws Exception{
 		
