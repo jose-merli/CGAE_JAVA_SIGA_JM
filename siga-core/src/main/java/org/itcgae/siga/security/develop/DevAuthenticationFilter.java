@@ -55,7 +55,7 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			String dni = (String) request.getHeader("CAS-username");
 			String nombre = (String) request.getHeader("CAS-displayName");
 
-			String grupo = "SAD";
+			String grupo = request.getParameter("profile");
 			String institucion = request.getParameter("location");
 			String letrado = request.getParameter("letrado");
 			AdmRol rol = null;
