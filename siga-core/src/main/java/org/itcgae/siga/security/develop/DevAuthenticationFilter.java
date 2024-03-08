@@ -49,13 +49,13 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			LOGGER.info("Se accede por el formulario de deserrallo");
 			
 			List<String> perfiles = new ArrayList<String>();
-			perfiles.add("ADG");
+			perfiles.add(request.getParameter("profile"));
 			//String dni = "44149718E"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
 			//String nombre = "Jesus"; // Habilitar este para trabajar en local y comentar las dos líneas de CAS
 			String dni = (String) request.getHeader("CAS-username");
 			String nombre = (String) request.getHeader("CAS-displayName");
 
-			String grupo = request.getParameter("profile");
+			String grupo = "SAD";
 			String institucion = request.getParameter("location");
 			String letrado = request.getParameter("letrado");
 			AdmRol rol = null;
