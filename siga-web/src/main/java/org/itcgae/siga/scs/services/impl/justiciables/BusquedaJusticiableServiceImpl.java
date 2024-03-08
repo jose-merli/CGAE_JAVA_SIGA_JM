@@ -204,15 +204,10 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
 
-						if(justiciableBusquedaItem.getFilas() == null || justiciableBusquedaItem.getFilas().equals("0")) {
-						
-							if(tamMax != null) {
-								tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-							}else {
-								tamMaximo = null;
-							}
-						}else {
-							tamMaximo = Integer.valueOf(justiciableBusquedaItem.getFilas());
+						if (tamMax != null) {
+							tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
+						} else {
+							tamMaximo = null;
 						}
 						
 						idPersonaJusticiables = scsPersonajgExtendsMapper

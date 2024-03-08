@@ -244,13 +244,15 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		sql.ORDER_BY("fechamodificacion desc");
 		sqlOrder.FROM("(" + sql + " )");
-		if (tamMax != null) {
-			Integer tamMaxNumber = tamMax + 1;
-			if(tamMax > 10) {
-				sqlOrder.WHERE("rownum <= " + tamMaxNumber);
-			}else {
-				sqlOrder.WHERE("rownum <= " + tamMax);
-			}
+//		if (tamMax != null) {
+//			Integer tamMaxNumber = tamMax + 1;
+//			if(tamMax > 10) {
+//				sqlOrder.WHERE("rownum <= " + tamMaxNumber);
+//			}
+//		}
+		
+		if (tamMax != null) { 
+			sqlOrder.WHERE("rownum <= " + (tamMax + 1));
 		}
 
 //		LOGGER.info("MONTADA SQL IDPERSONAS");
@@ -269,10 +271,8 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		String idPersonasIn = "";
 		int count = 1;
 
-		for (int i = 0; i < justiciableBusquedaItems.size(); i++) {
-
-			if (count < 100) {
-
+		for (int i = 0; i < justiciableBusquedaItems.size(); i++) {			
+			if (count < 100 && i != 0) {
 				if (count == 99 || count == justiciableBusquedaItems.size() || i + 1 == justiciableBusquedaItems.size()) {
 					idPersonas += justiciableBusquedaItems.get(i).getValor();
 					arrayPersonas.add(idPersonas);
@@ -283,12 +283,18 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 				}
 
 				count++;
-
+				
 			} else {
 				count = 1;
 				idPersonas = "";
 
 				idPersonas += justiciableBusquedaItems.get(i).getValor();
+				
+				if (i == justiciableBusquedaItems.size() - 1) {
+					arrayPersonas.add(idPersonas);
+					break;
+				}
+				
 				idPersonas += ",";
 
 			}
