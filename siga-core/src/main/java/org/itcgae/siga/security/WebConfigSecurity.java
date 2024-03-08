@@ -2,9 +2,7 @@ package org.itcgae.siga.security;
 
 import org.itcgae.siga.logger.RequestLoggingFilter;
 import org.itcgae.siga.security.develop.DevAuthenticationFilter;
-import org.itcgae.siga.security.develop.DevAuthorizationFilter;
 import org.itcgae.siga.security.production.ProAuthenticationFilter;
-import org.itcgae.siga.security.production.ProAuthorizationFilter;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,11 +67,12 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 	}
 
 	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
+	protected void configure(HttpSecurity http) throws Exception {
 		String [] authorizedRequests = {
 				loginUrl, 
 				"/loginDevelop",
 				"/validaInstitucion",
+				"/validaUsuario",
 				"/instituciones", 
 				"/perfilespost", 
 				"/perfiles",
@@ -90,21 +89,30 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		 * 3. Se desactiva el filtro CSRF 
 		 * 4. Se indica que el login no requiere autenticación 
 		 * 5. Se indica que el resto de URLs esten securizadas
-		 */ 
+		 */
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+			.cors().and().csrf().disable().authorizeRequests()
+            .antMatchers(authorizedRequests).permitAll()
+            .anyRequest().authenticated().and()
+            .addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop", tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
+            .addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl, tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
+            .addFilter(new AuthorizationFilter(authenticationManager(), userDetailsService, authorizedRequests, yamlPermisosProperties, security))
+			.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
+	
+		/*
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().cors().and().csrf().disable().authorizeRequests()
 				.antMatchers(authorizedRequests).permitAll()
 				.anyRequest().authenticated().and()
-				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
-						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
+				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl, tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilter(new ProAuthorizationFilter(authenticationManager(), yamlPermisosProperties))
-				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop",
-						tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
+				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop", tokenHeaderAuthKey, userDetailsService), BasicAuthenticationFilter.class)
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 		
 		if (!security){
 			httpSecurity.addFilter(new DevAuthorizationFilter(authenticationManager(), userDetailsService, authorizedRequests));
 		}
+		*/
 		
 		// Configuramos el token con los parametros de configuracion
 		UserTokenUtils.configure(secretSignKey, tokenPrefix, expirationTime, tokenHeaderAuthKey);

@@ -17,12 +17,16 @@ import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class UserTokenUtils {
 	
-	static Logger LOGGER = LoggerFactory.getLogger(UserTokenUtils.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(UserTokenUtils.class);
 
 	private static long expirationTime;
 
@@ -40,7 +44,7 @@ public class UserTokenUtils {
 		UserTokenUtils.tokenHeaderAuthKey = tokenHeaderAuthKey;
 	}
 
-	public static UserAuthenticationToken getAuthentication(HttpServletRequest request) {
+	public static UserAuthenticationToken getAuthentication(HttpServletRequest request) throws ExpiredJwtException, Exception {
 		String token = request.getHeader(tokenHeaderAuthKey);
 		if (token == null || !token.startsWith(tokenPrefix)) {
 			return null;
@@ -83,10 +87,15 @@ public class UserTokenUtils {
 
 	public static String generateToken(UserCgae user) throws TokenGenerationException {
 		try {
-
-			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
-					.setSubject(user.getDni()).claim("permisos", user.getPermisos())
-					.claim("institucion", user.getInstitucion()).claim("grupo", user.getGrupo()).claim("perfiles", user.getPerfiles())
+			
+			return tokenPrefix + Jwts.builder()
+					.setIssuedAt(new Date())
+					.setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
+					.setSubject(user.getDni())
+					.claim("permisos", user.getPermisos())
+					.claim("institucion", user.getInstitucion())
+					.claim("grupo", user.getGrupo())
+					.claim("perfiles", user.getPerfiles())
 					.claim("letrado",user.getLetrado())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
@@ -111,22 +120,35 @@ public class UserTokenUtils {
 		}
 	}
 
-	public static UserCgae gerUserFromJWTToken(String token) {
-		String dni = Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, "")).getBody()
-				.getSubject();
-		String institucion = (String) Jwts.parser().setSigningKey(secretSignKey)
-				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("institucion");
-		String grupo = (String) Jwts.parser().setSigningKey(secretSignKey)
-				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("grupo");
-		HashMap<String, String> permisos = getPermisosFromJWTToken(token);
+	public static UserCgae gerUserFromJWTToken(String token) throws ExpiredJwtException, Exception {
 		
-		List<String> perfiles = (List<String>) Jwts.parser().setSigningKey(secretSignKey)
-				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("perfiles");
+		UserCgae userCgae = null;
+		
+		try {
+		
+			token = token.replace(tokenPrefix, "");
+			Jws<Claims> jws = Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token);
 
-		String letrado = (String) Jwts.parser().setSigningKey(secretSignKey)
-				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("letrado");
+			Claims body = jws.getBody();
+			
+			String dni = body.getSubject();
+			String institucion = (String) body.get("institucion");
+			String grupo = (String) body.get("grupo");
+			String letrado = (String) body.get("letrado");
 
-		return new UserCgae(dni, grupo, institucion, permisos,perfiles,letrado, null, null);
+			HashMap<String, String> permisos = (HashMap<String, String>) body.get("permisos");
+			List<String> perfiles = (List<String>) body.get("perfiles");
+
+			userCgae = new UserCgae(dni, grupo, institucion, permisos, perfiles, letrado, null, null);
+
+		} catch (ExpiredJwtException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new Exception("Token inválido: " + e.getMessage());
+		}
+		
+		return userCgae;
+		
 	}
 
 	public static String getDniFromJWTToken(String token) {
