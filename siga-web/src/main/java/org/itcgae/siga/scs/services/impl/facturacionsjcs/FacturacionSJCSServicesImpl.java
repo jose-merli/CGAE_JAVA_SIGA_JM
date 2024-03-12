@@ -390,11 +390,11 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.debug(
-					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+//			LOGGER.debug(
+//					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.debug(
-					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+//			LOGGER.debug(
+//					"FacturacionSJCSServicesImpl.eliminarFacturaciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -412,8 +412,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 					if (facturacion != null) {
 
-						LOGGER.debug(
-								"ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
+//						LOGGER.debug(
+//								"ejecutarFacturacion() -> Entrada limpieza de facturacion al recalcular facturacion");
 						try {
 							response = limpiafacturacion(facturacion, true, usuario);
 						}catch (BusinessException e1) {
@@ -430,8 +430,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 									"facturacionSJCS.facturacionesYPagos.buscarFacturacion.mensajeErrorEliminar");
 							error.setMessage(facturacionItem.getNombre());
 						}
-						LOGGER.debug(
-								"ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
+//						LOGGER.debug(
+//								"ejecutarFacturacion() -> Salida limpieza de facturacion al recalcular facturacion");
 
 					}
 					//
@@ -477,8 +477,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
 		facturacionesDelete.setError(error);
 
-		LOGGER.debug(
-				"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida del servicio para eliminar las facturaciones");
+//		LOGGER.debug(
+//				"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Salida del servicio para eliminar las facturaciones");
 
 		return facturacionesDelete;
 	}
@@ -1209,7 +1209,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 			boolean factEnProceso = checkFactEnProceso();
 			
 			if (factEnProceso == false) {
-		        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
+//		        LOGGER.debug("ejecutarFacturacion() -> Entrada borrar fichero facturacion fisico y registro de BBDD");
 		        resPL = ejecutarBorrarFacturacion(facturacion,borrarFacturacion);
 		
 		        if ((facturacion.getNombrefisico() != null) && !facturacion.getNombrefisico().isEmpty()) {
@@ -1220,13 +1220,13 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 		            }
 		        }
 		
-		        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
+//		        LOGGER.debug("ejecutarFacturacion() -> Salida borrar fichero facturacion fisico y registro de BBDD");
 				if("".equals(resPL)) {
 					response = -1;
 				}
 			}else {
-				LOGGER.debug(
-						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Hay facturaciones en ejecucion o programadas, no se puede eliminar ahora");
+//				LOGGER.debug(
+//						"FacturacionSJCSServicesImpl.eliminarFacturaciones() -> Hay facturaciones en ejecucion o programadas, no se puede eliminar ahora");
 				String mensajeError = "factSJCS.facturacion.error.borrarFact.pendienteEliminar";
 				// Insertamos una nueva fila en la tabla de historicos de estados facturacion
 				// con el estado ELIMINACION PDTE  para que se pueda eliminar con el Scheduled
@@ -1847,8 +1847,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
     private void facturacionesProgramadas(CenInstitucion institucion) {
 
-        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesProgramadas()");
-        LOGGER.debug("AGUERRA - BUSCAMOS LA LISTA DE FACTURACIÓN PROGRAMADA");
+//        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesProgramadas()");
+//        LOGGER.debug("AGUERRA - BUSCAMOS LA LISTA DE FACTURACIÓN PROGRAMADA");
         List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
                 .facturacionesPorEstadoProgramadas(institucion.getIdinstitucion().toString());
 
@@ -1856,9 +1856,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
-            	LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
-                LOGGER.debug("AUDIT FACTURACIONES PROGRAMADAS");
-                LOGGER.debug("ITEM: " + item);
+//            	LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCIÓN PARA LAS FACTURACIONES EN EJECUCION");
+//                LOGGER.debug("AUDIT FACTURACIONES PROGRAMADAS");
+//                LOGGER.debug("ITEM: " + item);
                 
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0, false);
@@ -1866,20 +1866,20 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
                 // Ejecutamos la facturación y genero los multiples ficheros pendientes
 
                 // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
-                LOGGER.debug("AGUERRA - ENTRA LA PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
+//                LOGGER.debug("AGUERRA - ENTRA LA PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
                 if (item.getRegularizacion().equals("1")) {
-                	LOGGER.debug("AUDIT ejecutarRegularizacionJG()");
+//                	LOGGER.debug("AUDIT ejecutarRegularizacionJG()");
                     ejecutarRegularizacionJG(item, institucion);
                 } else {
-                	LOGGER.debug("AUDIT ejecutarFacturacionJG()");
+//                	LOGGER.debug("AUDIT ejecutarFacturacionJG()");
                     ejecutarFacturacionJG(item, institucion);
                 }
-                LOGGER.debug("AGUERRA - SALE DE PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
+//                LOGGER.debug("AGUERRA - SALE DE PARTE DE LA REGULACION EN FACTURACIONES PROGRAMADAS");
 
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0, false);
             } catch (Exception e) {
-                LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACION PROGRAMADA");
+//                LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACION PROGRAMADA");
                 LOGGER.error(e.getStackTrace());
                 LOGGER.error(e);
                 actualizaObservacionesEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(),
@@ -1893,9 +1893,9 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     }
 
     private void facturacionesBloqueadas(CenInstitucion institucion) {
-        LOGGER.debug("AGUERRA - ENTRA EN FACTURACION BLOQUEADA");
-        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
-        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
+//        LOGGER.debug("AGUERRA - ENTRA EN FACTURACION BLOQUEADA");
+//        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
+//        LOGGER.debug("ENTRA -> FacturacionSJCSServicesImpl.facturacionesBloqueadas()");
         List<FcsFacturacionjg> listaFacturaciones = fcsFacturacionJGExtendsMapper
                 .facturacionesPorEstadoEjecucion(institucion.getIdinstitucion().toString());
 
@@ -1903,33 +1903,33 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
 
             try {
                 // Insertamos el estado programada para las facturaciones en ejecucion
-                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO PROGRAMADA PARA LAS FACTURACIONES EN EJECUCION");
-                LOGGER.debug(" Insertamos el estado programada para las facturaciones en ejecucion");
+//                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO PROGRAMADA PARA LAS FACTURACIONES EN EJECUCION");
+//                LOGGER.debug(" Insertamos el estado programada para las facturaciones en ejecucion");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_PROGRAMADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0, false);
 
                 // Insertamos el estado En ejecucion para las facturaciones en ejecucion
-                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCION PARA LAS FACTURACIONES EN EJECUCION");
-                LOGGER.debug("Insertamos el estado En ejecucion para las facturaciones en ejecucion");
+//                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCION PARA LAS FACTURACIONES EN EJECUCION");
+//                LOGGER.debug("Insertamos el estado En ejecucion para las facturaciones en ejecucion");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EN_EJECUCION.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0, false);
 
                 // Ejecutamos la facturación y genero los multiples ficheros pendientes
                 // UtilidadesFacturacionSJCS utils = new UtilidadesFacturacionSJCS();
-                LOGGER.debug("AGUERRA - ENTRA LA PARTE DE LA REGULACION DE FACTURACIONES BLOQUEADAS");
+//                LOGGER.debug("AGUERRA - ENTRA LA PARTE DE LA REGULACION DE FACTURACIONES BLOQUEADAS");
                 if (item.getRegularizacion().equals("1")) {
                     ejecutarRegularizacionJG(item, institucion);
                 } else {
                     ejecutarFacturacionJG(item, institucion);
                 }
-                LOGGER.debug("AGUERRA - SALE DE PARTE DE LA REGULACION DE FACTURACIONES BLOQUEADAS");
+//                LOGGER.debug("AGUERRA - SALE DE PARTE DE LA REGULACION DE FACTURACIONES BLOQUEADAS");
 
                 // Insertamos el estado En ejecucion para las facturaciones ejecutada
-                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCION PARA LAS FACTURACIONES EJECUTADAS");
+//                LOGGER.debug("AGUERRA - INSERTAMOS EL ESTADO EN EJECUCION PARA LAS FACTURACIONES EJECUTADAS");
                 insertarEstado(ESTADO_FACTURACION.ESTADO_FACTURACION_EJECUTADA.getCodigo(), item.getIdinstitucion(),
                         item.getIdfacturacion(), SigaConstants.USUMODIFICACION_0, false);
             } catch (Exception e) {
-                LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS");
+//                LOGGER.debug("AGUERRA - PETA EN EL METODO DE FACTURACIONES BLOQUEADAS");
                 LOGGER.error(e.getStackTrace());
                 LOGGER.error(e.getCause());
                 LOGGER.error(e.getMessage());
@@ -1941,8 +1941,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
             }
         }
 
-        LOGGER.debug("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
-        LOGGER.debug("AGUERRA - SALE DE FACTURACION BLOQUEADA");
+//        LOGGER.debug("SALE -> FacturacionSJCSServicesImpl.facturacionesBloqueadas(): " + listaFacturaciones.toString());
+//        LOGGER.debug("AGUERRA - SALE DE FACTURACION BLOQUEADA");
     }
 
     @Transactional
@@ -2953,7 +2953,7 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
     
     public void eliminarFacturacionesPendientes() {
     	
-        LOGGER.debug("Inicio de eliminarFacturacionesPendientes() -> Se comprueba si la facturación se puede eliminar");
+//        LOGGER.debug("Inicio de eliminarFacturacionesPendientes() -> Se comprueba si la facturación se puede eliminar");
     	
         List<FacturacionItem> ListfactPendientesEliminar = fcsFacturacionJGExtendsMapper.getFacturacionesPendientesEliminar();
 		
@@ -2963,8 +2963,8 @@ public class FacturacionSJCSServicesImpl implements IFacturacionSJCSServices {
         	
         	eliminarFacturaciones(factPendienteEliminar, null);
 			
-			LOGGER.debug(
-					"eliminarFacturaciones() -> Terminado el proceso de eliminacion de la facturacion");
+//			LOGGER.debug(
+//					"eliminarFacturaciones() -> Terminado el proceso de eliminacion de la facturacion");
 		}
     }
     
