@@ -892,7 +892,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 					ScsDocumentoejgExample ejemplo = new ScsDocumentoejgExample();
 					ejemplo.createCriteria().andAbreviaturaEqualTo(documentacionejgItem.getAbreviatura())
-							.andIdinstitucionEqualTo(idInstitucion);
+							.andIdinstitucionEqualTo(idInstitucion).andIdtipodocumentoejgEqualTo(Short.valueOf(documentacionejgItem.getIdTipoDocumento()));
 
 					List<ScsDocumentoejg> tipoDocDuplicados = scsDocumentoEjgExtendsMapper.selectByExample(ejemplo);
 

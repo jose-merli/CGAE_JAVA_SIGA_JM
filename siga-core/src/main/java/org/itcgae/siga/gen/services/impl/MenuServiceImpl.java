@@ -1342,14 +1342,20 @@ public class MenuServiceImpl implements IMenuService {
 	@Override
 	public StringDTO getTokenOldSiga(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
-		UserCgae userDesarrollo = UserTokenUtils.gerUserFromJWTToken(token);
+		UserCgae userDesarrollo = null;
+		try {
+			userDesarrollo = UserTokenUtils.gerUserFromJWTToken(token);
+		} catch (Exception e) {
+			LOGGER.error("Se ha producido un error en el token: " + e.getMessage());
+		}
 
 		String header = "";
-		try {
-			header = UserTokenUtils.generateTokenOldSiga(userDesarrollo);
-		} catch (TokenGenerationException e) {
-			// TODO Auto-generated catch block
-			LOGGER.error("Se ha producido un error al generar el token de SIGA Classique");
+		if(userDesarrollo != null) {
+			try {
+				header = UserTokenUtils.generateTokenOldSiga(userDesarrollo);
+			} catch (TokenGenerationException e) {
+				LOGGER.error("Se ha producido un error al generar el token de SIGA Classique");
+			}
 		}
 		StringDTO respuesta = new StringDTO();
 		respuesta.setValor(header);
