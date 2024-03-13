@@ -1428,7 +1428,8 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 
 	}
 	
-	public String getCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion) {
+	public String getCalendariosProgramadosSigaClassiqueTamMax(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion, Integer tamMax) {
+		SQL sqlPadre = new SQL();
 
 		SQL sql2 = new SQL();
 		sql2.SELECT("1");
@@ -1463,9 +1464,7 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		
 		SQL sqlCalGenerados = new SQL();
 		sqlCalGenerados.SELECT("COUNT (*)");
-		sqlCalGenerados.FROM("("+tablaGenerados.toString()+")");
-		
-		
+		sqlCalGenerados.FROM("("+tablaGenerados.toString()+")");	
 	
 		SQL sqlGenerado = new SQL();
 		sqlGenerado.SELECT("COUNT(*) ");
@@ -1525,19 +1524,12 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (calendarioItem.getEstado() != null && calendarioItem.getEstado() != "") {
 		sql.WHERE("HPC.ESTADO IN (" + calendarioItem.getEstado()+")");
 		}
-
 		if (calendarioItem.getFechaProgramadaDesde() != null && calendarioItem.getFechaProgramadaDesde() != "") {
 		sql.WHERE("PC.FECHAPROGRAMACION >= "+ "TO_DATE('" +  calendarioItem.getFechaProgramadaDesde() + "','dd/MM/yyyy HH24:mi:ss')");
 		}
 		if (calendarioItem.getFechaProgramadaHasta() != null && calendarioItem.getFechaProgramadaHasta() != "") {
 		sql.WHERE("PC.FECHAPROGRAMACION <= " + "TO_DATE('" +  calendarioItem.getFechaProgramadaHasta() + "','dd/MM/yyyy HH24:mi:ss')");
 		}
-//		if (calendarioItem.getFechaCalendarioDesde() != null && calendarioItem.getFechaCalendarioDesde() != "") {
-//		sql.WHERE("trunc(PC.FECHACALINICIO) >= " + "TO_DATE('" + calendarioItem.getFechaCalendarioDesde()+ "','DD/MM/YYYY')");
-//		}
-//		if (calendarioItem.getFechaCalendarioHasta() != null && calendarioItem.getFechaCalendarioHasta() != "") {
-//			sql.WHERE("trunc(PC.FECHACALFIN) <= " + "TO_DATE('" + calendarioItem.getFechaCalendarioHasta() + "','DD/MM/YYYY')");
-//			}
 		if (calendarioItem.getFechaCalendarioDesde() != null && calendarioItem.getFechaCalendarioDesde() != "") {
 			sql.WHERE("trunc(PC.FECHACALINICIO) >= " + "TO_DATE('" + calendarioItem.getFechaCalendarioDesde() + "','DD/MM/YYYY')");
 		}
@@ -1550,17 +1542,25 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		if (calendarioItem.getIdGuardia() != null && calendarioItem.getIdGuardia() != "") {
 		sql.WHERE("(hpc.IDGUARDIA IN (" + calendarioItem.getIdGuardia()+") OR hpc.IDGUARDIA is null)");
 		}
-
 		if (!UtilidadesString.esCadenaVacia(calendarioItem.getIdCalendarioProgramado())) {
 			sql.WHERE("PC.IDPROGCALENDARIO = " + calendarioItem.getIdCalendarioProgramado());
 		}
 		
-		//sql.WHERE("NOT EXISTS (" + sql2 + ")");
-		
 		sql.ORDER_BY("PC.FECHAPROGRAMACION desc, PC.FECHACALINICIO desc, PC.FECHACALFIN desc");
 
-		
-		return sql.toString();
+	
+		sqlPadre.SELECT(" *");
+		sqlPadre.FROM("( " + sql.toString() + " )");
+        if (tamMax != null && tamMax > 0) {
+            tamMax = tamMax + 1;
+            sqlPadre.WHERE(" ROWNUM <= " + tamMax);
+        }
+
+        return sqlPadre.toString();
+	}
+	
+	public String getCalendariosProgramadosSigaClassique(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion) {
+		return getCalendariosProgramadosSigaClassiqueTamMax(calendarioItem, idInstitucion, null);
 	}
 	
 	public String getCalendariosProgramadosSigaClassiqueTarjeta(CalendariosProgDatosEntradaItem calendarioItem, String idInstitucion) {
