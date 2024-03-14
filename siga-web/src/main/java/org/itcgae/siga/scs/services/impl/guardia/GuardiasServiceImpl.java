@@ -4416,11 +4416,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							idInstitucion.toString());
 					itemList.forEach(item -> {
 //						String response3 = scsGuardiasturnoExtendsMapper.deleteguardiaFromLog(idConjuntoGuardia, idInstitucion.toString(), today, item);
-						String response = scsGuardiasturnoExtendsMapper.deleteguardiaFromConjuntoGuardias(
-								idConjuntoGuardia, idInstitucion.toString(), today, item);
 						String response2 = scsGuardiasturnoExtendsMapper.deleteGuardiaFromCalendario(idCalendar,
 								idConjuntoGuardia, idInstitucion.toString(), today, item);
-						if (response2 == null || response == null && error.getDescription() == null) {
+						if (response2 == null  && error.getDescription() == null) {
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
