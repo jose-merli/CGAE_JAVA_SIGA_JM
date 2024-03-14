@@ -81,6 +81,7 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EcomGuardiacolegiadoMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
@@ -203,6 +204,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsIncompatibilidadguardiasExtendsMapper scsIncompatibilidadguardiasExtendsMapper;
+	
+	@Autowired
+    private GenDiccionarioMapper genDiccionarioMapper;
 
 	@Autowired
 	private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
@@ -11385,6 +11389,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 		ScsCabeceraguardias beanCabeceraGuardias;
 		ScsGuardiascolegiado beanGuardiasColegiado;
 		LetradoInscripcionItem letrado = null;
+		
+		if (mensaje != null) {
+			mensaje = getTraduccionLiteral(mensaje, "1");
+		}
 
 		List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar);
 		for (int j = 0; j < alPeriodosSinAgrupar.size(); j++) {
@@ -11653,6 +11661,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		LetradoInscripcionItem letrado = null;
 		Short idInstitucion = 0;
 		List<Integer> listDiasAseparar = lDiasASeparar;
+		if (mensaje != null) {
+			mensaje = getTraduccionLiteral(mensaje, "1");
+		}
 		List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar); //El Periodo no ocincide con lo marcado en el calendario
 		LOGGER.info("Recorriendo el listado de perios sin agrupar que tiene " + alPeriodosSinAgrupar.size() + " registros");
 		for (int j = 0; j < alPeriodosSinAgrupar.size(); j++) {
@@ -12844,6 +12855,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return stringDTO;
 	}
+	
+	private String getTraduccionLiteral(String idRecurso, String idLenguaje) {
+
+        GenDiccionarioKey genDiccionarioKey = new GenDiccionarioKey();
+        genDiccionarioKey.setIdlenguaje(idLenguaje);
+        genDiccionarioKey.setIdrecurso(idRecurso);
+
+        return genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+    }
 
 	@Override
 	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody, HttpServletRequest request) {
