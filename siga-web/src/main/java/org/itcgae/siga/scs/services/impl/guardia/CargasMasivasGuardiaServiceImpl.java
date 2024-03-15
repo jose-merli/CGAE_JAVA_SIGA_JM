@@ -2719,7 +2719,7 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 			if (hashtable.get(SigaConstants.POSICION) != null
 					&& !hashtable.get(SigaConstants.POSICION).toString().equals("")) {
 				try {
-					if (esConvertibleNumero(hashtable.get(SigaConstants.POSICION).toString())) {
+					if (esConvertibleNumeroNatural(hashtable.get(SigaConstants.POSICION).toString())) {
 						cargaMasivaDatosBTItem.setPosicion(hashtable.get(SigaConstants.POSICION).toString());
 						arrListIntControl.add(hashtable.get(SigaConstants.POSICION).toString());
 					}else {
@@ -2944,14 +2944,15 @@ public class CargasMasivasGuardiaServiceImpl implements CargasMasivasGuardiaServ
 		return masivaDatosBTVos;
 	}
 	
-	private static boolean esConvertibleNumero(String str) {
+	private static boolean esConvertibleNumeroNatural(String str) {
 		try {
-			Integer.parseInt(str);
-			return true;
+			Integer n = Integer.parseUnsignedInt(str);
+			return n>0;
 		}catch(NumberFormatException e) {
 			return false;
 		}
 	}
+	
 
 	private ArrayList<PeriodoEfectivoItem> generarCalendarioEfectivo2(Boolean cumple, int unidadesPeriodo,
 			Date fechaInicio, Date fechaFin, int duracion, int unidadesDuracion, int periodo,
