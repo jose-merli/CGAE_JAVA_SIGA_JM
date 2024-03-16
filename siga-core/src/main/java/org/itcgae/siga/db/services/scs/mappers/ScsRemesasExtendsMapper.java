@@ -41,6 +41,7 @@ public interface ScsRemesasExtendsMapper {
 		@Result(column = "FECHA_ENVIO", property = "fechaEnvio", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHA_RECEPCION", property = "fechaRecepcion", jdbcType = JdbcType.DATE),
 		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "INCIDENCIAS_EJG", property = "incidenciasEJG", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "TOTAL_EJG", property = "totalEJG", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "INCIDENCIAS", property = "incidencias", jdbcType = JdbcType.NUMERIC)

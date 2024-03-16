@@ -2211,58 +2211,41 @@ public class WSCommons {
 		String result[] = null;
 
 		try {
-			LOGGER.warn("AGUERRA - ENTRA EN EL WSCOMMON");
 			if (outParameters > 0)
 				result = new String[outParameters];
 
 			ds = getOracleDataSource();
-			LOGGER.warn("AGUERRA - Pilla dataSource");
 			con = ds.getConnection();
-			LOGGER.warn("AGUERRA - Pilla connection: ");
-
+			
 			cs = con.prepareCall(functionDefinition);
-			LOGGER.warn("AGUERRA - Prepare call");
 			int size = inParameters.length;
-			LOGGER.warn("AGUERRA - Tamaño parametros: " + size);
-			LOGGER.warn("AGUERRA - PARAMETROS DE ENTRADA");
 			// input Parameters
 			for (int i = 0; i < size; i++) {
 
 					try {
-						LOGGER.info("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
+						if(inParameters[i] == null) {
+							cs.setNull(i+1, Types.NULL);		
+						} else if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
+							 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
+						} else if (inParameters[i] instanceof String){
+							cs.setString(i+1, inParameters[i].toString());
+						}
 					} catch (Exception e) {
 						LOGGER.error("Error en formato para mostrar en callPLProcedureFacturacionPyS()");
 					}
-					//LOGGER.warn("AGUERRA - PARAMETRO " + (i+1) + ": " + inParameters[i].toString());
-					
-					if(inParameters[i] == null) {
-						cs.setNull(i+1, Types.NULL);		
-					} else if (inParameters[i] instanceof Integer || inParameters[i] instanceof Short || inParameters[i] instanceof Long){
-						 cs.setInt(i+1,Integer.valueOf(inParameters[i].toString()));
-					} else if (inParameters[i] instanceof String){
-						cs.setString(i+1, inParameters[i].toString());
-					}
-				
-					
 				
 			}
-			LOGGER.warn("AGUERRA - FIN PARAMETROS DE ENTRADA");
-
+			
 			// output Parameters
-			LOGGER.warn("AGUERRA - PARAMETROS DE SALIDA");
 			for (int i = 0; i < outParameters; i++) {
-				LOGGER.warn("AGUERRA - PARAMETRO " + (i + size + 1) + ": " + Types.VARCHAR);
 				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
 			}
 
-			LOGGER.warn("AGUERRA - VA A EJECUTAR EL PL");
 			cs.execute();
-			LOGGER.warn("AGUERRA - HA EJECUTADO EL PL");
-			LOGGER.warn("AGUERRA - RECORRE RESULTADOS");
 			for (int i = 0; i < outParameters; i++) {
 				result[i] = cs.getString(i + size + 1);
 			}
-			LOGGER.warn("AGUERRA - FIN DEL RECORRIDO DE RESULTADOS");
+			
 		} catch (Exception e) {
 			LOGGER.error("WSCommons.callPLProcedureFacturacionPyS > ERROR al llamar al paquete de facturacionPyS. ", e);
 			throw e;
@@ -2277,8 +2260,6 @@ public class WSCommons {
 				cs = null;
 			}
 		}
-
-		LOGGER.warn("AGUERRA - SALE DEL WSCOMMON");
 
 		return result;
 	}	

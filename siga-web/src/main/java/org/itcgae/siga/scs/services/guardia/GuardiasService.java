@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
+import org.itcgae.siga.DTOs.scs.CalendarioProgramadosDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
@@ -98,7 +99,7 @@ public interface GuardiasService {
 	public List<CalendariosProgDatosSalidaItem> getCalendariosProg(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
 
-	public List<DatosCalendarioProgramadoItem> getCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
+	public CalendarioProgramadosDTO getCalendarioProgramado(CalendariosProgDatosEntradaItem calendarioProgBody,
 			HttpServletRequest request);
 	
 	public List<DatosCalendarioProgramadoItem> getCalendarioProgramadoTarjeta(CalendariosProgDatosEntradaItem calendarioProgBody,

@@ -81,6 +81,7 @@ import org.itcgae.siga.db.entities.*;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EcomGuardiacolegiadoMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ScsCabeceraguardiasMapper;
@@ -203,6 +204,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	@Autowired
 	private ScsIncompatibilidadguardiasExtendsMapper scsIncompatibilidadguardiasExtendsMapper;
+	
+	@Autowired
+    private GenDiccionarioMapper genDiccionarioMapper;
 
 	@Autowired
 	private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
@@ -352,23 +356,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				LOGGER.info(
 						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
-						.andParametroEqualTo(SigaConstants.TAM_MAX_CONSULTA_JG)
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-				genParametrosExample.setOrderByClause(SigaConstants.C_IDINSTITUCION + " DESC");
-
-				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-				LOGGER.info(
-						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				if (tamMax != null) {
-					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				} else {
-					tamMaximo = null;
-				}
+				
+				tamMaximo = getTamanoMaximoConsultas(idInstitucion);
 
 				LOGGER.info("searchGuardias() -> Entrada para obtener las guardias");
 
@@ -2723,25 +2712,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("getIncompatibilidades() -> Entrada para obtener las incompatibilidades");
 
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-
-				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-
-				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-				LOGGER.info(
-						"getIncompatibilidades() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-				LOGGER.info(
-						"getIncompatibilidades() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				if (tamMax != null) {
-					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				} else {
-					tamMaximo = null;
-				}
+				tamMaximo = getTamanoMaximoConsultas(idInstitucion);
 //				List<String> idTurnoIncpList = Arrays.asList(incompBody.getIdTurno().split("\\s*,\\s*"));
 //				List<String> idGuardiaIncpList = new ArrayList<>();
 //				if (incompBody.getIdGuardia() != null) {
@@ -3135,9 +3106,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
-	public List<DatosCalendarioProgramadoItem> getCalendarioProgramado(
+	public CalendarioProgramadosDTO getCalendarioProgramado(
 			CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
-
+		CalendarioProgramadosDTO calendarioProgramados = new CalendarioProgramadosDTO();
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -3201,9 +3172,19 @@ public class GuardiasServiceImpl implements GuardiasService {
 							calendarioProgBody.getFechaProgramadaHasta());
 					calendarioProgBody.setFechaProgramadaHasta(fecha);
 				}
-				datos = scsGuardiasturnoExtendsMapper.getCalendariosProgramadosSigaClassique(calendarioProgBody,
-						idInstitucion.toString());
-
+				Error error = new Error();
+				Integer tamMaximo = getTamanoMaximoConsultas(idInstitucion);
+				datos = scsGuardiasturnoExtendsMapper.getCalendariosProgramadosSigaClassiqueTamMax(calendarioProgBody,
+						idInstitucion.toString(), tamMaximo);
+				
+				if((datos != null) && tamMaximo != null && (datos.size()) > tamMaximo) {
+					error.setCode(200);
+					error.setDescription("La consulta devuelve más de " + tamMaximo + " resultados, pero se muestran sólo los " + tamMaximo + " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
+					calendarioProgramados.setError(error);
+					datos.remove(datos.size()-1);
+				}
+				
+				calendarioProgramados.setDatos(datos);
 //				datos.forEach(d -> {
 //					d.setFacturado(false);
 //					String numGuardias = scsGuardiasturnoExtendsMapper.getNumGuardiasCalProg(d.getIdCalG(), d.getIdCalendarioProgramado(), d.getIdInstitucion());
@@ -3248,7 +3229,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			}
 		}
 
-		return datos;
+		return calendarioProgramados;
 	}
 	
 	@Override
@@ -4435,11 +4416,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 							idInstitucion.toString());
 					itemList.forEach(item -> {
 //						String response3 = scsGuardiasturnoExtendsMapper.deleteguardiaFromLog(idConjuntoGuardia, idInstitucion.toString(), today, item);
-						String response = scsGuardiasturnoExtendsMapper.deleteguardiaFromConjuntoGuardias(
-								idConjuntoGuardia, idInstitucion.toString(), today, item);
 						String response2 = scsGuardiasturnoExtendsMapper.deleteGuardiaFromCalendario(idCalendar,
 								idConjuntoGuardia, idInstitucion.toString(), today, item);
-						if (response2 == null || response == null && error.getDescription() == null) {
+						if (response2 == null  && error.getDescription() == null) {
 							error.setCode(400);
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						} else if (error.getCode() == null) {
@@ -4620,22 +4599,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 				if (usuarios != null && usuarios.size() > 0) {
-					GenParametrosExample genParametrosExample = new GenParametrosExample();
-					genParametrosExample.createCriteria().andModuloEqualTo("SCS")
-							.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-							.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-					genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-					this.LOGGER.info(
-							"ListaGuardiaServiceImpl.getGuardiasFromLista() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-					List<GenParametros> tamMax = this.genParametrosExtendsMapper.selectByExample(genParametrosExample);
-					this.LOGGER.info(
-							"ListaGuardiaServiceImpl.getGuardiasFromLista() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-					Integer tamMaximo;
-					if (tamMax != null) {
-						tamMaximo = Integer.valueOf(((GenParametros) tamMax.get(0)).getValor());
-					} else {
-						tamMaximo = null;
-					}
+					Integer tamMaximo = getTamanoMaximoConsultas(idInstitucion);
 					AdmUsuarios usuario = usuarios.get(0);
 					SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 					String today = formatter.format(new Date());
@@ -11423,6 +11387,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 		ScsCabeceraguardias beanCabeceraGuardias;
 		ScsGuardiascolegiado beanGuardiasColegiado;
 		LetradoInscripcionItem letrado = null;
+		
+		if (mensaje != null) {
+			mensaje = getTraduccionLiteral(mensaje, "1");
+		}
 
 		List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar);
 		for (int j = 0; j < alPeriodosSinAgrupar.size(); j++) {
@@ -11691,6 +11659,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 		LetradoInscripcionItem letrado = null;
 		Short idInstitucion = 0;
 		List<Integer> listDiasAseparar = lDiasASeparar;
+		if (mensaje != null) {
+			mensaje = getTraduccionLiteral(mensaje, "1");
+		}
 		List alPeriodosSinAgrupar = getPeriodos(periodoDiasGuardia, lDiasASeparar); //El Periodo no ocincide con lo marcado en el calendario
 		LOGGER.info("Recorriendo el listado de perios sin agrupar que tiene " + alPeriodosSinAgrupar.size() + " registros");
 		for (int j = 0; j < alPeriodosSinAgrupar.size(); j++) {
@@ -12778,23 +12749,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("getInscripciones() -> Entrada para obtener las inscripciones");
 				
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-
-				genParametrosExample.createCriteria().andModuloEqualTo("SCS").andParametroEqualTo("TAM_MAX_CONSULTA_JG")
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-
-				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
-
-				LOGGER.info(
-						"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				List<GenParametros> tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-				if (tamMax != null) {
-					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				} else {
-					tamMaximo = null;
-				}
+				tamMaximo = getTamanoMaximoConsultas(idInstitucion);
 
 				inscripciones = scsInscripcionguardiaExtendsMapper.getListadoInscripciones(inscripcionesBody,
 						idInstitucion.toString(), tamMaximo);
@@ -12898,6 +12853,15 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return stringDTO;
 	}
+	
+	private String getTraduccionLiteral(String idRecurso, String idLenguaje) {
+
+        GenDiccionarioKey genDiccionarioKey = new GenDiccionarioKey();
+        genDiccionarioKey.setIdlenguaje(idLenguaje);
+        genDiccionarioKey.setIdrecurso(idRecurso);
+
+        return genDiccionarioMapper.selectByPrimaryKey(genDiccionarioKey).getDescripcion();
+    }
 
 	@Override
 	public UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody, HttpServletRequest request) {
@@ -12955,22 +12919,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
-						.andParametroEqualTo(SigaConstants.TAM_MAX_CONSULTA_JG)
-						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
-				genParametrosExample.setOrderByClause(SigaConstants.C_IDINSTITUCION + " DESC");
-
-				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
-
-				LOGGER.info(
-						"searchGuardias() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
-
-				if (tamMax != null) {
-					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
-				} else {
-					tamMaximo = null;
-				}
+				tamMaximo = getTamanoMaximoConsultas(idInstitucion);
 
 				List<GuardiasItem> guardiasColegiado = scsCabeceraguardiasExtendsMapper
 						.busquedaGuardiasColegiado(guardiaItem, idInstitucion.toString(), tamMaximo);
@@ -13671,6 +13620,25 @@ public class GuardiasServiceImpl implements GuardiasService {
 		}
 		*/
 		return response;
+	}
+	
+	private Integer getTamanoMaximoConsultas(short idInstitucion) {
+		Integer tamMaximo = null;
+		
+		GenParametrosExample genParametrosExample = new GenParametrosExample();
+		genParametrosExample.createCriteria().andModuloEqualTo(SigaConstants.MODULO_SCS)
+				.andParametroEqualTo(SigaConstants.TAM_MAX_CONSULTA_JG)
+				.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
+		genParametrosExample.setOrderByClause(SigaConstants.C_IDINSTITUCION + " DESC");
+
+		List<GenParametros> tamMaximoJG = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+		LOGGER.info("genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+		if (tamMaximoJG != null) {
+			tamMaximo = Integer.valueOf(tamMaximoJG.get(0).getValor());
+		}
+		return tamMaximo;
 	}
 
 }
