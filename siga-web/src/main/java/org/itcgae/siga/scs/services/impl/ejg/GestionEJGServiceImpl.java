@@ -2236,16 +2236,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						// Se elimina su propiedad como solicitante y su rol
 						record.setSolicitante((short) 0);
+						
+						ScsEjgKey ejgKey = new ScsEjgKey();
+
+						ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+						ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 
 						// Actualizamos el ejg correspondientemente para que no lo considere su
 						// solicitante principal
 						if (record.getEncalidadde() != null && record.getEncalidadde().equals("3")) {
-							ScsEjgKey ejgKey = new ScsEjgKey();
-
-							ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
-							ejgKey.setIdinstitucion(idInstitucion);
-							ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
-							ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
+							
 
 							ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
@@ -2256,7 +2258,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //							insertAuditoriaEJG("Solicitante principal borrado", ejg.getIdpersonajg().toString(), null,	usuarios.get(0), ejg);
 
 							ejg.setIdpersonajg(null);
+						
 
+							response = scsEjgMapper.updateByPrimaryKey(ejg);
+							if (response == 0) {
+								throw (new Exception("Error al actualizar eliminar el solicitante principal del EJG"));
+							}
+						}
+						// si se elimina la unidad familiar con rol "Solicitante principal" hay que eliminar el soliciante del ejg
+						if (datos.get(i).getUf_idPersona() != null && datos.get(i).getUf_idPersona().equals(datos.get(i).getSolicitantePpal())) {
+							ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+							long idPersona = Long.valueOf(datos.get(i).getUf_idPersona());
+							if ( ejg.getIdpersona() != null && idPersona == ejg.getIdpersona()) {
+								ejg.setIdpersona(null);
+							}
+							if ( ejg.getIdpersonajg() != null && idPersona == ejg.getIdpersonajg()) {
+								ejg.setIdpersonajg(null);
+							}
 							response = scsEjgMapper.updateByPrimaryKey(ejg);
 							if (response == 0) {
 								throw (new Exception("Error al actualizar eliminar el solicitante principal del EJG"));
