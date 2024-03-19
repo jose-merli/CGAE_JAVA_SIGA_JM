@@ -216,7 +216,7 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         fechainicio = dateFormat.format(guardiaItem.getFechadesde());
 
         SQL sql = new SQL();
-        sql.SELECT("UNIQUE col.ncolegiado || ' ' || (CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) || ' | ' || gc.FECHAINICIO AS GUARDIA,"
+        sql.SELECT("UNIQUE col.ncolegiado || ' - ' || (CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) || ' - ' || TO_CHAR(gc.FECHAINICIO, 'DD/MM/YYYY') AS GUARDIA,"
                 + "gc.idguardia  || ' | ' || gc.idturno || ' | ' || gc.idpersona || ' | ' ||  gc.IDCALENDARIOGUARDIAS DATOS,"
                 + "gc.fechainicio");
         sql.FROM("SCS_CABECERAGUARDIAS  gc");
