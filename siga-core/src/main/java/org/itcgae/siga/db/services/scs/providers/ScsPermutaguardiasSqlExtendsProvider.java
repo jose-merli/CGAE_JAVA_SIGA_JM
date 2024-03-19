@@ -216,7 +216,7 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         fechainicio = dateFormat.format(guardiaItem.getFechadesde());
 
         SQL sql = new SQL();
-        sql.SELECT("UNIQUE col.ncolegiado || ' ' || (CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) || ' | ' || gc.FECHAINICIO AS GUARDIA,"
+        sql.SELECT("UNIQUE col.ncolegiado || ' - ' || (CASE WHEN per.nombre is  NULL THEN '' ELSE per.apellidos1 || ' ' || per.apellidos2 || ', ' || per.nombre END) || ' - ' || TO_CHAR(gc.FECHAINICIO, 'DD/MM/YYYY') AS GUARDIA,"
                 + "gc.idguardia  || ' | ' || gc.idturno || ' | ' || gc.idpersona || ' | ' ||  gc.IDCALENDARIOGUARDIAS DATOS,"
                 + "gc.fechainicio");
         sql.FROM("SCS_CABECERAGUARDIAS  gc");
@@ -228,8 +228,12 @@ public class ScsPermutaguardiasSqlExtendsProvider extends ScsPermutaguardiasSqlP
         sql.WHERE("col.IDINSTITUCION = " + idinstitucion);
         sql.WHERE("gc.idinstitucion = " + idinstitucion);
         sql.WHERE("gc.FECHAINICIO > SYSDATE");
+        if (guardiaItem.getIdPersona() != null && !guardiaItem.getIdPersona().isEmpty()) {
+        	sql.WHERE("gc.idpersona <> " + guardiaItem.getIdPersona());
+        }
         //sql.WHERE("SYSDATE between si.FECHAVALIDACION and nvl(si.FECHABAJA, '31/12/2999')");
         sql.WHERE("gc.IDTURNO = " + guardiaItem.getIdTurno());
+        sql.ORDER_BY("gc.fechainicio desc");
         //sql.WHERE("gc.IDGUARDIA = " + guardiaItem.getIdGuardia());
         //sql.WHERE("gc.IDCALENDARIOGUARDIAS = " + guardiaItem.getIdCalendarioGuardias());
         //SIGARNV-2885@DTT.JAMARTIN@06/02/2023@INICIO

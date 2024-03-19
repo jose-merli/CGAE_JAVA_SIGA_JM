@@ -15,6 +15,7 @@ public class RemesasItem {
 	private Date fechaEnvio;
 	private Date fechaRecepcion;
 	private String estado;
+	private Integer idEstado;
 	private int incidenciasEJG;
 	private int totalEJG;
 	private String incidencias;
@@ -140,5 +141,23 @@ public class RemesasItem {
 	public void setInformacionEconomica(boolean informacionEconomica) {
 		this.informacionEconomica = informacionEconomica;
 	}
+
+	public int getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(int idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+
+	public Integer getIdEstado() {
+		return idEstado;
+	}
+
+	public void setIdEstado(Integer idEstado) {
+		this.idEstado = idEstado;
+	}
+	
+	
 	
 }

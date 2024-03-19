@@ -255,6 +255,7 @@ public class ScsRemesasExtendsProvider {
 		sql.SELECT("(" + subquery1.toString() + ") fecha_envio");
 		sql.SELECT("(" + subquery2.toString() + ") fecha_recepcion");
 		sql.SELECT("F_SIGA_GETRECURSO((tipoest.descripcion), " + idLenguaje + ") estado");
+		sql.SELECT("est.idestado idestado");
 		sql.SELECT("(" + subquery9.toString() + ") - " + "("+subquery10.toString() +") incidencias_ejg");
 		sql.SELECT("(" + subquery6.toString() + ") total_ejg");
 		sql.SELECT("(" + subquery9.toString() + ") - " + "("+subquery10.toString() +") || ' / ' || (" + subquery6.toString() + ") as INCIDENCIAS");

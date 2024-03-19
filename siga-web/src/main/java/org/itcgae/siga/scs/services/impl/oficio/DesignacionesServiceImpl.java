@@ -8163,12 +8163,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty() && justificacionExpressItem != null) {
 				
-				// Obtenemos los documentos de la designación
+				// Obtenemos solo los documentos de la designación
 				ScsDocumentaciondesignaExample documentaciondesignaExample = new ScsDocumentaciondesignaExample();
 				documentaciondesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 						.andIdturnoEqualTo(Integer.valueOf(justificacionExpressItem.getIdTurno()))
 						.andAnioEqualTo(Short.valueOf(justificacionExpressItem.getAnioDesignacion()))
-						.andNumeroEqualTo(Long.valueOf(justificacionExpressItem.getNumDesignacion()));
+						.andNumeroEqualTo(Long.valueOf(justificacionExpressItem.getNumDesignacion()))
+						.andIdactuacionIsNull();
+
 
 				List<ScsDocumentaciondesigna> documentos = scsDocumentaciondesignaMapper.selectByExample(documentaciondesignaExample);
 					

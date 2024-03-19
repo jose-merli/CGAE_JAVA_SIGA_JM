@@ -26,6 +26,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.scs.BusquedaInscripcionItem;
 import org.itcgae.siga.DTOs.scs.BusquedaLetradosGuardiaDTO;
+import org.itcgae.siga.DTOs.scs.CalendarioProgramadosDTO;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosEntradaItem;
 import org.itcgae.siga.DTOs.scs.CalendariosProgDatosSalidaItem;
 import org.itcgae.siga.DTOs.scs.ComboIncompatibilidadesDatosEntradaItem;
@@ -265,11 +266,11 @@ public class GuardiaController {
 	}
 
 	@PostMapping(value = "/buscarCalendariosProgramados", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<List<DatosCalendarioProgramadoItem>> getCalendarioProgramado(
+	ResponseEntity<CalendarioProgramadosDTO> getCalendarioProgramado(
 			@RequestBody CalendariosProgDatosEntradaItem calendarioProgBody, HttpServletRequest request) {
-		List<DatosCalendarioProgramadoItem> response = guardiasService.getCalendarioProgramado(calendarioProgBody,
+		CalendarioProgramadosDTO response = guardiasService.getCalendarioProgramado(calendarioProgBody,
 				request);
-		return new ResponseEntity<List<DatosCalendarioProgramadoItem>>(response, HttpStatus.OK);
+		return new ResponseEntity<CalendarioProgramadosDTO>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/buscarCalendariosProgramadosTarjeta", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -32,6 +32,7 @@ public class ScsIntercambiosExtendsProvider {
 		sql.WHERE("cm.idinstitucion = usu.idinstitucion");
 		sql.WHERE("cm.tipocarga = 'PD'");
 		sql.WHERE("cm.idinstitucion = " + idInstitucion.toString());
+		sql.ORDER_BY("cm.fechacarga desc");
 		
 		if(cargaMasivaItem.getFechaCarga() != null) {
 			String fechaCarga = "";

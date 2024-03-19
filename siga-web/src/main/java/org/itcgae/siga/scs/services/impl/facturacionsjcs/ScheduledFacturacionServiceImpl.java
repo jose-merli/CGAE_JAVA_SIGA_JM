@@ -18,25 +18,25 @@ public class ScheduledFacturacionServiceImpl implements IScheduledFacturacionSer
     @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacion}")
     @Override
     public void ejecutaFacturacionSJCS() {
-        LOGGER.debug("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
+//        LOGGER.debug("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> ENTRA ejecutaFacturacionSJCS");
         facturacionServices.ejecutaFacturacionSJCS();
-        LOGGER.debug("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
+//        LOGGER.debug("ScheduledFacturacionServiceImpl --> ejecutaFacturacionSJCS --> SALE ejecutaFacturacionSJCS");
     }
   //COMENTAR SCHEDULED PARA USAR EN LOCAL
     @Scheduled(cron = "${cron.pattern.scheduled.procesoFacturacionBloqueadas}")
     @Override
     public void ejecutaFacturacionesSJCSBloqueadas() {
-        LOGGER.debug("ScheduledFacturacionServiceImpl --> ENTRA ejecutaFacturacionesSJCSBloqueadas");
+//        LOGGER.debug("ScheduledFacturacionServiceImpl --> ENTRA ejecutaFacturacionesSJCSBloqueadas");
         facturacionServices.ejecutaFacturacionesSJCSBloqueadas();
-        LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE ejecutaFacturacionesSJCSBloqueadas");
+//        LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE ejecutaFacturacionesSJCSBloqueadas");
     }
 
   //COMENTAR SCHEDULED PARA USAR EN LOCAL
     @Scheduled(cron = "${cron.pattern.scheduled.procesoEliminarFacturacionesPendientes}")
     @Override
     public void eliminarFacturacionesPendientes() {
-        LOGGER.debug("ScheduledFacturacionServiceImpl --> ENTRA eliminarFacturacionesPendientes");
+//        LOGGER.debug("ScheduledFacturacionServiceImpl --> ENTRA eliminarFacturacionesPendientes");
         facturacionServices.eliminarFacturacionesPendientes();
-        LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE eliminarFacturacionesPendientes");
+//        LOGGER.debug("ScheduledFacturacionServiceImpl --> SALE eliminarFacturacionesPendientes");
     }
 }

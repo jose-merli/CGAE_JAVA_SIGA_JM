@@ -2236,16 +2236,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						// Se elimina su propiedad como solicitante y su rol
 						record.setSolicitante((short) 0);
+						
+						ScsEjgKey ejgKey = new ScsEjgKey();
+
+						ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+						ejgKey.setIdinstitucion(idInstitucion);
+						ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+						ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 
 						// Actualizamos el ejg correspondientemente para que no lo considere su
 						// solicitante principal
 						if (record.getEncalidadde() != null && record.getEncalidadde().equals("3")) {
-							ScsEjgKey ejgKey = new ScsEjgKey();
-
-							ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
-							ejgKey.setIdinstitucion(idInstitucion);
-							ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
-							ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
+							
 
 							ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
 
@@ -2256,7 +2258,23 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 //							insertAuditoriaEJG("Solicitante principal borrado", ejg.getIdpersonajg().toString(), null,	usuarios.get(0), ejg);
 
 							ejg.setIdpersonajg(null);
+						
 
+							response = scsEjgMapper.updateByPrimaryKey(ejg);
+							if (response == 0) {
+								throw (new Exception("Error al actualizar eliminar el solicitante principal del EJG"));
+							}
+						}
+						// si se elimina la unidad familiar con rol "Solicitante principal" hay que eliminar el soliciante del ejg
+						if (datos.get(i).getUf_idPersona() != null && datos.get(i).getUf_idPersona().equals(datos.get(i).getSolicitantePpal())) {
+							ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+							long idPersona = Long.valueOf(datos.get(i).getUf_idPersona());
+							if ( ejg.getIdpersona() != null && idPersona == ejg.getIdpersona()) {
+								ejg.setIdpersona(null);
+							}
+							if ( ejg.getIdpersonajg() != null && idPersona == ejg.getIdpersonajg()) {
+								ejg.setIdpersonajg(null);
+							}
 							response = scsEjgMapper.updateByPrimaryKey(ejg);
 							if (response == 0) {
 								throw (new Exception("Error al actualizar eliminar el solicitante principal del EJG"));
@@ -5065,13 +5083,11 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 				String path = genFichero.get(0).getDirectorio();
 				String extension = genFichero.get(0).getExtension();
-				LOGGER.warn("AGUERRA - EXTENSION: " + extension);
-
+				
 				path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
 
 				path += "." + extension;
 
-				LOGGER.warn("AGUERRA - TIPOMIME: " + extension);
 				// String mimeType = getMimeType("."+extension);
 				File file = new File(path);
 				FileInputStream fileInputStream = new FileInputStream(file);
@@ -5654,8 +5670,8 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 		InputStream fileStream = null;
 		HttpHeaders headers = new HttpHeaders();
 
-		LOGGER.warn("AGUERRA - COMIENZA EL SERVICIO");
-		LOGGER.warn("AGUERRA - PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0).getNombreFichero());
+		LOGGER.debug("COMIENZA EL SERVICIO DE DESCARGA DE DOCUMENTOS");
+		LOGGER.debug("PRIMER DOCUMENTO: " + listadocumentoEjgItem.get(0).getNombreFichero());
 		try {
 
 			LOGGER.info("GestionEJGServiceImpl.descargarDocumentosEjg() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -5677,22 +5693,18 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 					String extension = genFichero.get(0).getExtension();
 
-					LOGGER.warn("AGUERRA - EXTENSION: " + extension);
-
 					path += File.separator + idInstitucion + "_" + genFichero.get(0).getIdfichero();
 
 					path += "." + extension;
-					LOGGER.warn("AGUERRA - RUTA: " + path);
 					LOGGER.debug("descargarDocumentosEjg: RUTA FICHERO A DESCARGAR: " + path);
 
 					File file = new File(path);
 					fileStream = new FileInputStream(file);
 
 					// String tipoMime = getMimeType(extension);
-					LOGGER.warn("AGUERRA - TIPOMIME: " + extension);
 					String mimeType = getMimeType("." + extension);
 					if (mimeType == "") {
-						LOGGER.warn("AGUERRA - ENTRA EN LA EXCEPCION DE LA EXTENSION NO SOPORTADA");
+						LOGGER.debug("ENTRA EN LA EXCEPCION DE LA EXTENSION NO SOPORTADA");
 						throw new Exception("Error: el documento contiene una extensión no soportada");
 					} else {
 						headers.setContentType(MediaType.parseMediaType(mimeType));
@@ -5709,21 +5721,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 			}
 
-//		} catch (Exception e) {
-//			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
-//			LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg", e);
-//			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.INTERNAL_SERVER_ERROR);
-//		} finally {
-//			if(fileStream != null) {
-//				try {
-//					fileStream.close();
-//				} catch (IOException e) {
-//					LOGGER.error("GestionEJGServiceImpl.descargarDocumentosEjg() --> se ha producido un error al generar el fichero", e);
-//				}
-//			}
-//        }
 		} catch (Exception e) {
-			LOGGER.warn("AGUERRA - HA OCURRIDO UN ERROR EN EL PROCESO");
 			LOGGER.error(
 					"GestionEJGServiceImpl.descargarDocumentosEjg() -> Se ha producido un error al descargar archivos asociados al ejg",
 					e);
@@ -5736,7 +5734,7 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 			}
 		}
 
-		LOGGER.warn("AGUERRA - SALE DEL SERVICIO");
+		LOGGER.warn("SALE DEL SERVICIO");
 
 		return res;
 	}
