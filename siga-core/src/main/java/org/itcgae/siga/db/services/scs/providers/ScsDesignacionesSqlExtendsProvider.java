@@ -2922,11 +2922,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		SQL sql = new SQL();
 		sql.SELECT(" DISTINCT IDPRETENSION, NVL('(' ||CODIGOEXT || ')', ' ') ||' - ' || F_SIGA_GETRECURSO(DESCRIPCION, "+idLenguaje+") AS NOMBRE");
+		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION, 1) AS NOMBRE_ORDENADO");
 		sql.FROM("SCS_PRETENSION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.WHERE("FECHA_BAJA IS NULL");
-		sql.ORDER_BY("NOMBRE");
+		sql.ORDER_BY("NOMBRE_ORDENADO ASC");
 
 		return sql.toString();
 	}
