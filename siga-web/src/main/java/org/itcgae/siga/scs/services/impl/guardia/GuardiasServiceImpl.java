@@ -164,6 +164,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private static final String DATE_LONG = "yyyy-MM-dd HH:mm:ss";
 	private static final String DATE_LONG_MSEC = "yyyy-MM-dd HH:mm:ss.S";
 	
+	private static boolean ERROR_GENERACION_CALENDARIO = false;
+	
 
 	// private Map<String, Boolean> calendariosGenerandose = new HashMap<String,
 	// Boolean>();
@@ -4896,8 +4898,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					// List <DatosCalendarioProgramadoItem> listaIdCalendariosProgramados
 					// =programacionItemList.stream().
 					// filter(distinctByIdCalProg(DatosCalendarioProgramadoItem::getIdCalendarioProgramado)).collect(Collectors.toList());
-					List<DatosCalendarioProgramadoItem> listaLimpia = listaNoRepetida(programacionItemList);
+					List<DatosCalendarioProgramadoItem> listaLimpia = listaNoRepetida(programacionItemList);				
 					listaLimpia.forEach(d -> {
+						ERROR_GENERACION_CALENDARIO = false;
 						// commitProgramaciones(txProgramacion);
 						List<String> idProgCalGenerandose2 = scsCalendarioguardiasMapper.getGeneracionEnProceso();
 						String generado = scsCalendarioguardiasMapper.getGenerado(d.getIdCalendarioProgramado(),
@@ -5024,6 +5027,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														} catch (Exception exp) {
 															rollBackCalendarios(txCalendario);
 															editarLog(d, "Con errores", "Error en la programación: "+exp.getMessage());
+															ERROR_GENERACION_CALENDARIO = true;
 														}
 														
 														
@@ -5152,6 +5156,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 								// generacionCalEnProceso = false;
 
 							}
+						}
+						
+						if (ERROR_GENERACION_CALENDARIO) {
+							return;
 						}
 					});
 
@@ -6602,7 +6610,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 			return listaFinal;
 
 		} catch (Exception e) {
-			throw new Exception(e + ": Excepcion al calcular la matriz de periodos de dias de guardias.");
+			LOGGER.error(e + ": Error al calcular la matriz de periodos de dias de guardias.");
+			throw new Exception("Error al calcular la matriz de periodos de dias de guardias.");
 		}
 	}
 
