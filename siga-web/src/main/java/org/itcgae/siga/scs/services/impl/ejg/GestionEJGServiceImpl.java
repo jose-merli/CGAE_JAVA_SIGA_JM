@@ -5881,6 +5881,21 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					turnosItem.setHistorico(true);
 					List<TurnosItem> turnos = scsTurnosExtendsMapper.busquedaTurnos(turnosItem, idInstitucion, usuarios.get(0).getIdlenguaje());
 					record.setIdturno(Integer.parseInt(turnos.get(0).getIdturno()));
+					
+					 // verificamos si la asociación designa/ejg ya existe
+                    ScsEjgdesigna ejgDesigna = scsEjgdesignaMapper.selectByPrimaryKey(record);
+                    if (ejgDesigna!= null) {
+                    	Error error = new Error();
+                        error.setCode(200);
+                        error.setDescription("justiciaGratuita.sjcs.designa.asociar.ejg.duplicado");
+                        updateResponseDTO.setStatus(SigaConstants.OK);
+                        updateResponseDTO.setError(error);
+
+                        LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Ya existe la asociación. Saliendo del servicio... ");
+                        // como ya existe la relación finalizamos el proceso
+                        return updateResponseDTO;
+                    }
+                    // la relación no existe. Se crea asociación
 
 					response = scsEjgdesignaMapper.insert(record);
 					
