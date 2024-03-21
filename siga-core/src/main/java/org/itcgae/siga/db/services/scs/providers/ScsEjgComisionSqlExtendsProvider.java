@@ -261,6 +261,7 @@ public class ScsEjgComisionSqlExtendsProvider extends ScsEjgSqlProvider {
 
 	public String busquedaEJGComision(EjgItem ejgItem, String idInstitucion, Integer tamMaximo,
 			String idLenguaje) {
+		
 		String dictamenCad = "";
 		boolean indiferente = false;
 		boolean sinDictamen = false;
