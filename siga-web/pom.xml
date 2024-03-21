@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.redabogacia</groupId>
 			<artifactId>siga-core</artifactId>
-			<version>${siga.version}</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
