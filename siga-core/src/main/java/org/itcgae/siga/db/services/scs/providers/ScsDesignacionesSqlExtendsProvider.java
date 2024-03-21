@@ -762,7 +762,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.SELECT_DISTINCT("des.anio anio, des.numero numero, des.idturno idturno, des.codigo codigo, des.idinstitucion idinstitucion");
 			
 			sql.FROM("scs_designa des"); 
-			
+
 			boolean tiene_juzg = designaItem.getIdJuzgadoActu() != null
 					&& designaItem.getIdJuzgadoActu().length >0;
 			boolean tiene_asunto = designaItem.getAsunto() != null && !designaItem.getAsunto().equalsIgnoreCase("");
@@ -784,21 +784,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					&& designaItem.getIdModulos().length > 0);
 			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimientos() != null
 					&& designaItem.getIdProcedimientos().length > 0);
-		    boolean esNinguna = designaItem.getDocumentacionActuacion() != null && designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA");
 
-		    if(!esNinguna && (tiene_modulo||tiene_documentacion||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta||tiene_juzg||tiene_acreditacion||tiene_origen)) {
+			if(tiene_modulo||tiene_documentacion||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta||tiene_juzg||tiene_acreditacion||tiene_origen) {
 				sql.JOIN("scs_actuaciondesigna act ON act.idturno = des.idturno" +
 												" and act.idinstitucion = des.idinstitucion " +
 												" and act.anio = des.anio " +
 												" and act.numero = des.numero ");
 			}
-		    else if (esNinguna) {
-		        sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act_check " +
-		                "WHERE act_check.IDTURNO = des.IDTURNO " +
-		                "AND act_check.IDINSTITUCION = des.IDINSTITUCION " +
-		                "AND act_check.ANIO = des.ANIO " +
-		                "AND act_check.NUMERO = des.NUMERO)");
-		    }
 			
 			boolean tiene_interesado = false;
 			if ((designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase(""))
@@ -1017,39 +1009,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
 				if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("TODAS")) {
-				    sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act " +
-				              "WHERE act.IDTURNO = des.IDTURNO " +
-				              "AND act.IDINSTITUCION = des.IDINSTITUCION " +
-				              "AND act.ANIO = des.ANIO " +
-				              "AND act.NUMERO = des.NUMERO " +
-				              "AND NOT EXISTS (SELECT 1 FROM scs_documentaciondesigna doc " +
-				              "WHERE doc.IDTURNO = act.IDTURNO " +
-				              "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
-				              "AND doc.ANIO = act.ANIO " +
-				              "AND doc.NUMERO = act.NUMERO))");
+					sql.WHERE("not exists (select 1 from scs_actuaciondesigna act "
+							+ "and act.docjustificacion IS NULL or act.docjustificacion = 0) ");
 				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("ALGUNAS")) {
-				    sql.WHERE("EXISTS (SELECT 1 FROM scs_actuaciondesigna act " +
-				              "LEFT JOIN scs_documentaciondesigna doc ON doc.IDTURNO = act.IDTURNO " +
-				              "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
-				              "AND doc.ANIO = act.ANIO " +
-				              "AND doc.NUMERO = act.NUMERO " +
-				              "WHERE act.IDTURNO = des.IDTURNO " +
-				              "AND act.IDINSTITUCION = des.IDINSTITUCION " +
-				              "AND act.ANIO = des.ANIO " +
-				              "AND act.NUMERO = des.NUMERO " +
-				              "AND doc.IDDOCUMENTACIONDES IS NULL)");
-				} else if (designaItem.getDocumentacionActuacion() != null && designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA")) {
-					sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act_check " +
-	                        "WHERE act_check.IDTURNO = des.IDTURNO " +
-	                        "AND act_check.IDINSTITUCION = des.IDINSTITUCION " +
-	                        "AND act_check.ANIO = des.ANIO " +
-	                        "AND act_check.NUMERO = des.NUMERO)");
-					
+					sql.WHERE(" exists (select 1 from scs_actuaciondesigna act "
+							+ "and act.docjustificacion = 1) ");
+				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA")) {
+					sql.WHERE("not exists (select 1 from scs_actuaciondesigna act "
+							+ "and act.docjustificacion = 1) ");
 				}
 			}
-			
-			
-
 
 			// Mostrar ART 27
 			String mostarArt27 = designaItem.getIdArt27();
