@@ -12646,10 +12646,46 @@ public class GuardiasServiceImpl implements GuardiasService {
 			return null;
 		}
 	}
+	
+	public ByteArrayInputStream descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem[] calyprogItem) throws Exception {
+		
+		ByteArrayOutputStream byteArrayOutputStream = null;
+		
+		try {
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+			
+			for (DatosCalendarioyProgramacionItem item : calyprogItem) {
+				DatosDocumentoItem datos = descargarExcelLog(request, item);
+				zipOutputStream.putNextEntry(new ZipEntry(datos.getFileName()));
+				FileInputStream fileInputStream = new FileInputStream(datos.getDocumentoFile());
+				IOUtils.copy(fileInputStream, zipOutputStream);
+				fileInputStream.close();
+			}
+			
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
 
 	@Override
 	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request,
-			DatosCalendarioyProgramacionItem calyprogItem) {
+			DatosCalendarioyProgramacionItem calyprogItem) throws Exception {
 		String directorioPlantillaClase = "";
 		DatosDocumentoItem docGenerado = new DatosDocumentoItem();
 		String token = request.getHeader("Authorization");
@@ -12657,8 +12693,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ArrayList<String> nombresConsultasDatos = null;
 		String pathPlantilla = null;
-		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(), calyprogItem.getIdTurno(),
-				calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
+		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(), calyprogItem.getIdTurno(), calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
 		LOGGER.info("descargarExcelLog() -> NOMBRE LOG A DESCARGAR : " + nombreLog);
 		LOGGER.info("descargarExcelLog() - > INFO CAL A DESCARGAR - > Turno:" + calyprogItem.getIdTurno() +  " / Guardia: " + calyprogItem.getIdGuardia() + "/ idCalG: " + calyprogItem.getIdCalendarioGuardias());
 		try {
@@ -12674,8 +12709,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			docGenerado.setFileName(nombreFicheroSalida);
 			docGenerado.setDatos(Files.readAllBytes(file.toPath()));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new Exception("El archivo que estas intentado obtener no existe.");
 		}
 		return docGenerado;
 	}

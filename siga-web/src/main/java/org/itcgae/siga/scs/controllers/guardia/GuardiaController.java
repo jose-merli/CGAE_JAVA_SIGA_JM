@@ -462,19 +462,31 @@ public class GuardiaController {
 	 */
 
 	@RequestMapping(value = "/descargarExcelLog", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public ResponseEntity<InputStreamResource> descargarExcelLog(
-			@RequestBody DatosCalendarioyProgramacionItem calyProgItem, HttpServletRequest request)
+	public ResponseEntity<InputStreamResource> descargarExcelLog(@RequestBody DatosCalendarioyProgramacionItem[] calyProgItem, HttpServletRequest request)
 			throws IOException, EncryptedDocumentException, InvalidFormatException {
-		DatosDocumentoItem response = guardiasService.descargarExcelLog(request, calyProgItem);
-		ByteArrayInputStream bis = new ByteArrayInputStream(response.getDatos());
+		
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.parseMediaType("application/octet-stream"));
-		headers.add("Content-Disposition", String.format("inline; filename=%s", response.getFileName()));
-		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-//		CorsFilter corsFilter = new CorsFilter();
-//	    corsFilter.setAllowedHeaders("Content-Type, Access-Control-Allow-Headers, Access-Control-Expose-Headers, Content-Disposition, Authorization, X-Requested-With");
-//	    corsFilter.setExposedHeaders("Content-Disposition");
-		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(bis));
+		ByteArrayInputStream body = null;
+
+		try {
+		
+			if(calyProgItem.length == 1) {
+				DatosDocumentoItem response = guardiasService.descargarExcelLog(request, calyProgItem[0]);
+				headers.add("Content-Disposition", String.format("inline; filename=%s", response.getFileName()));
+				headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);		
+				headers.setContentType(MediaType.parseMediaType("application/octet-stream"));
+				body = new ByteArrayInputStream(response.getDatos());
+			} else {
+				headers.setContentType(MediaType.parseMediaType("application/zip"));
+				headers.add("Content-Disposition", String.format("inline; filename=%s", "CalendariosLog.zip"));
+				headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+				body = guardiasService.descargarExcelLog(request, calyProgItem);
+			}
+		
+			return new ResponseEntity<InputStreamResource>(new InputStreamResource(body), headers, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<InputStreamResource>(null, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 //	@GetMapping(value = "/descargarExcelLog",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE) 

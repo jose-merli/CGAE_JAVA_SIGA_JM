@@ -142,8 +142,9 @@ public interface GuardiasService {
 
 	public InsertResponseDTO generarCalendario(HttpServletRequest request, DatosCalendarioProgramadoItem programacionItem) throws Exception;
 
-	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem list);
-			
+	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem list) throws Exception;
+	
+	public ByteArrayInputStream descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem[] calyprogItem)  throws Exception;
 
 	public InscripcionesResponseDTO getInscripciones(InscripcionDatosEntradaDTO inscripcionesDTO,
 			HttpServletRequest request);
