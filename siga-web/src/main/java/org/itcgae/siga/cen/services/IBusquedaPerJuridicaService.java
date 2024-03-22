@@ -30,4 +30,6 @@ public interface IBusquedaPerJuridicaService {
 	public ComboEtiquetasDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO,HttpServletRequest request) throws ParseException;
 		
 	public ParametroColegioDTO searchParametroColegio(StringDTO stringDTO, HttpServletRequest request);
+	
+	public ParametroColegioDTO searchProperty(StringDTO stringDTO, HttpServletRequest request);
 }

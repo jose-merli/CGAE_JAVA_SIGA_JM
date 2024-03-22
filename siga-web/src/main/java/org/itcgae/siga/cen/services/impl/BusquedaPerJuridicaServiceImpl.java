@@ -30,7 +30,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
@@ -63,6 +66,10 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;	
+	
 	
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
@@ -397,6 +404,56 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		}
 		
 		parametroColegioDTO.setParametro(stringDTO.getValor());
+		
+		
+		return parametroColegioDTO;
+	}
+	
+	@Override
+	public ParametroColegioDTO searchProperty(StringDTO stringDTO, HttpServletRequest request) {
+		
+		ParametroColegioDTO parametroColegioDTO = new ParametroColegioDTO();
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"deleteNotCollegiate() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"deleteNotCollegiate() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+		
+				String parametro = stringDTO.getValor();
+				GenPropertiesExample example = new GenPropertiesExample();
+				example.createCriteria().andParametroEqualTo(parametro).andFicheroEqualTo("SIGA");
+				
+				LOGGER.info(
+						"searchProperty() / genPropertiesMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener un parámetro de un colegio");
+				
+				List<GenProperties> properties = genPropertiesMapper.selectByExample(example);
+				
+				
+				LOGGER.info(
+						"searchProperty() / genPropertiesMapper.selectByExample() -> Salida de genParametrosExtendsMapper para obtener un parámetro de un colegio");
+				
+				
+				if(properties == null || properties.isEmpty()) {
+					parametroColegioDTO.setError(new Error("no hay valor para el property especificado"));
+				}else {
+					parametroColegioDTO.setParametro(properties.get(0).getValor());
+				}
+			}else {
+				parametroColegioDTO.error(new Error("No existen usuarios con DNI: "+  dni ));
+			}
+		} else {
+			parametroColegioDTO.error(new Error("Institución no encontrada"));
+		}
 		
 		
 		return parametroColegioDTO;
