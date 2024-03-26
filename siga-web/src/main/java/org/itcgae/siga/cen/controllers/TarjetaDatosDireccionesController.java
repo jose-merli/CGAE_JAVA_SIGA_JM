@@ -11,12 +11,14 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,11 +54,17 @@ public class TarjetaDatosDireccionesController {
 	}
 	
 	@RequestMapping(value = "tarjetaDirecciones/poblacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getPoblacion(@RequestParam("idProvincia") String IdProvincia,@RequestParam("filtro") String filtro ,HttpServletRequest request) { 
-		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request,IdProvincia, filtro);
-		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
+    ResponseEntity<ComboDTO> getPoblacion( @RequestParam("idProvincia") String idProvincia, @RequestParam("filtro") String filtro, HttpServletRequest request) { 
+        ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request, idProvincia, filtro);
+        return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
 	
+    @RequestMapping(value = "tarjetaDirecciones/poblacion/{idPoblacion}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<ComboItem> getPoblacion( @PathVariable("idPoblacion") String idPoblacion, HttpServletRequest request) { 
+        ComboItem response = tarjetaDatosDireccionesService.getPoblacion(request,  idPoblacion);
+        return new ResponseEntity<ComboItem >(response, HttpStatus.OK);
+    }
+    
 	@RequestMapping(value = "tarjetaDirecciones/tipoDireccion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getTipoDireccion(HttpServletRequest request) { 
 		ComboDTO response = tarjetaDatosDireccionesService.getTipoDireccion(request);
