@@ -395,6 +395,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 		return comboDTO;
 	}
+	
+    @Override
+    public ComboItem getPoblacion(HttpServletRequest request, String idPoblacion) {
+        CenPoblaciones poblacion = cenPoblacionesExtendsMapper.selectByPrimaryKey(idPoblacion);
+        
+        ComboItem comboItem = new ComboItem();
+        comboItem.setLabel(poblacion.getNombre());
+        comboItem.setValue(poblacion.getIdpoblacion());
+        
+        return comboItem;
+    }
 
 	@Override
 	public ComboDTO getPoblacion(HttpServletRequest request, String idProvincia, String filtro) {
