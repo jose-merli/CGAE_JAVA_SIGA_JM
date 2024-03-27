@@ -98,6 +98,7 @@ import org.itcgae.siga.db.mappers.ScsProgCalendariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EcomColaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
@@ -209,6 +210,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	
 	@Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
+	
+	@Autowired
+	private CenPartidojudicialExtendsMapper cenPartidojudicialExtendsMapper;
 
 	@Autowired
 	private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
@@ -1958,8 +1962,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("resumenTurno() -> Entrada para obtener los resumen turno");
-
-				turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
+	            turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
+	            List<CenPartidojudicial> partidoJudicialItems = cenPartidojudicialExtendsMapper.getPartidoByInstitucion(idInstitucion);
+	            List<String> nombresPartidosJudiciales = cenPartidojudicialExtendsMapper.getPartidoByInstitucion(idInstitucion)
+	                    .stream()
+	                    .map(CenPartidojudicial::getNombre)
+	                    .collect(Collectors.toList());
+	            if (!nombresPartidosJudiciales.isEmpty()) {
+	                turnos.get(0).setPartidosJudiciales(nombresPartidosJudiciales);
+	            }
+	            turnoDTO.setTurnosItems(turnos);
 				List<TurnosItem> partidoJudicial = scsSubzonapartidoExtendsMapper.getPartidoJudicialTurno(
 						turnos.get(0).getIdzona(), turnos.get(0).getIdzubzona(), idInstitucion.toString());
 				if (partidoJudicial.size() > 0)

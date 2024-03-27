@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
+import java.util.List;
 
 public class TurnosItem {
 
@@ -66,7 +67,15 @@ public class TurnosItem {
 	private String idcomboguardias;
 	private String nombreguardia;
 	private String fechabajaguardia;
+	private List<String> partidosJudiciales;
+	
+    public List<String> getPartidosJudiciales() {
+        return partidosJudiciales;
+    }
 
+    public void setPartidosJudiciales(List<String> partidosJudiciales) {
+        this.partidosJudiciales = partidosJudiciales;
+    }
 	public String getPartidoJudicial() {
 		return partidoJudicial;
 	}
