@@ -3401,7 +3401,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
 		sql2.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
 
-		sql2.ORDER_BY("FECHAACTUACION DESC, NUMEROASUNTO DESC");
+		sql2.ORDER_BY("NUMEROASUNTO ASC, IDACREDITACION ASC");
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");
