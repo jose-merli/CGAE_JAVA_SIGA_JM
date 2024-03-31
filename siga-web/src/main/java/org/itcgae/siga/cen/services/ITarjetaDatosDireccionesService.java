@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 public interface ITarjetaDatosDireccionesService {
 
@@ -19,6 +20,8 @@ public interface ITarjetaDatosDireccionesService {
 	ComboDTO getPais(HttpServletRequest request);
 
     ComboDTO getPoblacion(HttpServletRequest request, String idProvincia, String filtro);
+    
+    ComboItem getPoblacion(HttpServletRequest request, String idPoblacion);
 
 	ComboDTO getTipoDireccion(HttpServletRequest request);
 

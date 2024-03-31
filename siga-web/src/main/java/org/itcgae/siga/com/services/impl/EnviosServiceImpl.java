@@ -764,8 +764,7 @@ public class EnviosServiceImpl implements IEnviosService{
         
         EnviarSMSResponse response = null;
         String respuesta = null;
-        
-        
+                
         GenParametrosKey keyParam = new GenParametrosKey();
         
         keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
@@ -833,15 +832,12 @@ public class EnviosServiceImpl implements IEnviosService{
                 if(listEnvDestinatarios.get(i).getMovil().length() == 9){
                     listEnvDestinatarios.get(i).setMovil(SigaConstants.ECOS_PREFIJO_ESPANA + listEnvDestinatarios.get(i).getMovil());
                 }
-                
-              //TODO
-                
+                                
                 //public static final 
                if (!listEnvDestinatarios.get(i).getMovil().matches(SigaConstants.EXPRESION_REGULAR_MOVIL)) {
             	   insertaExcelRow(envEnvio, sheet, from, descFrom, null, listEnvDestinatarios.get(i), "Número de móvil no es válido");
             	   listEnvDestinatarios.remove(i);
                } else {
-            	   
             	   listCorrectos.add(listEnvDestinatarios.get(i));
                }
             }    
@@ -851,11 +847,7 @@ public class EnviosServiceImpl implements IEnviosService{
             
             //Si es BuroSMS
             request.setIsSMSCertificado(esBuroSMS);
-            
-            
-            
-
-            
+                    
             if (listCorrectos != null && listCorrectos.size() > 0) {
             	
             	String[] listaTOs = new String[listCorrectos.size()];
@@ -873,7 +865,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	                responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);    
 	                response = responseDoc.getEnviarSMSResponse();
 	                idSolicidudEcos = response.getEnviarSMSResponse().getIdSolicitud();
-	                LOGGER.error("El SMS se ha enviado con idSolicitud: "+idSolicidudEcos+"");
+	                LOGGER.error("El SMS se ha enviado con idSolicitud: "+idSolicidudEcos);
 	            } catch (Exception e) {
 	                LOGGER.error("Error en la comunicacion con ECOS", e);
 	                throw new BusinessException("Error en la comunicacion con ECOS", e);
@@ -908,8 +900,7 @@ public class EnviosServiceImpl implements IEnviosService{
                 	insertaExcelRow(envEnvio, sheet, from, descFrom, null, listEnvDestinatarios.get(i), mensaje);//TODO REVISAR LA DESCRIPCIÓN DEL REMITENTE
                 }
         	}
-            LOGGER.error("No se ha enviado el sms", e);
-//            throw new BusinessException("No se ha enviado el sms", e);            
+            LOGGER.error("No se ha enviado el sms a causa de: "+ e.getMessage(), e);
         } finally {
         	writeCloseLogFile(envEnvio.getIdinstitucion(), envEnvio.getIdenvio(), sheet);
         }

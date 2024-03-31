@@ -98,6 +98,7 @@ import org.itcgae.siga.db.mappers.ScsProgCalendariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EcomColaExtendsMapper;
 import org.itcgae.siga.db.services.fcs.mappers.FcsFacturacionJGExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.*;
@@ -164,6 +165,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 	private static final String DATE_LONG = "yyyy-MM-dd HH:mm:ss";
 	private static final String DATE_LONG_MSEC = "yyyy-MM-dd HH:mm:ss.S";
 	
+	private static boolean ERROR_GENERACION_CALENDARIO = false;
+	
 
 	// private Map<String, Boolean> calendariosGenerandose = new HashMap<String,
 	// Boolean>();
@@ -207,6 +210,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 	
 	@Autowired
     private GenDiccionarioMapper genDiccionarioMapper;
+	
+	@Autowired
+	private CenPartidojudicialExtendsMapper cenPartidojudicialExtendsMapper;
 
 	@Autowired
 	private ScsHitofacturableguardiaExtendsMapper scsHitofacturableguardiaExtendsMapper;
@@ -1956,8 +1962,16 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 				LOGGER.info("resumenTurno() -> Entrada para obtener los resumen turno");
-
-				turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
+	            turnos = scsTurnosExtendsMapper.resumenTurnoColaGuardia(idTurno, idInstitucion.toString());
+	            List<CenPartidojudicial> partidoJudicialItems = cenPartidojudicialExtendsMapper.getPartidoByInstitucion(idInstitucion);
+	            List<String> nombresPartidosJudiciales = cenPartidojudicialExtendsMapper.getPartidoByInstitucion(idInstitucion)
+	                    .stream()
+	                    .map(CenPartidojudicial::getNombre)
+	                    .collect(Collectors.toList());
+	            if (!nombresPartidosJudiciales.isEmpty()) {
+	                turnos.get(0).setPartidosJudiciales(nombresPartidosJudiciales);
+	            }
+	            turnoDTO.setTurnosItems(turnos);
 				List<TurnosItem> partidoJudicial = scsSubzonapartidoExtendsMapper.getPartidoJudicialTurno(
 						turnos.get(0).getIdzona(), turnos.get(0).getIdzubzona(), idInstitucion.toString());
 				if (partidoJudicial.size() > 0)
@@ -4896,8 +4910,9 @@ public class GuardiasServiceImpl implements GuardiasService {
 					// List <DatosCalendarioProgramadoItem> listaIdCalendariosProgramados
 					// =programacionItemList.stream().
 					// filter(distinctByIdCalProg(DatosCalendarioProgramadoItem::getIdCalendarioProgramado)).collect(Collectors.toList());
-					List<DatosCalendarioProgramadoItem> listaLimpia = listaNoRepetida(programacionItemList);
+					List<DatosCalendarioProgramadoItem> listaLimpia = listaNoRepetida(programacionItemList);				
 					listaLimpia.forEach(d -> {
+						ERROR_GENERACION_CALENDARIO = false;
 						// commitProgramaciones(txProgramacion);
 						List<String> idProgCalGenerandose2 = scsCalendarioguardiasMapper.getGeneracionEnProceso();
 						String generado = scsCalendarioguardiasMapper.getGenerado(d.getIdCalendarioProgramado(),
@@ -5024,6 +5039,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 														} catch (Exception exp) {
 															rollBackCalendarios(txCalendario);
 															editarLog(d, "Con errores", "Error en la programación: "+exp.getMessage());
+															ERROR_GENERACION_CALENDARIO = true;
 														}
 														
 														
@@ -5152,6 +5168,10 @@ public class GuardiasServiceImpl implements GuardiasService {
 								// generacionCalEnProceso = false;
 
 							}
+						}
+						
+						if (ERROR_GENERACION_CALENDARIO) {
+							return;
 						}
 					});
 
@@ -6602,7 +6622,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 			return listaFinal;
 
 		} catch (Exception e) {
-			throw new Exception(e + ": Excepcion al calcular la matriz de periodos de dias de guardias.");
+			LOGGER.error(e + ": Error al calcular la matriz de periodos de dias de guardias.");
+			throw new Exception("Error al calcular la matriz de periodos de dias de guardias.");
 		}
 	}
 
@@ -12637,10 +12658,46 @@ public class GuardiasServiceImpl implements GuardiasService {
 			return null;
 		}
 	}
+	
+	public ByteArrayInputStream descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem[] calyprogItem) throws Exception {
+		
+		ByteArrayOutputStream byteArrayOutputStream = null;
+		
+		try {
+
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+			
+			for (DatosCalendarioyProgramacionItem item : calyprogItem) {
+				DatosDocumentoItem datos = descargarExcelLog(request, item);
+				zipOutputStream.putNextEntry(new ZipEntry(datos.getFileName()));
+				FileInputStream fileInputStream = new FileInputStream(datos.getDocumentoFile());
+				IOUtils.copy(fileInputStream, zipOutputStream);
+				fileInputStream.close();
+			}
+			
+			zipOutputStream.closeEntry();
+
+			if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+				IOUtils.closeQuietly(zipOutputStream);
+			}
+
+			IOUtils.closeQuietly(bufferedOutputStream);
+			IOUtils.closeQuietly(byteArrayOutputStream);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+	}
 
 	@Override
 	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request,
-			DatosCalendarioyProgramacionItem calyprogItem) {
+			DatosCalendarioyProgramacionItem calyprogItem) throws Exception {
 		String directorioPlantillaClase = "";
 		DatosDocumentoItem docGenerado = new DatosDocumentoItem();
 		String token = request.getHeader("Authorization");
@@ -12648,8 +12705,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ArrayList<String> nombresConsultasDatos = null;
 		String pathPlantilla = null;
-		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(), calyprogItem.getIdTurno(),
-				calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
+		String nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(), calyprogItem.getIdTurno(), calyprogItem.getIdGuardia(), calyprogItem.getIdCalendarioGuardias());
 		LOGGER.info("descargarExcelLog() -> NOMBRE LOG A DESCARGAR : " + nombreLog);
 		LOGGER.info("descargarExcelLog() - > INFO CAL A DESCARGAR - > Turno:" + calyprogItem.getIdTurno() +  " / Guardia: " + calyprogItem.getIdGuardia() + "/ idCalG: " + calyprogItem.getIdCalendarioGuardias());
 		try {
@@ -12665,8 +12721,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 			docGenerado.setFileName(nombreFicheroSalida);
 			docGenerado.setDatos(Files.readAllBytes(file.toPath()));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new Exception("El archivo que estas intentado obtener no existe.");
 		}
 		return docGenerado;
 	}

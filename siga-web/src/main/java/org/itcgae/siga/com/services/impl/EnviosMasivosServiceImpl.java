@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -213,6 +214,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	
 	@Autowired
 	private IEnviosService _enviosService;
+	
+	@Autowired
+	private IEnviosMasivosService _enviosMasivosService;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -1178,12 +1182,30 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 				try {
 
-					List<DocumentoEnvioItem> documentos = _envDocumentosExtendsMapper
-							.selectDocumentosEnvio(idInstitucion, idEnvio);
-
-					if (documentos.size() > 0) {
-						response.setDocumentoEnvioItem(documentos);
+					List<DocumentoEnvioItem> result = new ArrayList<DocumentoEnvioItem>();
+					List<DocumentoEnvioItem> documentos = _envDocumentosExtendsMapper.selectDocumentosEnvio(idInstitucion, idEnvio);
+					for (DocumentoEnvioItem documento : documentos) {
+						
+						String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(idInstitucion, Long.parseLong(documento.getIdEnvio()),null);
+						
+						String nombreFichero = documento.getNombreDocumento();
+						//String idEnvio = documentoDTO.getIdEnvio();
+						
+						File file = null;
+						if(filePath.contains("\\")) {
+							String[] partsPath = filePath.split("\\\\");
+							filePath = String.join("\\",Arrays.copyOf(partsPath, partsPath.length-1));
+							file = new File(filePath, partsPath[partsPath.length-1]);
+						} else {
+		                    file = new File(filePath, nombreFichero);
+						}
+						
+						if(file.exists()) {
+							result.add(documento);
+						}
 					}
+
+					response.setDocumentoEnvioItem(result);
 
 				} catch (Exception e) {
 					error = new Error();
@@ -2462,6 +2484,4 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		LOGGER.info("obtenerDestinatarios() -> Salida del servicio para obtener destinatarios de envios");
 		return enviosMasivos;
 	}
-
-
 }

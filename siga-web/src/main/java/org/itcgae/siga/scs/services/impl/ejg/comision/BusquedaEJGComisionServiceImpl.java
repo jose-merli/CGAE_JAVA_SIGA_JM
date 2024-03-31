@@ -45,6 +45,7 @@ import org.itcgae.siga.db.mappers.ScsEstadoejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgComisionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.scs.services.ejg.IBusquedaEJGComision;
 import org.itcgae.siga.scs.services.impl.ejg.GestionEJGServiceImpl;
 import org.itcgae.siga.scs.services.impl.maestros.BusquedaDocumentacionEjgServiceImpl;
@@ -72,6 +73,10 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 	private ScsEstadoejgMapper scsEstadoejgMapper;
 	@Autowired
 	private ScsEjgMapper scsEjgMapper;
+	
+	@Autowired
+	private ScsEjgExtendsMapper scsEjgExtendsMapper;
+
 	@Autowired
 	GestionEJGServiceImpl gestionEJGServiceImpl;
 	@Autowired
@@ -238,7 +243,7 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 
 	@Override
 	public EjgDTO busquedaEJG(EjgItem ejgItem, HttpServletRequest request) {
-		LOGGER.info("busquedaEJGComision() -> Entrada al servicio para obtener el colegiado");
+		LOGGER.info("busquedaEJG() -> Entrada al servicio para obtener el colegiado");
 		Error error = new Error();
 		EjgDTO ejgDTO = new EjgDTO();
 		List<GenParametros> tamMax = null;
@@ -246,22 +251,17 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		//String idUltimoEstado = "";
-		if(ejgItem.getAnnio() == null) {
-			int anioActa = new Date().getYear();
-			ejgItem.setAnnio(String.valueOf(anioActa));
-		}
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"busquedaEJG() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"busquedaEJGComision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-			if (usuarios != null && usuarios.size() > 0) {
+					"busquedaEJG() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
+			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				usuario.setIdinstitucion(idInstitucion);
 				GenParametrosExample genParametrosExample = new GenParametrosExample();
@@ -269,59 +269,73 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						.andIdinstitucionIn(Arrays.asList(SigaConstants.ID_INSTITUCION_0, idInstitucion));
 				genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
 				LOGGER.info(
-						"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+						"busquedaEJG() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
 				tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
 
 				LOGGER.info(
-						"busquedaEJGComision() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+						"busquedaEJG() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
 
 				LOGGER.info(
-						"busquedaEJGComision() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
+						"busquedaEJG() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
 				if (tamMax != null) {
 					tamMaximo = Integer.valueOf(tamMax.get(0).getValor());
 				} else {
 					tamMaximo = null;
 				}
-
-				//idUltimoEstado = scsEjgComisionExtendsMapper.idUltimoEstado(ejgItem, idInstitucion.toString());
-
 				LOGGER.info(
-						"busquedaEJGComision() / scsEjgComisionExtendsMapper.busquedaEJGComision() -> Entrada a scsEjgComisionExtendsMapper para obtener el EJG");
-				List<EjgItem> listaEjgs = scsEjgComisionExtendsMapper.busquedaEJGComision(ejgItem,
-						idInstitucion.toString(), tamMaximo, "1");
+						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Entrada a scsEjgExtendsMapper para obtener el EJG");
+				// para obtener registros separados por ,
+				
+				String[] parts;
 				String stringListaEJG = "";
+				List<EjgItem> listaEjgs;
+				
+				if(ejgItem.getNumCAJG() != null) {
+                    String NumCAJGSinCerosDelante = ejgItem.getNumCAJG().replaceFirst("^0+", "");
+                    ejgItem.setNumCAJG(NumCAJGSinCerosDelante);
+
+                }
+				
+				//Saca todos los ejg con los filtros
+				listaEjgs = scsEjgExtendsMapper.busquedaEJG(ejgItem, idInstitucion.toString(), tamMaximo,
+						usuarios.get(0).getIdlenguaje().toString());
 				if(listaEjgs.size() > 0 && listaEjgs != null) {
 					for(int i = 0; i < listaEjgs.size(); i++) {
 						if(i == listaEjgs.size()-1) {
-							stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + ")";
+							stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + ")";
 						}else {
-							stringListaEJG += "(" + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumEjg() + "), ";
+							stringListaEJG += "(" + listaEjgs.get(i).getidInstitucion() + ", " + listaEjgs.get(i).getAnnio() + ", " + listaEjgs.get(i).getNumero() + ", " + listaEjgs.get(i).getTipoEJG() + "), ";
 						}
 					}
-					//se carga los registros obtenidos de la consulta (se espera uno solo)
-					ejgDTO.setEjgItems(scsEjgComisionExtendsMapper.busquedaEJGComisionFinal(ejgItem, idInstitucion.toString(), tamMaximo,
+					//Saca los datos de los ejgs de la primera consulta
+					ejgDTO.setEjgItems(scsEjgExtendsMapper.busquedaEJGFinal(ejgItem, idInstitucion.toString(), tamMaximo,
 							usuarios.get(0).getIdlenguaje().toString(), stringListaEJG));
 				}
-				
+
 				LOGGER.info(
-						"busquedaEJGComision() / scsEjgComisionExtendsMapper.busquedaEJGComision() -> Salida de scsEjgComisionExtendsMapper para obtener lista de EJGs");
-				if (ejgDTO.getEjgItems() != null && tamMaximo != null && ejgDTO.getEjgItems().size() >= tamMaximo) {
+						"busquedaEJG() / scsEjgExtendsMapper.busquedaEJG() -> Salida de scsEjgExtendsMapper para obtener lista de EJGs");
+				if (ejgDTO.getEjgItems() != null && tamMaximo != null
+						&& ejgDTO.getEjgItems().size() >= tamMaximo) {
 					error.setCode(200);
 					error.setDescription("La consulta devuelve más de " + tamMaximo
 							+ " resultados, pero se muestran sólo los " + tamMaximo
 							+ " más recientes. Si lo necesita, refine los criterios de búsqueda para reducir el número de resultados.");
 					ejgDTO.setError(error);
+					// justiciablesItems.remove(justiciablesItems.size()-1);
 				}
+			} else {
+				LOGGER.warn(
+						"busquedaEJG() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
 		} else {
-			LOGGER.warn("busquedaEJGComision() -> idInstitucion del token nula");
+			LOGGER.warn("busquedaEJG() -> idInstitucion del token nula");
 		}
 
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return ejgDTO;
 	}
-
 	@Override
 	public ComboDTO getLabelColegiosCol(HttpServletRequest request) {
 		// TODO Auto-generated method stub

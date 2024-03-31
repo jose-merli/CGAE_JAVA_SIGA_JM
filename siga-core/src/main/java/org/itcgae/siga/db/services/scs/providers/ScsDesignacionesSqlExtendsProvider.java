@@ -784,14 +784,21 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 					&& designaItem.getIdModulos().length > 0);
 			boolean tienePretensionesDesignacion = (designaItem.getIdProcedimientos() != null
 					&& designaItem.getIdProcedimientos().length > 0);
-
-			if(tiene_modulo||tiene_documentacion||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta||tiene_juzg||tiene_acreditacion||tiene_origen) {
-				sql.JOIN("scs_actuaciondesigna act ON act.idturno = des.idturno" +
+            boolean esNinguna = designaItem.getDocumentacionActuacion() != null && designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA");
+            
+            if(!esNinguna && (tiene_modulo||tiene_documentacion||tiene_fechaJustificacionDesde||tiene_fechaJustificacionHasta||tiene_juzg||tiene_acreditacion||tiene_origen)) {				
+            	sql.JOIN("scs_actuaciondesigna act ON act.idturno = des.idturno" +
 												" and act.idinstitucion = des.idinstitucion " +
 												" and act.anio = des.anio " +
 												" and act.numero = des.numero ");
 			}
-			
+            else if (esNinguna) {
+                sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act_check " +
+                        "WHERE act_check.IDTURNO = des.IDTURNO " +
+                        "AND act_check.IDINSTITUCION = des.IDINSTITUCION " +
+                        "AND act_check.ANIO = des.ANIO " +
+                        "AND act_check.NUMERO = des.NUMERO)");
+            }
 			boolean tiene_interesado = false;
 			if ((designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase(""))
 					|| (designaItem.getNombreInteresado() != null
@@ -1009,14 +1016,33 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
 				if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("TODAS")) {
-					sql.WHERE("not exists (select 1 from scs_actuaciondesigna act "
-							+ "and act.docjustificacion IS NULL or act.docjustificacion = 0) ");
+                    sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act " +
+                            "WHERE act.IDTURNO = des.IDTURNO " +
+                            "AND act.IDINSTITUCION = des.IDINSTITUCION " +
+                            "AND act.ANIO = des.ANIO " +
+                            "AND act.NUMERO = des.NUMERO " +
+                            "AND NOT EXISTS (SELECT 1 FROM scs_documentaciondesigna doc " +
+                            "WHERE doc.IDTURNO = act.IDTURNO " +
+                            "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
+                            "AND doc.ANIO = act.ANIO " +
+                            "AND doc.NUMERO = act.NUMERO))");
 				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("ALGUNAS")) {
-					sql.WHERE(" exists (select 1 from scs_actuaciondesigna act "
-							+ "and act.docjustificacion = 1) ");
+                    sql.WHERE("EXISTS (SELECT 1 FROM scs_actuaciondesigna act " +
+                            "LEFT JOIN scs_documentaciondesigna doc ON doc.IDTURNO = act.IDTURNO " +
+                            "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
+                            "AND doc.ANIO = act.ANIO " +
+                            "AND doc.NUMERO = act.NUMERO " +
+                            "WHERE act.IDTURNO = des.IDTURNO " +
+                            "AND act.IDINSTITUCION = des.IDINSTITUCION " +
+                            "AND act.ANIO = des.ANIO " +
+                            "AND act.NUMERO = des.NUMERO " +
+                            "AND doc.IDDOCUMENTACIONDES IS NULL)");
 				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA")) {
-					sql.WHERE("not exists (select 1 from scs_actuaciondesigna act "
-							+ "and act.docjustificacion = 1) ");
+                    sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act_check " +
+                            "WHERE act_check.IDTURNO = des.IDTURNO " +
+                            "AND act_check.IDINSTITUCION = des.IDINSTITUCION " +
+                            "AND act_check.ANIO = des.ANIO " +
+                            "AND act_check.NUMERO = des.NUMERO)");
 				}
 			}
 
@@ -2922,11 +2948,12 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 		SQL sql = new SQL();
 		sql.SELECT(" DISTINCT IDPRETENSION, NVL('(' ||CODIGOEXT || ')', ' ') ||' - ' || F_SIGA_GETRECURSO(DESCRIPCION, "+idLenguaje+") AS NOMBRE");
+		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION, 1) AS NOMBRE_ORDENADO");
 		sql.FROM("SCS_PRETENSION");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("FECHABAJA IS NULL");
 		sql.WHERE("FECHA_BAJA IS NULL");
-		sql.ORDER_BY("NOMBRE");
+		sql.ORDER_BY("NOMBRE_ORDENADO ASC");
 
 		return sql.toString();
 	}
@@ -3374,7 +3401,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql2.WHERE("ACT.ANIO = '" + actuacionDesignaRequestDTO.getAnio() + "'");
 		sql2.WHERE("ACT.NUMERO = '" + actuacionDesignaRequestDTO.getNumero() + "'");
 
-		sql2.ORDER_BY("FECHAACTUACION DESC, NUMEROASUNTO DESC");
+		sql2.ORDER_BY("NUMEROASUNTO ASC, IDACREDITACION ASC");
 
 		sql.SELECT("*");
 		sql.FROM("( " + sql2.toString() + " )");

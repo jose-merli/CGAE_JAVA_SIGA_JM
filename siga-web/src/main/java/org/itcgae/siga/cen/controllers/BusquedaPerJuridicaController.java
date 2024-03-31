@@ -81,6 +81,13 @@ public class BusquedaPerJuridicaController {
 		return new ResponseEntity<ParametroColegioDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "busquedaPerJuridica/property", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ParametroColegioDTO> searchproperty(@RequestBody StringDTO stringDTO, HttpServletRequest request) { 
+		ParametroColegioDTO response = busquedaPerJuridicaService.searchProperty(stringDTO, request);
+		return new ResponseEntity<ParametroColegioDTO>(response, HttpStatus.OK);
+	}
+	
+	
 	
 	
 }

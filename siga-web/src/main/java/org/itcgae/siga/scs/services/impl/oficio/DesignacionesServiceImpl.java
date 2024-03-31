@@ -8163,12 +8163,14 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 			if (usuarios != null && !usuarios.isEmpty() && justificacionExpressItem != null) {
 				
-				// Obtenemos los documentos de la designación
+				// Obtenemos solo los documentos de la designación
 				ScsDocumentaciondesignaExample documentaciondesignaExample = new ScsDocumentaciondesignaExample();
 				documentaciondesignaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 						.andIdturnoEqualTo(Integer.valueOf(justificacionExpressItem.getIdTurno()))
 						.andAnioEqualTo(Short.valueOf(justificacionExpressItem.getAnioDesignacion()))
-						.andNumeroEqualTo(Long.valueOf(justificacionExpressItem.getNumDesignacion()));
+						.andNumeroEqualTo(Long.valueOf(justificacionExpressItem.getNumDesignacion()))
+						.andIdactuacionIsNull();
+
 
 				List<ScsDocumentaciondesigna> documentos = scsDocumentaciondesignaMapper.selectByExample(documentaciondesignaExample);
 					
@@ -8407,6 +8409,21 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 
 					designaItem.setNumero((Math.toIntExact(designasCodigo.get(0).getNumero())));
 					record.setNumerodesigna(designasCodigo.get(0).getNumero());
+					
+                    
+                    // verificamos si la asociación designa/ejg ya existe
+                    ScsEjgdesigna ejgDesigna = scsEjgdesignaMapper.selectByPrimaryKey(record);
+                    if (ejgDesigna!= null) {
+                        error.setCode(200);
+                        error.setDescription("justiciaGratuita.sjcs.designa.asociar.ejg.duplicado");
+                        responseDTO.setStatus(SigaConstants.OK);
+                        responseDTO.setError(error);
+
+                        LOGGER.info("DesignacionesServiceImpl.asociarEjgDesigna() -> Ya existe la asociación. Saliendo del servicio... ");
+                        // como ya existe la relación finalizamos el proceso
+                        return responseDTO;
+                    }
+                    // la relación no existe. Se crea asociación
 
 					response = scsEjgdesignaMapper.insert(record);
 					
