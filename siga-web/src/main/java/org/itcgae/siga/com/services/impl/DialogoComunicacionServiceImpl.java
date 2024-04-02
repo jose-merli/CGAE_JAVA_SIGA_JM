@@ -660,7 +660,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							if(!ejecutarConsulta) {
 								for(int j = 0; j < listaKey.size(); j++){
 									KeyItem key = listaKey.get(j);
-									mapaClave.put(key.getNombre(), listaStringKey.get(j));
+									mapaClave.put(key.getNombre().toLowerCase(), listaStringKey.get(j));
 								}
 								if (dialogo.isComunicar() && modelosComunicacionItem.getIdTipoEnvio() != null) {
 									mapaClave.put(SigaConstants.ETIQUETATIPOENVIO.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, ""), modelosComunicacionItem.getIdTipoEnvio());
