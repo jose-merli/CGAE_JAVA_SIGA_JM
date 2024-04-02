@@ -1497,8 +1497,6 @@ public String deleteguardiaFromLog(String idConjuntoGuardia, String idInstitucio
 		sql.SELECT("gt.nombre as guardia");
 		sql.SELECT("t.nombre as turno");
 		sql.SELECT("( " + sqlNumGuardias + " ) as numGuardias");
-		sql.SELECT("( " + sqlFact + " ) as facturado");
-		sql.SELECT("( " + sqlAs + " ) as asistenciasAsociadas");
 		
 		sql.FROM("scs_prog_calendarios            pc");
 		sql.FROM("scs_hco_conf_prog_calendarios   hpc");

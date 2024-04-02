@@ -964,14 +964,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							validacion = validacionDatosSegunTipoPcajg(rolJusticiable, idInstitucion, justiciableItem);
 						}
 					}
-					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil || validacionFechaNacimiento || validacionPais || validacionParentesco	|| validacionPoblacion || validacionProvincia || validacionRegimenConyugal || validacionSexo || validacionTipoVia) {
+					if (validacionCodigoPostal || validacionDireccion|| validacionPoblacion || validacionProvincia || validacionTipoVia) {
 
 						error.setCode(600);
 
 						String camposErroneos = "";
 
-						if (validacionEstadoCivil)
-							camposErroneos += ", Estado Civil ";
 						if (validacionDireccion)
 							camposErroneos += ", Direccion";
 						if (validacionTipoVia)
@@ -982,16 +980,6 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							camposErroneos += ", Provincia";
 						if (validacionPoblacion)
 							camposErroneos += ", Poblacion";
-						if (validacionFechaNacimiento)
-							camposErroneos += ", Fecha de Nacimiento";
-						if (validacionPais)
-							camposErroneos += ", Nacionalidad";
-						if (validacionParentesco)
-							camposErroneos += ", Parentesco";
-						if (validacionRegimenConyugal)
-							camposErroneos += ", Régimen Conyugal";
-						if (validacionSexo)
-							camposErroneos += ", Sexo";
 
 						camposErroneos = camposErroneos.substring(1, camposErroneos.length());
 						validacion = "Debe informar los siguientes campos para poder guardar el justiciable: " + camposErroneos;
