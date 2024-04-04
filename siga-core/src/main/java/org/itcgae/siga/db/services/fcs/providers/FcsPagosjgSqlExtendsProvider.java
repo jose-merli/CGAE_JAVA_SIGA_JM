@@ -548,6 +548,13 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         sql1.WHERE("PC.IDINSTITUCION = '" + idInstitucion + "'");
         sql1.WHERE("PC.IDPAGOSJG = '" + idPago + "'");
         sql1.WHERE("EXISTS ( " + sql.toString() + " )");
+        
+        SQL importePago = new SQL();
+        importePago.SELECT("SUM(IMPOFICIO + IMPASISTENCIA + IMPSOJ + IMPEJG + IMPSOJ + IMPMOVVAR + IMPIRPF + IMPRET)");
+        importePago.FROM("FCS_PAGO_COLEGIADO PC");
+        importePago.WHERE("PC.IDINSTITUCION = '" + idInstitucion + "'");
+        importePago.WHERE("PC.IDPAGOSJG = '" + idPago + "'");
+        importePago.WHERE("idperorigen = factura.idpersona");
 
         SQL query = new SQL();
         query.SELECT("FACTURA.IDPERSONA");
@@ -559,7 +566,7 @@ public class FcsPagosjgSqlExtendsProvider extends FcsPagosjgSqlProvider {
         query.SELECT("FACTURA.IMPTOTAL AS IMPORTETOTALFACTURA");
         query.SELECT("FACTURA.IMPTOTALPORPAGAR AS IMPORTEPENDIENTEFACTURA");
         query.SELECT("FACTURA.IMPTOTALCOMPENSADO AS IMPORTECOMPENSADO");
-        query.SELECT("FACTURA.IMPTOTALPAGADO AS IMPORTEPAGO");
+        query.SELECT("(" + importePago.toString() + ") AS IMPORTEPAGO");
         query.FROM("FAC_FACTURA FACTURA");
         query.JOIN("CEN_COLEGIADO COLEGIADO ON COLEGIADO.IDPERSONA = FACTURA.IDPERSONA AND COLEGIADO.IDINSTITUCION = FACTURA.IDINSTITUCION");
         query.JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = COLEGIADO.IDPERSONA");
