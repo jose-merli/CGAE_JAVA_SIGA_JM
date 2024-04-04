@@ -66,8 +66,10 @@ public interface FacBancoinstitucionExtendsMapper extends FacBancoinstitucionMap
 	List<ComboItem> getPorcentajeIva(String idInstitucion, String bancoCodigo);
 	
 	@SelectProvider(type = FacBancoinstitucionSqlExtendsProvider.class, method = "comboPropTranferencia")
-    @Results({@Result(column = "IBAN", property = "label", jdbcType = JdbcType.VARCHAR),
-            @Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR)})
+    @Results({
+    	@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "BANCOS_CODIGO", property = "value", jdbcType = JdbcType.VARCHAR)
+    })
     List<ComboItem> comboCuentasBanc(Short idInstitucion);
 	
 }

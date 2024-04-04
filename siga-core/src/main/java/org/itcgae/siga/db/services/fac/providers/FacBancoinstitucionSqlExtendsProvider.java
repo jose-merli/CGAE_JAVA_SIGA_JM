@@ -108,7 +108,7 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 	public String getBancosCodigo(String idInstitucion, String idFactura) {
 		SQL sql = new SQL();
 
-		sql.SELECT("fb.DESCRIPCION");
+		sql.SELECT("fb.IBAN");
 		sql.FROM("FAC_BANCOINSTITUCION fb");
 		sql.INNER_JOIN("FAC_SERIEFACTURACION_BANCO fsb ON(fsb.IDINSTITUCION = fb.IDINSTITUCION AND fb.BANCOS_CODIGO = fsb.BANCOS_CODIGO)");
 		sql.INNER_JOIN("FAC_FACTURA ff ON(ff.IDFACTURA = "+idFactura+" AND ff.IDINSTITUCION = fb.IDINSTITUCION AND fsb.IDSERIEFACTURACION = ff.IDSERIEFACTURACION)");
@@ -133,11 +133,9 @@ public class FacBancoinstitucionSqlExtendsProvider extends FacBancoinstitucionSq
 
 	        SQL sql = new SQL();
 
+	        sql.SELECT("DESCRIPCION");
 	        sql.SELECT("BANCOS_CODIGO");
-	        sql.SELECT("IBAN");
-
 	        sql.FROM("FAC_BANCOINSTITUCION");
-
 	        sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 
 	        return sql.toString();
