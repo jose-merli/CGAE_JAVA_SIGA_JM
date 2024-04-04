@@ -5028,12 +5028,15 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					List<ScsDesignaprocurador> procsDesigna = scsDesignaProcuradorMapper
 							.selectByExample(procsDesignaExample);
 					
-					// Si el nuevo procurador es el mismo que el ultimo asignado de la designa, se devuelve error. 
-					if(!procsDesigna.isEmpty() && procsDesigna.get(0).getIdprocurador() != Long.parseLong(procuradorItem.getIdProcurador())) { 
+					 
 	
 	
 						// En el caso que haya algun procurador asignado
 						if (!procsDesigna.isEmpty()) {
+							
+							// Si el nuevo procurador es el mismo que el ultimo asignado de la designa, se devuelve error. 
+							if(procsDesigna.get(0).getIdprocurador() != Long.parseLong(procuradorItem.getIdProcurador())) {
+							
 							// 1. Se modifica las entradas correspondientes en la tabla, si la hubiera, para
 							// que su fecha de renuncia
 							// efectiva se corresponda con la fecha de designacion del nuevo procurador. Se
@@ -5107,47 +5110,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 	
 							if (response11 == 1 && response12 == 1 && response13 == 1 && !procsDesignaDelete.isEmpty())
 								response2 = scsDesignaProcuradorMapper.deleteByPrimaryKey(procsDesignaDelete.get(0));
+							} else {
+								mismoProcurador = true;
+							}
 						}
-						// 3. Se introduce el nuevo procurador
-	
-						// Informacion designacion
-						newProcDesigna.setIdinstitucion(idInstitucion);
-						newProcDesigna.setIdturno(Integer.valueOf(procuradorItem.getIdTurno()));
-						newProcDesigna.setNumero(Long.valueOf(procuradorItem.getNumero()));
-						newProcDesigna.setAnio(procuradorItem.getAnio());
-	
-						// Informacion procurador
-						newProcDesigna.setIdinstitucionProc(Short.valueOf(procuradorItem.getIdInstitucion()));
-						newProcDesigna.setIdprocurador(Long.valueOf(procuradorItem.getIdProcurador()));
-	
-						// Informacion entrada
-						newProcDesigna.setFechadesigna(procuradorItem.getFechaDesigna());
-						newProcDesigna.setNumerodesignacion(procuradorItem.getNumerodesignacion());
-						newProcDesigna.setMotivosrenuncia(procuradorItem.getMotivosRenuncia());
-						newProcDesigna.setObservaciones(procuradorItem.getObservaciones());
-						newProcDesigna.setFecharenunciasolicita(procuradorItem.getFecharenunciasolicita());
-	
-						newProcDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
-						newProcDesigna.setFechamodificacion(new Date());
-	
-						if (response11 == 1 && response12 == 1 && response13 == 1 && response2 == 1) {
-							// if(procsDesigna.size()<Integer.valueOf(procuradorItem.getNumeroTotalProcuradores()))
-							response3 = scsDesignaProcuradorMapper.insert(newProcDesigna);
-							// else response3 =
-							// scsDesignaProcuradorMapper.updateByPrimaryKey(newProcDesigna);
+						if(!mismoProcurador){
+							// 3. Se introduce el nuevo procurador
+		
+							// Informacion designacion
+							newProcDesigna.setIdinstitucion(idInstitucion);
+							newProcDesigna.setIdturno(Integer.valueOf(procuradorItem.getIdTurno()));
+							newProcDesigna.setNumero(Long.valueOf(procuradorItem.getNumero()));
+							newProcDesigna.setAnio(procuradorItem.getAnio());
+		
+							// Informacion procurador
+							newProcDesigna.setIdinstitucionProc(Short.valueOf(procuradorItem.getIdInstitucion()));
+							newProcDesigna.setIdprocurador(Long.valueOf(procuradorItem.getIdProcurador()));
+		
+							// Informacion entrada
+							newProcDesigna.setFechadesigna(procuradorItem.getFechaDesigna());
+							newProcDesigna.setNumerodesignacion(procuradorItem.getNumerodesignacion());
+							newProcDesigna.setMotivosrenuncia(procuradorItem.getMotivosRenuncia());
+							newProcDesigna.setObservaciones(procuradorItem.getObservaciones());
+							newProcDesigna.setFecharenunciasolicita(procuradorItem.getFecharenunciasolicita());
+		
+							newProcDesigna.setUsumodificacion(usuarios.get(0).getIdusuario());
+							newProcDesigna.setFechamodificacion(new Date());
+		
+							if (response11 == 1 && response12 == 1 && response13 == 1 && response2 == 1) {
+								// if(procsDesigna.size()<Integer.valueOf(procuradorItem.getNumeroTotalProcuradores()))
+								response3 = scsDesignaProcuradorMapper.insert(newProcDesigna);
+								// else response3 =
+								// scsDesignaProcuradorMapper.updateByPrimaryKey(newProcDesigna);
+							}
+							ScsDesignaKey designaKey = new ScsDesignaKey();
+							designaKey.setIdinstitucion(idInstitucion);
+							designaKey.setAnio(procuradorItem.getAnio());
+							designaKey.setIdturno(Integer.valueOf(procuradorItem.getIdTurno()));
+							designaKey.setNumero(Long.valueOf(procuradorItem.getNumero()));
+							ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
+							if(scsDesigna != null)
+								actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "procuradorDesigna", usuarios.get(0));	
 						}
-						ScsDesignaKey designaKey = new ScsDesignaKey();
-						designaKey.setIdinstitucion(idInstitucion);
-						designaKey.setAnio(procuradorItem.getAnio());
-						designaKey.setIdturno(Integer.valueOf(procuradorItem.getIdTurno()));
-						designaKey.setNumero(Long.valueOf(procuradorItem.getNumero()));
-						ScsDesigna scsDesigna = scsDesignacionesExtendsMapper.selectByPrimaryKey(designaKey);
-						if(scsDesigna != null)
-							actualizaDesignaEnAsuntos(scsDesigna, idInstitucion, "procuradorDesigna", usuarios.get(0));
-						
-					} else {
-						mismoProcurador = true;
-					}
+					
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					LOGGER.info("DesignacionesServiceImpl.getDatosAdicionales -> Salida del servicio");
