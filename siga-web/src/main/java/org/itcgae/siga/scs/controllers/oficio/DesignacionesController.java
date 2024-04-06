@@ -913,10 +913,15 @@ public class DesignacionesController {
 	ResponseEntity<InsertResponseDTO> nuevoProcurador(@RequestBody ProcuradorItem procuradorItem,
 			HttpServletRequest request) {
 		InsertResponseDTO response = designacionesService.guardarProcurador(procuradorItem, request);
-		if (response.getStatus()=="OK")
+		if (response.getStatus()=="OK") {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}else {
+			if(response.getError().getCode() == 406) {
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.NOT_ACCEPTABLE);
+			}else {
+				return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 	}
 	
 	@RequestMapping(value = "/designas/compruebaFechaProcurador",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

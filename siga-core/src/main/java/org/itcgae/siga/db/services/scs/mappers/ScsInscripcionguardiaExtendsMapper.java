@@ -229,6 +229,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		})
 	    List<GestionInscripcion> busquedaTarjetaInscripcionesTurnosConGuardia(Short idInstitucion, AdmUsuarios admUsuarios, BusquedaInscripcionItem inscripcion);
 
+	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionPorguardia")
 	@Results({
 		@Result(column = "idguardia", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idturno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
@@ -249,9 +250,7 @@ public interface ScsInscripcionguardiaExtendsMapper extends ScsInscripcionguardi
 		@Result(column = "descripcion_tipo_guardia", property = "descripcionNombreGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "obligatoriedad_inscripcion", property = "obligatoriedadInscripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcion_obligatoriedad", property = "descripcionObligatoriedad", jdbcType = JdbcType.VARCHAR),
-		
 	})
-	@SelectProvider(type = ScsInscripcionguardiaSqlExtendsProvider.class, method = "inscripcionPorguardia")
 	List<GestionInscripcion> inscripcionPorguardia(Short idInstitucion, AdmUsuarios admUsuarios, String guardia, String idpersona);
 
 
