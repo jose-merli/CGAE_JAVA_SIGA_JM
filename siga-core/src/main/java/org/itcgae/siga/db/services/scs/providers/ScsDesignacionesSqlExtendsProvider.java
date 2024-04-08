@@ -2499,9 +2499,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		StringBuilder sql = new StringBuilder();
 
 		if(!imprimir) {
-			sql.append(
-					"SELECT DISTINCT * FROM ( SELECT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', "
-							+ "3,'PTE_CAJG', 4, 'SIN_RESOLUCION','SIN_EJG') AS TIPO_RESOLUCION_DESIGNA, ");
+			sql.append("SELECT DISTINCT DECODE(ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA,1,'FAVORABLE', 2,'NO_FAVORABLE', 3,'PTE_CAJG', 4, 'SIN_RESOLUCION','SIN_EJG') AS TIPO_RESOLUCION_DESIGNA, ");
 			sql.append(" ALLDESIGNAS.* ");
 			sql.append(" FROM ( ");
 
@@ -2510,11 +2508,9 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" D.ART27 AS ART27, ");
 			sql.append(" D.ANIO || '/' || D.CODIGO AS CODIGODESIGNA,");
 
-			sql.append(" F_SIGA_GETEJG_DESIGNA(" + idInstitucion + ",d.idturno,d.anio,d.numero," + longitudCodEJG
-					+ ") AS EXPEDIENTES, ");
+			sql.append(" F_SIGA_GETEJG_DESIGNA(" + idInstitucion + ",d.idturno,d.anio,d.numero," + longitudCodEJG + ") AS EXPEDIENTES, ");
 
-			sql.append(
-					" DECODE(D.ANIOPROCEDIMIENTO,NULL,D.NUMPROCEDIMIENTO,D.NUMPROCEDIMIENTO||'/'||D.ANIOPROCEDIMIENTO) AS ASUNTO, ");
+			sql.append(" DECODE(D.ANIOPROCEDIMIENTO,NULL,D.NUMPROCEDIMIENTO,D.NUMPROCEDIMIENTO||'/'||D.ANIOPROCEDIMIENTO) AS ASUNTO, ");
 
 			sql.append(" f_siga_getdefendidosdesigna(" + idInstitucion + ",d.anio,d.idturno,d.numero,0) AS CLIENTE, ");
 
@@ -2536,20 +2532,16 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" D.ANIOPROCEDIMIENTO, P.NOMBRE PROCEDIMIENTO,");
 			sql.append(" P.COMPLEMENTO,");
 			sql.append(" P.CODIGO CATEGORIA, ");
-			sql.append(
-					"(SELECT 1 FROM scs_documentaciondesigna WHERE ( idinstitucion = " + idInstitucion
-					+ " AND numero = d.numero AND anio = d.anio AND idturno = d.idturno ) FETCH FIRST 1 ROWS ONLY) AS TIENEDOCUMENTACION,");
+			sql.append("(SELECT 1 FROM scs_documentaciondesigna WHERE ( idinstitucion = " + idInstitucion + " AND numero = d.numero AND anio = d.anio AND idturno = d.idturno ) FETCH FIRST 1 ROWS ONLY) AS TIENEDOCUMENTACION,");
 			sql.append(" D.NIG, ");
-			sql.append(
-					" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
+			sql.append(" (SELECT COUNT(*) FROM SCS_DESIGNASLETRADO SDL WHERE D.IDINSTITUCION = SDL.IDINSTITUCION" );
 			if (fechaDesde != null) {
 				sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') >=  '" + fechaDesde + "'" );
 			}
 			if (fechaHasta != null) {
 				sql.append(" AND TO_CHAR(SDL.FECHADESIGNA , 'dd-MM-yyyy') <=  '" + fechaHasta + "'" );
 			}
-			sql.append(" AND D.ANIO = SDL.ANIO AND "
-							+ "D.NUMERO = SDL.NUMERO AND D.IDTURNO = SDL.IDTURNO) AS CAMBIOLETRADO, ");
+			sql.append(" AND D.ANIO = SDL.ANIO AND D.NUMERO = SDL.NUMERO AND D.IDTURNO = SDL.IDTURNO) AS CAMBIOLETRADO, ");
 			sql.append(" (SELECT MIN(CASE WHEN (EJG.FECHARESOLUCIONCAJG IS NOT NULL ");
 			sql.append(" AND ((EJG.IDTIPORATIFICACIONEJG IN (3,5,6,7) ");
 			sql.append(" AND EJG.IDTIPORESOLAUTO IS NOT NULL ");
@@ -2586,18 +2578,13 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(" DECODE(turno.LETRADOACTUACIONES,'S',1,'1',1,'N',0,'0',0) AS LETRADOACTUACIONES ");
 
 		}else {
-			sql.append(" SELECT DISTINCT * FROM ( select  ALLDESIGNAS.*  FROM (  SELECT    D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO, DL.IDPERSONA ");
-		
+			sql.append("SELECT DISTINCT ALLDESIGNAS.* FROM ( SELECT D.IDINSTITUCION,  D.IDTURNO,  D.ANIO,  D.NUMERO, DL.IDPERSONA ");
 		}
 		
-		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion "
-				+ "AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
-		sql.append(" JOIN scs_turno   turno        ON d.idinstitucion = turno.idinstitucion "
-                + " AND d.idturno = turno.idturno " );
-		sql.append(" LEFT OUTER join scs_juzgado j ON  d.idjuzgado = j.idjuzgado\r\n"
-				+ "                AND d.idinstitucion_juzg = j.idinstitucion ");
-		sql.append(" LEFT OUTER join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento\r\n"
-				+ "                AND p.idinstitucion = d.idinstitucion ");
+		sql.append(" FROM SCS_DESIGNA D join scs_designasletrado   dl ON d.idinstitucion = dl.idinstitucion AND d.anio = dl.anio AND d.numero = dl.numero AND d.idturno = dl.idturno ");
+		sql.append(" JOIN scs_turno turno ON d.idinstitucion = turno.idinstitucion AND d.idturno = turno.idturno " );
+		sql.append("LEFT OUTER join scs_juzgado j ON  d.idjuzgado = j.idjuzgado AND d.idinstitucion_juzg = j.idinstitucion ");
+		sql.append("LEFT OUTER join scs_procedimientos p ON  p.idprocedimiento = d.idprocedimiento AND p.idinstitucion = d.idinstitucion ");
 		sql.append("LEFT OUTER join scs_ejgdesigna ejd ON  d.anio = ejd.aniodesigna\r\n"
 				+ "                AND d.numero = ejd.numerodesigna\r\n"
 				+ "                AND d.idturno = ejd.idturno\r\n"
@@ -2614,7 +2601,6 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if(item.isMuestraPendiente()) {
 				sql.append(" AND D.ESTADO <> 'F' ");
 				sql.append(" AND D.ESTADO <> 'A' ");
-	
 			}
 		}
 		
@@ -2683,8 +2669,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if ("SINACTUACIONES".equalsIgnoreCase(item.getActuacionesValidadas().trim())) {
 				sql.append(" AND F_SIGA_ACTUACIONESDESIG(D.IDINSTITUCION,D.IDTURNO,D.ANIO,D.NUMERO) IS NULL ");
 			} else {
-				sql.append(" AND UPPER(F_SIGA_ACTUACIONESDESIG(D.IDINSTITUCION,D.IDTURNO,D.ANIO,D.NUMERO))=UPPER('"
-						+ item.getActuacionesValidadas() + "')");
+				sql.append(" AND UPPER(F_SIGA_ACTUACIONESDESIG(D.IDINSTITUCION,D.IDTURNO,D.ANIO,D.NUMERO))=UPPER('" + item.getActuacionesValidadas() + "')");
 			}
 		}
 
@@ -2728,26 +2713,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		}
 
 		// nombre y apellidos
-		if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty() && item.getNombre() != null
-				&& !item.getNombre().trim().isEmpty()) {
-
-			sql.append(" AND UPPER(f_siga_getdefendidosdesigna(" + idInstitucion
-					+ ",D.anio,D.idturno,D.numero,1) ) like ");
+		if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty() && item.getNombre() != null && !item.getNombre().trim().isEmpty()) {
+			sql.append(" AND UPPER(f_siga_getdefendidosdesigna(" + idInstitucion + ",D.anio,D.idturno,D.numero,1) ) like ");
 			sql.append("'%" + item.getNombre().trim().toUpperCase() + "%");
 			sql.append(item.getApellidos().trim().toUpperCase() + "%'");
-
-		} else if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty()
-				&& (item.getNombre() == null || item.getNombre().trim().isEmpty())) {
-
-			sql.append(" and UPPER(f_siga_getdefendidosdesigna(" + idInstitucion
-					+ ",d.anio,d.idturno,d.numero,1) ) like ");
+		} else if (item.getApellidos() != null && !item.getApellidos().trim().isEmpty() && (item.getNombre() == null || item.getNombre().trim().isEmpty())) {
+			sql.append(" and UPPER(f_siga_getdefendidosdesigna(" + idInstitucion + ",d.anio,d.idturno,d.numero,1) ) like ");
 			sql.append("'%" + item.getApellidos().trim().toUpperCase() + "%'");
-
-		} else if ((item.getApellidos() == null || item.getApellidos().isEmpty()) && item.getNombre() != null
-				&& !item.getNombre().trim().isEmpty()) {
-
-			sql.append(" AND UPPER(f_siga_getdefendidosdesigna(" + idInstitucion
-					+ ",D.anio,D.idturno,D.numero,1) ) like ");
+		} else if ((item.getApellidos() == null || item.getApellidos().isEmpty()) && item.getNombre() != null && !item.getNombre().trim().isEmpty()) {
+			sql.append(" AND UPPER(f_siga_getdefendidosdesigna(" + idInstitucion + ",D.anio,D.idturno,D.numero,1) ) like ");
 			sql.append("'%" + item.getNombre().trim().toUpperCase() + "%'");
 		}
 
@@ -2769,7 +2743,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (imprimir) {
 			if(item.isMuestraPendiente()) {
 				sql.append(" AND NOT EXISTS( "
-						+ "				SELECT 1 "
+						+ "	SELECT 1 "
 						+ "FROM "
 						+ "	scs_actuaciondesigna act, "
 						+ "	scs_procedimientos pro, "
@@ -2841,56 +2815,53 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			}
 		}
 		sql.append(" ) ALLDESIGNAS ");
+		
+		sql.append(" WHERE 1=1 ");
 
 		StringBuilder tiposResolucionBuilder = new StringBuilder();
 
-		tiposResolucionBuilder.append(" WHERE (ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA IN (1");
+		tiposResolucionBuilder.append(" AND (ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA IN (1");
 
-		if (!item.isRestriccionesVisualizacion()
-				|| (item.getResolucionPTECAJG() != null && !"0".equals(item.getResolucionPTECAJG()))) {
+		if (!item.isRestriccionesVisualizacion() || (item.getResolucionPTECAJG() != null && !"0".equals(item.getResolucionPTECAJG()))) {
 			tiposResolucionBuilder.append(",3");
 		}
 
-		if (!item.isRestriccionesVisualizacion()
-				|| (item.getConEJGNoFavorables() != null && !"0".equals(item.getConEJGNoFavorables()))) {
+		if (!item.isRestriccionesVisualizacion() || (item.getConEJGNoFavorables() != null && !"0".equals(item.getConEJGNoFavorables()))) {
 			tiposResolucionBuilder.append(",2");
 		}
 
-		if (!item.isRestriccionesVisualizacion()
-				|| (item.getEjgSinResolucion() != null && !"0".equals(item.getEjgSinResolucion()))) {
+		if (!item.isRestriccionesVisualizacion() || (item.getEjgSinResolucion() != null && !"0".equals(item.getEjgSinResolucion()))) {
 			tiposResolucionBuilder.append(",4");
 		}
 
 		tiposResolucionBuilder.append(")");
 
-		if (!item.isRestriccionesVisualizacion()
-				|| (item.getEjgSinResolucion() != null && !"0".equals(item.getEjgSinResolucion()))) {
+		if (!item.isRestriccionesVisualizacion() || (item.getEjgSinResolucion() != null && !"0".equals(item.getEjgSinResolucion()))) {
 			tiposResolucionBuilder.append(" OR ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA is null ");
 		}
 
 		tiposResolucionBuilder.append(")");
-
-		if(!imprimir) {
-			sql.append(tiposResolucionBuilder);
-
-			sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
-			sql.append(") query WHERE rownum<=200");
-		}else {
-			sql.append(" ORDER BY IDINSTITUCION, ANIO DESC");
-			sql.append(") query WHERE rownum<=200");
-		}
-	
+		
 		
 		if (item.getConEJGNoFavorables() != null && item.getConEJGNoFavorables().equals("0")) {
-			sql.append(" AND query.tipo_resolucion_designa != 'NO_FAVORABLE' ");
+			sql.append(" AND ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA != 2 ");
 		}
-	
+		if (item.getResolucionPTECAJG() != null && item.getResolucionPTECAJG().equals("0")) {
+			sql.append(" AND ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA != 3 ");
+		}
 		if (item.getEjgSinResolucion() != null && item.getEjgSinResolucion().equals("0")) {
-			sql.append(" AND query.tipo_resolucion_designa != 'SIN_RESOLUCION' ");
+			sql.append(" AND ALLDESIGNAS.NUM_TIPO_RESOLUCION_DESIGNA != 4 ");
 		}
 		
-		if (item.getResolucionPTECAJG() != null && item.getResolucionPTECAJG().equals("0")) {
-			sql.append(" AND query.tipo_resolucion_designa != 'PTE_CAJG' ");
+		if(!imprimir) {
+			sql.append(tiposResolucionBuilder);
+			//sql.append(") query WHERE rownum<=200");
+			sql.append(" AND rownum<=200");
+			sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO DESC, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
+		}else {
+			//sql.append(") query WHERE rownum<=200");
+			sql.append(" AND rownum<=200");
+			sql.append(" ORDER BY IDINSTITUCION, ANIO DESC");
 		}
 
 		return sql.toString();
