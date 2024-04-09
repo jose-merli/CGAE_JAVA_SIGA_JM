@@ -951,7 +951,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		condicionNumRegRemesa = condicionNumRegRemesa + "))";
 		
 		// select
-		sql.SELECT("COUNT(*) as TOTAL");
+		sql.SELECT("DISTINCT ejg.anio anio");
+		sql.SELECT("ejg.idinstitucion");
+		sql.SELECT("ejg.numero numero");
+		sql.SELECT("ejg.idtipoejg idtipoejg");
 		
 		// from
 		sql.FROM("scs_ejg ejg"); 
@@ -1780,8 +1783,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
+		
+		String sqlTotalRegistros = "SELECT COUNT(*) AS TOTAL FROM (" + sql.toString() + ")";
 
-		return sql.toString();
+		return sqlTotalRegistros;
 	}
 	
 	public String busquedaEJGFinal(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje, String stringListaEjgs) {
