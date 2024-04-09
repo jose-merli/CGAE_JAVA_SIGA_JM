@@ -2225,6 +2225,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 					key.setIdpersona(Long.parseLong(datos.get(i).getUf_idPersona()));
 
 					ScsUnidadfamiliarejg record = scsUnidadfamiliarejgMapper.selectByPrimaryKey(key);
+					
+					ScsEjgKey ejgKey = new ScsEjgKey();
+
+					ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
+					ejgKey.setIdinstitucion(idInstitucion);
+					ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
+					ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 
 					// Modificamos el objeto
 					record.setFechamodificacion(new Date());
@@ -2236,13 +2243,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						// Se elimina su propiedad como solicitante y su rol
 						record.setSolicitante((short) 0);
-						
-						ScsEjgKey ejgKey = new ScsEjgKey();
-
-						ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
-						ejgKey.setIdinstitucion(idInstitucion);
-						ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
-						ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 
 						// Actualizamos el ejg correspondientemente para que no lo considere su
 						// solicitante principal
@@ -2282,6 +2282,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 						}
 					} else {
 						record.setFechabaja(null);
+						
+						ScsEjg ejg = scsEjgMapper.selectByPrimaryKey(ejgKey);
+						List<String> item = Arrays.asList(ejg.getIdinstitucion().toString(), record.getIdpersona().toString(), ejg.getAnio().toString(), ejg.getIdtipoejg().toString(), ejg.getNumero().toString());
+						boolean primero = compruebaSiSolicitanteEjg(ejg.getIdinstitucion(), item);
+						
+						if (primero) {
+							record.setSolicitante((short) 1);
+						}
 					}
 
 					record.setEncalidadde(null);
