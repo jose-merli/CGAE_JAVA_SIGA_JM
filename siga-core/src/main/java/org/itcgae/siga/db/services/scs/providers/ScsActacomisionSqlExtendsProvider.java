@@ -21,7 +21,7 @@ public class ScsActacomisionSqlExtendsProvider extends ScsActacomisionSqlProvide
 		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
 		if(!UtilidadesString.esCadenaVacia(idacta) && !UtilidadesString.esCadenaVacia(anioacta)) {
-			sql.WHERE("((fechaResolucion is null) OR (idacta = '" +idacta + "' AND anioacta = '" + anioacta + "'))");
+			sql.WHERE("((fechaResolucion is null) OR (idacta = " +idacta + " AND anioacta = " + anioacta + "))");
 		}else {
 			sql.WHERE("fechaResolucion is null");
 		}
