@@ -2498,7 +2498,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "COL.NCOMUNITARIO NCOMUNITARIO, ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, "
 						+ "F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION, " + idLenguaje
 						+ ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE,\r\n"
-						+ "            COUNT(tur.idturno) sumaturnos,\r\n"
+						+ "            COUNT(tur.idturno) tieneturno,\r\n"
 						+ "            COUNT(guar.idguardia) tieneguardias,\r\n"
 						+ "            SUM(nvl(guarpend.pendiente, 0)) AS guardiaspendientes");
 
@@ -2585,9 +2585,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		// registros
 		sql3.SELECT("nif,\r\n" + "    idpersona,\r\n" + "    nombre,\r\n" + "    apellidos,\r\n" + "    ncolegiado,\r\n"
 				+ "    ncomunitario,\r\n" + "    idestado,\r\n" + "    idinstitucion,\r\n" + "    abreviatura,\r\n"
-				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    guardiaspendientes,\r\n"
-				+ "    CASE sumaturnos\r\n" + "        WHEN 0 THEN\r\n" + "            'No'\r\n" + "        ELSE\r\n"
-				+ "            'Sí'\r\n" + "    END AS tieneturno FROM ( " + sql.toString() + ")");
+				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    tieneturno,\r\n" + " guardiaspendientes\r\n "
+				+ " FROM ( " + sql.toString() + ")");
 		
 		if(tamMaximo != null) {
 			sql3.FETCH_FIRST_ROWS_ONLY(tamMaximo+1);
