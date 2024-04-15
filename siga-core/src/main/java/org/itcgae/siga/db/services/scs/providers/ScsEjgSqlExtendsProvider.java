@@ -332,15 +332,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
 					// Comprobar que solo existe este Rol activado.
 					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+						sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 					} else {
 						// Verificar si el 1 Rol que tiene sino no añadir parentesis.
 						if (banderaRolprimero == true) {
-							sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("(( UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 							checkRolone = true;
 							banderaRolprimero = false;
 						} else {
-							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 						}
 					}
 				}
@@ -765,7 +765,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			// Verificar que no contiene Roles.
 		} else {
 			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 			if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
 				String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
 				String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
@@ -1221,15 +1221,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
 					// Comprobar que solo existe este Rol activado.
 					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+						sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 					} else {
 						// Verificar si el 1 Rol que tiene sino no añadir parentesis.
 						if (banderaRolprimero == true) {
-							sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("(( UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 							checkRolone = true;
 							banderaRolprimero = false;
 						} else {
-							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 						}
 					}
 				}
@@ -1654,7 +1654,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			// Verificar que no contiene Roles.
 		} else {
 			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 			if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
 				String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
 				String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
