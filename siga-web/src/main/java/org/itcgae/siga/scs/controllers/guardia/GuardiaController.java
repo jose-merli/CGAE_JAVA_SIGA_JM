@@ -438,19 +438,25 @@ public class GuardiaController {
 		else return new ResponseEntity<InsertResponseDTO>(response, headers, HttpStatus.CONFLICT);
 	}
 
-	@PostMapping(value = "/descargarZipExcelLog", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> descargarZIPExcelLog(
-			@RequestBody List<DatosCalendarioyProgramacionItem> programacionItemList, HttpServletRequest request) {
-		ByteArrayInputStream response = guardiasService.descargarZIPExcelLog(request, programacionItemList);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.parseMediaType("application/zip"));
-		headers.add("Content-Disposition", String.format("inline; filename=%s", "GeneracionCalendariosLog_ZIP"));
-		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-		if (response != null) {
-			return ResponseEntity.ok().headers(headers).body(new InputStreamResource(response));
-		} else {
-			return new ResponseEntity<InputStreamResource>(null, headers, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+//	@PostMapping(value = "/descargarZipExcelLog", produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<InputStreamResource> descargarZIPExcelLog(
+//			@RequestBody List<DatosCalendarioyProgramacionItem> programacionItemList, HttpServletRequest request) {
+//		ByteArrayInputStream response = guardiasService.descargarZIPExcelLog(request, programacionItemList);
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(MediaType.parseMediaType("application/zip"));
+//		headers.add("Content-Disposition", String.format("inline; filename=%s", "GeneracionCalendariosLog_ZIP"));
+//		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+//		if (response != null) {
+//			return ResponseEntity.ok().headers(headers).body(new InputStreamResource(response));
+//		} else {
+//			return new ResponseEntity<InputStreamResource>(null, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//	}
+	
+	@RequestMapping(value = "/descargarZipExcelLog", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	ResponseEntity<InputStreamResource> descargarLogCalendarioProgramado(@RequestBody List<DatosCalendarioyProgramacionItem> programacionItemList, HttpServletRequest request) throws Exception {
+		return guardiasService.descargarZIPExcelLog(request, programacionItemList);
+
 	}
 
 	/*

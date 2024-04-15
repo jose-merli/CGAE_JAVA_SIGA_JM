@@ -12594,69 +12594,119 @@ public class GuardiasServiceImpl implements GuardiasService {
 	}
 
 	@Override
-	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request,
+	public ResponseEntity<InputStreamResource> descargarZIPExcelLog(HttpServletRequest request,
 			List<DatosCalendarioyProgramacionItem> calyprogItemList) {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		List<String> nombresFicherosList = new ArrayList<>();
-		List<String> listaIdCalendarioGuardia = new ArrayList<>();
-		;
-		String nombreLog = null;
+		
+		
+		ResponseEntity<InputStreamResource> res = null;
+		AdmUsuarios usuario = null;
 
-		for (int i = 0; i < calyprogItemList.size(); i++) {
+		LOGGER.info(
+				"descargarZIPExcelLog() -> Entrada al servicio para descargar el LOG de los calendarios programados");
+		
+		List<File> listaFicheros = new ArrayList<File>();
+		File file = null;
+		
+		for (DatosCalendarioyProgramacionItem calendario : calyprogItemList) {
+			String pathFichero = getPathCalProByInstitucion(idInstitucion.toString());
+			
+			ScsProgCalendariosExample exampleUsuarios = new ScsProgCalendariosExample();
+			
+			exampleUsuarios.createCriteria()
+					.andIdinstitucionEqualTo(idInstitucion)
+					.andIdprogcalendarioEqualTo(Long.parseLong(calendario.getIdCalendarioProgramado()));
 
-			listaIdCalendarioGuardia = getCalendariosByIdCalendario(calyprogItemList.get(i), idInstitucion.toString());
-
-			for (int j = 0; j < listaIdCalendarioGuardia.size(); j++) {
-				nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(),
-						calyprogItemList.get(i).getIdTurno(), calyprogItemList.get(i).getIdGuardia(),
-						listaIdCalendarioGuardia.get(j).toString());
-				if (nombreLog != null) {
-					nombresFicherosList.add(nombreLog);
-				}
+			String nombreFichero = scsProgCalendariosMapper.selectByExample(exampleUsuarios).get(0).getLogProgramacionName();
+			file = new File(pathFichero + File.separator + nombreFichero);
+			listaFicheros.add(file);
+		}
+		
+		ArrayList<File> listaFicherosExistentes = new ArrayList<>();
+		
+		// Comprobamos qué ficheros existen para descargar
+		for (File fichero: listaFicheros) {
+			if(fichero.exists()) {
+				listaFicherosExistentes.add(fichero);
 			}
 		}
-
-		if (!nombresFicherosList.isEmpty()) {
-			ByteArrayOutputStream byteArrayOutputStream = null;
-
-			try {
-
-				byteArrayOutputStream = new ByteArrayOutputStream();
-				BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-				ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-
-				for (String nombreFichero : nombresFicherosList) {
-					String pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
-					String nombreFicheroSalida = nombreFichero + ".xlsx";
-					zipOutputStream.putNextEntry(new ZipEntry(nombreFicheroSalida));
-					String path = pathFicheroSalida + File.separator + nombreFicheroSalida;
-					File file = new File(path);
-					FileInputStream fileInputStream = new FileInputStream(file);
-					IOUtils.copy(fileInputStream, zipOutputStream);
-					fileInputStream.close();
-				}
-
-				zipOutputStream.closeEntry();
-
-				if (zipOutputStream != null) {
-					zipOutputStream.finish();
-					zipOutputStream.flush();
-					IOUtils.closeQuietly(zipOutputStream);
-				}
-
-				IOUtils.closeQuietly(bufferedOutputStream);
-				IOUtils.closeQuietly(byteArrayOutputStream);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-		} else {
-			return null;
+		
+		// Si no se puede descargar ninguno, salta error
+		if (listaFicherosExistentes.isEmpty()) {
+			throw new BusinessException("messages.general.error.ficheroNoExiste");
 		}
+
+		// Construcción de la respuesta para uno o más archivos
+		res = SIGAServicesHelper.descargarFicheros(listaFicherosExistentes, MediaType.parseMediaType("application/vnd.ms-excel"),
+				MediaType.parseMediaType("application/zip"), "LOG_CALENDARIOS.zip;" + listaFicherosExistentes.size() + ";" + listaFicheros.size());
+
+		LOGGER.info(
+				"descargarZIPExcelLog() -> Salida del servicio para descargar el LOG de los calendarios programados");
+
+		return res;
+		
+		
+		
+//		List<String> nombresFicherosList = new ArrayList<>();
+//		List<String> listaIdCalendarioGuardia = new ArrayList<>();
+//		;
+//		String nombreLog = null;
+//
+//		for (int i = 0; i < calyprogItemList.size(); i++) {
+//
+//			listaIdCalendarioGuardia = getCalendariosByIdCalendario(calyprogItemList.get(i), idInstitucion.toString());
+//
+//			for (int j = 0; j < listaIdCalendarioGuardia.size(); j++) {
+//				nombreLog = scsCalendarioguardiasMapper.getLogName(idInstitucion.toString(),
+//						calyprogItemList.get(i).getIdTurno(), calyprogItemList.get(i).getIdGuardia(),
+//						listaIdCalendarioGuardia.get(j).toString());
+//				if (nombreLog != null) {
+//					nombresFicherosList.add(nombreLog);
+//				}
+//			}
+//		}
+//
+//		if (!nombresFicherosList.isEmpty()) {
+//			ByteArrayOutputStream byteArrayOutputStream = null;
+//
+//			try {
+//
+//				byteArrayOutputStream = new ByteArrayOutputStream();
+//				BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+//				ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+//
+//				for (String nombreFichero : nombresFicherosList) {
+//					String pathFicheroSalida = getRutaFicheroSalida(idInstitucion.toString());
+//					String nombreFicheroSalida = nombreFichero + ".xlsx";
+//					zipOutputStream.putNextEntry(new ZipEntry(nombreFicheroSalida));
+//					String path = pathFicheroSalida + File.separator + nombreFicheroSalida;
+//					File file = new File(path);
+//					FileInputStream fileInputStream = new FileInputStream(file);
+//					IOUtils.copy(fileInputStream, zipOutputStream);
+//					fileInputStream.close();
+//				}
+//
+//				zipOutputStream.closeEntry();
+//
+//				if (zipOutputStream != null) {
+//					zipOutputStream.finish();
+//					zipOutputStream.flush();
+//					IOUtils.closeQuietly(zipOutputStream);
+//				}
+//
+//				IOUtils.closeQuietly(bufferedOutputStream);
+//				IOUtils.closeQuietly(byteArrayOutputStream);
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//
+//			return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+//		} else {
+//			return null;
+//		}
 	}
 	
 	public ByteArrayInputStream descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem[] calyprogItem) throws Exception {
