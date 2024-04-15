@@ -628,7 +628,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
 //					sql += " and PER.NIF = " + "'" + designaItem.getNif().trim() + "'";
-					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))";
+					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NIF) like '"+designaItem.getNif().toUpperCase()+"%' AND IDINSTITUCION = "+idInstitucion+"))";
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
@@ -1152,7 +1152,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (tiene_interesado) {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
-					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NIF) like '"+designaItem.getNif().toUpperCase()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
@@ -1640,7 +1640,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (tiene_interesado) {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
-					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NIF) like '"+designaItem.getNif().toUpperCase()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
