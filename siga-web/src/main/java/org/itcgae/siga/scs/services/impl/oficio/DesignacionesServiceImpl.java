@@ -4420,7 +4420,7 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 			LOGGER.info("Buscando compensaciones…");
 
 			Iterator<LetradoInscripcionItem> iterador = alCompensaciones.iterator();
-			while (iterador.hasNext() && letradoGuardia != null) {
+			while (iterador.hasNext()) {
 				auxLetradoSeleccionado = (LetradoInscripcionItem) iterador.next();
 				// vale
 				if (comprobarRestriccionesLetradoCompensadoTurno(auxLetradoSeleccionado, diasGuardia, iterador, null,
@@ -4428,6 +4428,10 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					letradoGuardia = auxLetradoSeleccionado;
 					LOGGER.info("Letrado encontrado. idPersona: " + letradoGuardia.getIdpersona());
 					
+				}
+				
+				if (letradoGuardia != null) {
+					break;
 				}
 			}
 		}
@@ -5644,10 +5648,49 @@ public class DesignacionesServiceImpl implements IDesignacionesService {
 					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 					// Verificar que si es un Letrado igual al asignado entonces pasar al siguiente
 					// Letrado.
+					
 					LetradoInscripcionItem newLetrado = this.getLetradoTurno(idInstitucion.toString(),
 							String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),
 							usuarios.get(0), designaLetradoVieja, false);
+					//Hay que comprobar si el letrado que se va a seleccionar es el mismo que el letrado saliente y en ese caso crearle una compensación 
+					//(insert en la tabla compensaciones) por no haberlo seleccionado cuando le tocaba para que se seleccione la próxima vez 
+					//y volver a hacer la búsqueda del siguiente letrado
+					int numCompensaciones = 0;
+					
+					while(newLetrado !=null && letradoSaliente.getIdpersona().toString().equals(newLetrado.getIdpersona().toString())) {
+						if(letradoSaliente.getIdpersona().toString().equals(newLetrado.getIdpersona().toString())) {
+							numCompensaciones++;
+						}
+						
+						//vuelvo a buscar al siguiente letrado
+						newLetrado = this.getLetradoTurno(idInstitucion.toString(),
+								String.valueOf(designa.getIdturno()), dateFormat.format(letradoSaliente.getFechadesigna()),
+								usuarios.get(0), designaLetradoVieja, false);
+					}
+					
+					if(numCompensaciones>0) {
+						
+						for(int i=1; i<= numCompensaciones; i++) {
 
+							//Creo compensación para que sea seleccionado la próxima vez
+	
+							List<SaltoCompGuardiaItem> listaCompensacionItem = new ArrayList<SaltoCompGuardiaItem>();
+	
+							SaltoCompGuardiaItem compensacion = new SaltoCompGuardiaItem();
+							compensacion.setIdPersona(designaLetradoVieja.getIdpersona().toString());
+							compensacion.setIdTurno(designa.getIdturno().toString());
+							compensacion.setSaltoCompensacion("C");
+							String fecha = sdf.format(new Date());
+							compensacion.setFecha(fecha);
+							compensacion.setMotivo("C - Se crea compensación automática por no poder ser seleccionado");
+							listaCompensacionItem.add(compensacion);
+	
+							// Introducimos la compensacion
+							DeleteResponseDTO op = saltosCompOficioService.guardarSaltosCompensaciones(listaCompensacionItem, request);
+						}
+					}
+					
+				
 					if (newLetrado == null) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.error(
