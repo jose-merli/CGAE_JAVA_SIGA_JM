@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
@@ -1187,9 +1186,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					for (DocumentoEnvioItem documento : documentos) {
 						
 						String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(idInstitucion, Long.parseLong(documento.getIdEnvio()),null);
+						String pathDocumento = documento.getPathDocumento();
 						
-						String nombreFichero = documento.getNombreDocumento();
-						//String idEnvio = documentoDTO.getIdEnvio();
 						
 						File file = null;
 						if(filePath.contains("\\")) {
@@ -1197,7 +1195,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							filePath = String.join("\\",Arrays.copyOf(partsPath, partsPath.length-1));
 							file = new File(filePath, partsPath[partsPath.length-1]);
 						} else {
-		                    file = new File(filePath, nombreFichero);
+		                    file = new File(filePath, pathDocumento);
 						}
 						
 						if(file.exists()) {
