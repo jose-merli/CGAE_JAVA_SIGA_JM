@@ -2865,11 +2865,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(tiposResolucionBuilder);
 			//sql.append(") query WHERE rownum<=200");
 			sql.append(" AND rownum<=200");
-			sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO DESC, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
+			sql.append(" ORDER BY ANIO DESC, CODIGO DESC, FECHAORDEN DESC, IDINSTITUCION, SUFIJO, CODIGODESIGNA DESC");
 		}else {
 			//sql.append(") query WHERE rownum<=200");
 			sql.append(" AND rownum<=200");
-			sql.append(" ORDER BY IDINSTITUCION, ANIO DESC");
+			sql.append(" ORDER BY ANIO DESC, NUMERO DESC");
 		}
 
 		return sql.toString();
