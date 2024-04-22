@@ -10,7 +10,7 @@ public class ResponseDocumentoDTO {
 	private String idPlantillaDocumento;
 	private String idioma;
 	private String idIdioma;
-	private Short idDocumento;
+	private Integer idDocumento;
 	private Short idInstitucion;
 	
 	private Error error;
@@ -58,10 +58,10 @@ public class ResponseDocumentoDTO {
 	public void setIdIdioma(String idIdioma) {
 		this.idIdioma = idIdioma;
 	}
-	public Short getIdDocumento() {
+	public Integer getIdDocumento() {
 		return idDocumento;
 	}
-	public void setIdDocumento(Short idDocumento) {
+	public void setIdDocumento(Integer idDocumento) {
 		this.idDocumento = idDocumento;
 	}
 	public Short getIdInstitucion() {

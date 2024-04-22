@@ -407,7 +407,7 @@ public class EnviosServiceImpl implements IEnviosService{
     	}
 	}
 
-	private void insertaExcelRow(EnvEnvios envEnvio, Sheet sheet, String from, String descFrom, String documentosAdjuntos, DestinatarioItem destinatarioItem, String mensaje) {
+	public void insertaExcelRow(EnvEnvios envEnvio, Sheet sheet, String from, String descFrom, String documentosAdjuntos, DestinatarioItem destinatarioItem, String mensaje) {
 		
         if (sheet != null) {
             Row row = sheet.createRow(sheet.getLastRowNum()+1);

@@ -2332,7 +2332,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Integer idDocumento) {
 
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
 		Resource inputStreamResource = null;

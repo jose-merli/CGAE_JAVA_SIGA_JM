@@ -186,9 +186,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 			if (enviosBasura != null && enviosBasura.size() > 0) {
 				for (EnvEnvios envioBasura : enviosBasura) {
 					envio = envioBasura;
-					LOGGER.info(
-							"Listener envios => Se ha encontrado envio mal creado y se procederá a su cambio de estado a Error con ID: "
-									+ envio.getIdenvio());
+					LOGGER.info("Listener envios => Se ha encontrado envio mal creado y se procederá a su cambio de estado a Error con ID: " + envio.getIdenvio());
 					envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
 					envio.setFechamodificacion(new Date());
 					_envEnviosMapper.updateByPrimaryKey(envio);
@@ -915,7 +913,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 		// Realizamos el envio por SMS para cada destiantario
 		boolean hayError = false;
-		int buroSMSenviados = 0;
 
 		for (EnvDestinatariosBurosms envDestinatariosBurosms : listEnvDestinatariosBurosms) {
 			String[] dest = new String[1];
@@ -926,59 +923,48 @@ public class ColaEnviosImpl implements IColaEnvios {
 				List<DestinatarioItem> listDestinatarioItems = new ArrayList<DestinatarioItem>();
 				listDestinatarioItems.add(destinatarioItem);
 
-				idSolicitudEcos = _enviosService.envioSMS(remitente, listDestinatarioItems, envio, cuerpoFinal,
-						isBuroSMS);
+				idSolicitudEcos = _enviosService.envioSMS(remitente, listDestinatarioItems, envio, cuerpoFinal, isBuroSMS);
 
-				LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es "
-						+ idSolicitudEcos);
+				LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es " + idSolicitudEcos);
 
 				if (idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
 					if (isBuroSMS) {
 
-						// añadimos un documento vacío para que al descargar desde la web vayamos a
-						// buscar el pdf a la pfd
-						EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(),
-								envDestinatariosBurosms.getMovil());
+						// añadimos un documento vacío para que al descargar desde la web vayamos a buscar el pdf a la pfd
+						EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(), envDestinatariosBurosms.getMovil());
 						if (envDocumentos != null) {
-							LOGGER.debug(
-									"El identificador del documento insertado es " + envDocumentos.getIddocumento());
+							LOGGER.debug("El identificador del documento insertado es " + envDocumentos.getIddocumento());
 						}
 
 						envDestinatariosBurosms.setIdsolicitudecos(idSolicitudEcos);
-						envDestinatariosBurosms
-								.setIddocumento(Short.valueOf(envDocumentos.getIddocumento().toString()));
+						envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento().intValue());
 
-						buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);
+						envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);
+						
+						generaLogSMS(envio, destinatarioItem, "Se ha registrado correctamente el BuroSms");
 					}
 				} else {
 					hayError = true;
-					LOGGER.error("Error al enviar mensaje al destinatario " + envDestinatariosBurosms.getMovil()
-							+ " al no poder contactar con el servicio ECO");
-					break;
-
+					LOGGER.error("Error al enviar mensaje al destinatario " + envDestinatariosBurosms.getMovil() + " al no poder contactar con el servicio ECO");
+					if (isBuroSMS) {
+						 generaLogSMS(envio, destinatarioItem, "No se ha podido crear el registro de BuroSms, porque no se ha generado el SMS en ECO");
+					}
+					//break;
 				}
 
 			} catch (Exception e) {
 				hayError = true;
 				LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil(), e);
-				BusinessException exception = new BusinessException(
-						"Error al enviar el sms al destinatario " + envDestinatariosBurosms.getMovil(), e);
-				listaErrores.add(exception);
-				break;
+				//BusinessException exception = new BusinessException("Error al enviar el sms al destinatario " + envDestinatariosBurosms.getMovil(), e);
+				//listaErrores.add(exception);
+				//break;
 			}
 		}
 
 		if (hayError) {
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
-			generaLogSMS(envio.getIdinstitucion(), envio, SigaConstants.KO);
 		} else {
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
-			if (buroSMSenviados == 0) {
-				generaLogSMS(envio.getIdinstitucion(), envio, "No se ha enviado ningun SMS");
-			} else {
-				generaLogSMS(envio.getIdinstitucion(), envio, SigaConstants.OK);
-			}
-
 		}
 
 		envio.setFechamodificacion(new Date());
@@ -1052,29 +1038,18 @@ public class ColaEnviosImpl implements IColaEnvios {
 	/**
 	 * Genera un fichero excel de log para el envio SMS.
 	 */
-	private void generaLogSMS(Short idInstitucion, EnvEnvios envio, String msg) {
+	private void generaLogSMS(EnvEnvios envio, DestinatarioItem destinatarioItem, String msg) {
 		Sheet sheet = null;
 
 		try {
 			sheet = _enviosService.creaLogGenericoExcel(envio);
-			// Comprobamos si hay errores debido a excepciones para informarlos en el log
-			// En caso de no haber errores adicionales a los ya informados por cada destinatario, se cierra el excel sin añadir filas
-			if (msg.equals(SigaConstants.KO)) {
-				if (this.listaErrores.size() > 0) {
-					for (Exception e : this.listaErrores) {
-						_enviosService.insertaExcelRowLogGenerico(envio, sheet, e.getMessage());
-					}
-				}
-			}
-			// Comprobamos si el resultado no es OK, pero aun asi se ha procesado, para indicar el mensaje
-			else if(!msg.equals(SigaConstants.OK)) {
-				_enviosService.insertaExcelRowLogGenerico(envio, sheet, msg);
-			}
+			String from = destinatarioItem.getCorreoElectronico();
+			_enviosService.insertaExcelRow(envio, sheet, from, from, "", destinatarioItem, msg);
 
 		} catch (Exception e) {
 			LOGGER.error("ColaEnviosImpl -- > generaLogSMS: " + e);
 		} finally {
-			_enviosService.writeCloseLogFileGenerico(Short.valueOf(idInstitucion), envio.getIdenvio(), sheet);
+			_enviosService.writeCloseLogFileGenerico(envio.getIdinstitucion(), envio.getIdenvio(), sheet);
 		}
 	}
 
@@ -1120,9 +1095,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 		for (Entry<String, Object> object : mapa.entrySet()) {
 			if (object.getValue() != null) {
-				cuerpo = cuerpo.replaceAll("%%" + object.getKey() + "%%", object.getValue().toString());
+				cuerpo = cuerpo.replaceAll(SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO + object.getKey() + SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, object.getValue().toString());
+				cuerpo = cuerpo.replaceAll(SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO + object.getKey() + SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, object.getValue().toString());
 			} else {
-				cuerpo = cuerpo.replaceAll("%%" + object.getKey() + "%%", " ");
+				cuerpo = cuerpo.replaceAll(SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO + object.getKey() + SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, " ");
+				cuerpo = cuerpo.replaceAll(SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO + object.getKey() + SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, " ");
 			}
 		}
 

@@ -58,7 +58,7 @@ public interface IEnviosMasivosService {
 	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario);
 	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatario);
 	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String nif);
-	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Short idDocumento);
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Integer idDocumento);
 	public File[] getFicherosLOGEnvioMasivo(Short idInstitucion, Long idEnvio);
 	public File getPathFicheroLOGEnvioMasivo(Short idInstitucion, Long idEnvio);
 	public EnviosMasivosDTO busquedaEnvioMasivoSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
