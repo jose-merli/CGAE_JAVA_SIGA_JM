@@ -2330,7 +2330,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Integer idDocumento) {
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Object idDocumento) {
 
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
 		Resource inputStreamResource = null;
@@ -2339,7 +2339,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			try {
 				EnvDestinatariosBurosmsExample envDestinatariosBurosmsExample = new EnvDestinatariosBurosmsExample();
 				envDestinatariosBurosmsExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(idDocumento);
+						.andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(Integer.getInteger(idDocumento.toString()));
 				List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms = envDestinatariosBurosmsMapper
 						.selectByExample(envDestinatariosBurosmsExample);
 				if (listEnvDestinatariosBurosms != null && listEnvDestinatariosBurosms.size() == 1) {// solo puede haber
