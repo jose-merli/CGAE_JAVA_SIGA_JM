@@ -9,7 +9,6 @@ import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
-import org.itcgae.siga.DTOs.com.ResponseDataListDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -71,13 +70,6 @@ public interface IPlantillasDocumentoService {
 	ComboSufijoDTO obtenerSufijos(HttpServletRequest request);
 
 	/**
-	 * Obtiene el combo de sufijos posibles
-	 * @param request
-	 * @return
-	 */
-	ComboSufijoDTO obtenerSufijosAgrupados(HttpServletRequest request);
-
-	/**
 	 * Obtiene el combo de formatos de salida
 	 * @param request
 	 * @return
@@ -91,14 +83,6 @@ public interface IPlantillasDocumentoService {
 	 * @return
 	 */
 	ResponseDataDTO guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-
-	/**
-	 * Guarda una array de plantillas de documento
-	 * @param request
-	 * @param plantillasDoc
-	 * @return
-	 */
-	ResponseDataListDTO guardarModPlantillasDocumento(MultipartHttpServletRequest request, TarjetaPlantillaDocumentoDTO[] plantillasDoc);
 
 	/**
 	 * Guarda datos salida de la plantilla documento

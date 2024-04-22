@@ -2,6 +2,10 @@ package org.itcgae.siga.DTOs.com;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(value = Include.NON_NULL)
 public class ResponseDocumentoDTO {
 	
 	private String rutaDocumento;
@@ -10,9 +14,8 @@ public class ResponseDocumentoDTO {
 	private String idPlantillaDocumento;
 	private String idioma;
 	private String idIdioma;
-	private Integer idDocumento;
+	private Object idDocumento;
 	private Short idInstitucion;
-	
 	private Error error;
 	
 	
@@ -58,10 +61,10 @@ public class ResponseDocumentoDTO {
 	public void setIdIdioma(String idIdioma) {
 		this.idIdioma = idIdioma;
 	}
-	public Integer getIdDocumento() {
+	public Object getIdDocumento() {
 		return idDocumento;
 	}
-	public void setIdDocumento(Integer idDocumento) {
+	public void setIdDocumento(Object idDocumento) {
 		this.idDocumento = idDocumento;
 	}
 	public Short getIdInstitucion() {

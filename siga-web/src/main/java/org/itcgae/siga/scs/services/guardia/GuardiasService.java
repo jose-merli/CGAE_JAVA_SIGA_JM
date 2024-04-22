@@ -162,7 +162,7 @@ public interface GuardiasService {
 
 	public void generarCalendarioAsync();
 
-	public ByteArrayInputStream descargarZIPExcelLog(HttpServletRequest request, List<DatosCalendarioyProgramacionItem> programacionItem);
+	public ResponseEntity<InputStreamResource> descargarZIPExcelLog(HttpServletRequest request, List<DatosCalendarioyProgramacionItem> programacionItem);
 
 	UpdateResponseDTO denegarInscripciones(BusquedaInscripcionItem denegarBody, HttpServletRequest request);
 

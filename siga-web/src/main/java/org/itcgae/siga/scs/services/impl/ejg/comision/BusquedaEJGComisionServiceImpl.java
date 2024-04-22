@@ -884,17 +884,21 @@ public class BusquedaEJGComisionServiceImpl implements IBusquedaEJGComision {
 						scsEjgActa.setIdinstitucionacta(idInstitucion);
 						scsEjgActa.setAnioacta(Short.valueOf(ejgItem.getAnnioActa()));
 						ScsActacomision acta = obtenerActa(scsEjgActa, idInstitucion);
-	
-						if(scsEstadoEjg.getObservaciones() != null) {
-							scsEstadoEjg.setObservaciones(
-									scsEstadoEjg.getObservaciones() + ". \n"
-											+ "Expediente incluido masivamente en el acta "
-											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
-						}else {
-							scsEstadoEjg.setObservaciones(
-									"Expediente incluido masivamente en el acta "
-											+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+						
+						if(scsEstadoEjg != null) {
+							if(scsEstadoEjg.getObservaciones() != null) {
+								scsEstadoEjg.setObservaciones(
+										scsEstadoEjg.getObservaciones() + ". \n"
+												+ "Expediente incluido masivamente en el acta "
+												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+							}else {
+								scsEstadoEjg.setObservaciones(
+										"Expediente incluido masivamente en el acta "
+												+ acta.getAnioacta() + "/" + acta.getNumeroacta());
+							}
 						}
+						
+						
 	
 						ScsEjgActa scsEjgActaNuevo = new ScsEjgActa();
 	

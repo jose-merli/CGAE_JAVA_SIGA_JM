@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
-import org.itcgae.siga.DTOs.com.FichasPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
@@ -28,7 +27,6 @@ public interface IModelosYcomunicacionesService {
 	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idInstitucion, String idModeloComunicacion);
 	public ComboDTO colegiosModelo(HttpServletRequest request);
 	public PlantillasDocumentosDTO obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComuncacion);
-	public FichasPlantillaDocumentoDTO obtenerFichasPlantillaDocumento(HttpServletRequest request, String idInstitucion, String idModeloComuncacion);
 	public Error guardarPerfilesModelo(HttpServletRequest request, TarjetaPerfilesDTO perfilesDTO);
 
 	public ResponseDataDTO guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);

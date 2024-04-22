@@ -1685,7 +1685,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			// Obtenemos los sufijos del documento
 			String sufijo = "";
-			List<SufijoItem> sufijos = _modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(Long.parseLong(idModeloComunicacion), Long.parseLong(plantilla.getIdInforme()), Long.parseLong(plantilla.getIdPlantillaDocumento()), idLenguaje);
+			List<SufijoItem> sufijos = _modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(Long.parseLong(idModeloComunicacion), Long.parseLong(plantilla.getIdInforme()), idLenguaje);
 			
 			if(hDatosGenerales.get("row") != null){
 				hashMapRow = (HashMap<String, Object>) hDatosGenerales.get("row");
@@ -2558,7 +2558,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											}								
 										}
 										//Miramos si la consulta tiene region
-										List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
+										List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdinforme(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
 										
 										ConsultaItem consultaConRegion = listaPlantillaDocConsulta.get(0);
 										
@@ -2687,7 +2687,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								}								
 							}
 							//Miramos si la consulta tiene region
-							List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
+							List<ConsultaItem> listaPlantillaDocConsulta = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.valueOf(idInstitucion), consultaDatos.getIdmodelocomunicacion(), consultaDatos.getIdinforme(), consultaDatos.getIdconsulta(), consultaDatos.getIdplantilladocumento());
 							
 							ConsultaItem consultaConRegion = listaPlantillaDocConsulta.get(0);
 							

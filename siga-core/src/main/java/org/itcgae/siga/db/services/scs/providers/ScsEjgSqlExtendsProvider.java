@@ -332,15 +332,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
 					// Comprobar que solo existe este Rol activado.
 					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+						sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 					} else {
 						// Verificar si el 1 Rol que tiene sino no añadir parentesis.
 						if (banderaRolprimero == true) {
-							sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("(( UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 							checkRolone = true;
 							banderaRolprimero = false;
 						} else {
-							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 						}
 					}
 				}
@@ -765,7 +765,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			// Verificar que no contiene Roles.
 		} else {
 			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 			if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
 				String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
 				String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
@@ -951,7 +951,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		condicionNumRegRemesa = condicionNumRegRemesa + "))";
 		
 		// select
-		sql.SELECT("COUNT(*) as TOTAL");
+		sql.SELECT("DISTINCT ejg.anio anio");
+		sql.SELECT("ejg.idinstitucion");
+		sql.SELECT("ejg.numero numero");
+		sql.SELECT("ejg.idtipoejg idtipoejg");
 		
 		// from
 		sql.FROM("scs_ejg ejg"); 
@@ -1218,15 +1221,15 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 				if (ejgItem.getNif() != null && ejgItem.getNif() != "") {
 					// Comprobar que solo existe este Rol activado.
 					if (ejgItem.getRol().equals("1")) {
-						sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+						sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 					} else {
 						// Verificar si el 1 Rol que tiene sino no añadir parentesis.
 						if (banderaRolprimero == true) {
-							sql.WHERE("(( perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("(( UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 							checkRolone = true;
 							banderaRolprimero = false;
 						} else {
-							sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+							sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 						}
 					}
 				}
@@ -1651,7 +1654,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 			// Verificar que no contiene Roles.
 		} else {
 			if (ejgItem.getNif() != null && ejgItem.getNif() != "")
-				sql.WHERE("perjg.NIF = '" + ejgItem.getNif() + "'");
+				sql.WHERE("UPPER(perjg.NIF) = '" + ejgItem.getNif().toUpperCase() + "'");
 			if (ejgItem.getApellidos() != null && ejgItem.getApellidos() != "") {
 				String columna = "REPLACE(CONCAT(perjg.apellido1,perjg.apellido2), ' ', '')";
 				String cadena = ejgItem.getApellidos().replaceAll("\\s+", "");
@@ -1780,8 +1783,10 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		}
 
 		sql.ORDER_BY("EJG.ANIO DESC, EJG.NUMERO DESC");
+		
+		String sqlTotalRegistros = "SELECT COUNT(*) AS TOTAL FROM (" + sql.toString() + ")";
 
-		return sql.toString();
+		return sqlTotalRegistros;
 	}
 	
 	public String busquedaEJGFinal(EjgItem ejgItem, String idInstitucion, Integer tamMaximo, String idLenguaje, String stringListaEjgs) {
@@ -2493,7 +2498,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 						+ "COL.NCOMUNITARIO NCOMUNITARIO, ESTADO.IDESTADO IDESTADO,COL.IDINSTITUCION IDINSTITUCION, INS.ABREVIATURA ABREVIATURA, "
 						+ "F_SIGA_GETRECURSO(TIPOESTADO.DESCRIPCION, " + idLenguaje
 						+ ") ESTADO, COL.SITUACIONRESIDENTE RESIDENTE,\r\n"
-						+ "            COUNT(tur.idturno) sumaturnos,\r\n"
+						+ "            COUNT(tur.idturno) tieneturno,\r\n"
 						+ "            COUNT(guar.idguardia) tieneguardias,\r\n"
 						+ "            SUM(nvl(guarpend.pendiente, 0)) AS guardiaspendientes");
 
@@ -2580,9 +2585,8 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		// registros
 		sql3.SELECT("nif,\r\n" + "    idpersona,\r\n" + "    nombre,\r\n" + "    apellidos,\r\n" + "    ncolegiado,\r\n"
 				+ "    ncomunitario,\r\n" + "    idestado,\r\n" + "    idinstitucion,\r\n" + "    abreviatura,\r\n"
-				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    guardiaspendientes,\r\n"
-				+ "    CASE sumaturnos\r\n" + "        WHEN 0 THEN\r\n" + "            'No'\r\n" + "        ELSE\r\n"
-				+ "            'Sí'\r\n" + "    END AS tieneturno FROM ( " + sql.toString() + ")");
+				+ "    estado,\r\n" + "    residente,\r\n" + "    tieneguardias,\r\n" + "    tieneturno,\r\n" + " guardiaspendientes\r\n "
+				+ " FROM ( " + sql.toString() + ")");
 		
 		if(tamMaximo != null) {
 			sql3.FETCH_FIRST_ROWS_ONLY(tamMaximo+1);

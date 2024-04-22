@@ -628,7 +628,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
 //					sql += " and PER.NIF = " + "'" + designaItem.getNif().trim() + "'";
-					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))";
+					sql += " AND des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NIF) like '"+designaItem.getNif().toUpperCase()+"%' AND IDINSTITUCION = "+idInstitucion+"))";
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
@@ -1016,27 +1016,35 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (designaItem.getDocumentacionActuacion() != null
 					&& !designaItem.getDocumentacionActuacion().equalsIgnoreCase("")) {
 				if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("TODAS")) {
-                    sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act " +
-                            "WHERE act.IDTURNO = des.IDTURNO " +
-                            "AND act.IDINSTITUCION = des.IDINSTITUCION " +
-                            "AND act.ANIO = des.ANIO " +
-                            "AND act.NUMERO = des.NUMERO " +
-                            "AND NOT EXISTS (SELECT 1 FROM scs_documentaciondesigna doc " +
-                            "WHERE doc.IDTURNO = act.IDTURNO " +
-                            "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
-                            "AND doc.ANIO = act.ANIO " +
-                            "AND doc.NUMERO = act.NUMERO))");
+				    sql.WHERE("EXISTS (" +
+				              "SELECT 1 FROM scs_actuaciondesigna act " +
+				              "WHERE act.IDTURNO = des.IDTURNO " +
+				              "AND act.IDINSTITUCION = des.IDINSTITUCION " +
+				              "AND act.ANIO = des.ANIO " +
+				              "AND act.NUMERO = des.NUMERO " +
+				              "GROUP BY act.IDTURNO, act.IDINSTITUCION, act.ANIO, act.NUMERO " +
+				              "HAVING COUNT(*) = (" +
+				              "SELECT COUNT(*) FROM scs_documentaciondesigna doc " +
+				              "WHERE doc.IDTURNO = act.IDTURNO " +
+				              "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
+				              "AND doc.ANIO = act.ANIO " +
+				              "AND doc.NUMERO = act.NUMERO" +
+				              "))");
 				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("ALGUNAS")) {
-                    sql.WHERE("EXISTS (SELECT 1 FROM scs_actuaciondesigna act " +
-                            "LEFT JOIN scs_documentaciondesigna doc ON doc.IDTURNO = act.IDTURNO " +
-                            "AND doc.IDINSTITUCION = act.IDINSTITUCION " +
-                            "AND doc.ANIO = act.ANIO " +
-                            "AND doc.NUMERO = act.NUMERO " +
-                            "WHERE act.IDTURNO = des.IDTURNO " +
-                            "AND act.IDINSTITUCION = des.IDINSTITUCION " +
-                            "AND act.ANIO = des.ANIO " +
-                            "AND act.NUMERO = des.NUMERO " +
-                            "AND doc.IDDOCUMENTACIONDES IS NULL)");
+					sql.WHERE("EXISTS (" +
+				              "SELECT act.IDTURNO " +
+				              "FROM scs_actuaciondesigna act " +
+				              "JOIN scs_documentaciondesigna doc " +
+				              "ON act.IDTURNO = doc.IDTURNO " +
+				              "AND act.IDINSTITUCION = doc.IDINSTITUCION " +
+				              "AND act.ANIO = doc.ANIO " +
+				              "AND act.NUMERO = doc.NUMERO " +
+				              "WHERE act.IDTURNO = des.IDTURNO " +
+				              "AND act.IDINSTITUCION = des.IDINSTITUCION " +
+				              "AND act.ANIO = des.ANIO " +
+				              "AND act.NUMERO = des.NUMERO " +
+				              "GROUP BY act.IDTURNO, act.IDINSTITUCION, act.ANIO, act.NUMERO " +
+				              "HAVING COUNT(DISTINCT act.IDTURNO) != COUNT(doc.IDTURNO))");
 				} else if (designaItem.getDocumentacionActuacion().equalsIgnoreCase("NINGUNA")) {
                     sql.WHERE("NOT EXISTS (SELECT 1 FROM scs_actuaciondesigna act_check " +
                             "WHERE act_check.IDTURNO = des.IDTURNO " +
@@ -1144,7 +1152,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (tiene_interesado) {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
-					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NIF) like '"+designaItem.getNif().toUpperCase()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
@@ -1632,7 +1640,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			if (tiene_interesado) {
 
 				if (designaItem.getNif() != null && !designaItem.getNif().equalsIgnoreCase("")) {
-					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE sp.NIF like '"+designaItem.getNif()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
+					sql.WHERE(" des.NUMERO IN (SELECT numero FROM SCS_DEFENDIDOSDESIGNA sd WHERE sd.IDTURNO = des.IDTURNO AND sd.ANIO = des.ANIO AND sd.IDPERSONA IN (SELECT IDPERSONA FROM SCS_PERSONAJG sp WHERE UPPER(sp.NIF) like '"+designaItem.getNif().toUpperCase()+"%' AND IDINSTITUCION = "+idInstitucion+"))");
 				}
 				if (designaItem.getNombreInteresado() != null
 						&& !designaItem.getNombreInteresado().equalsIgnoreCase("")) {
@@ -2857,11 +2865,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 			sql.append(tiposResolucionBuilder);
 			//sql.append(") query WHERE rownum<=200");
 			sql.append(" AND rownum<=200");
-			sql.append(" ORDER BY FECHAORDEN DESC, IDINSTITUCION, ANIO DESC, CODIGO DESC, SUFIJO, CODIGODESIGNA DESC");
+			sql.append(" ORDER BY ANIO DESC, CODIGO DESC, FECHAORDEN DESC, IDINSTITUCION, SUFIJO, CODIGODESIGNA DESC");
 		}else {
 			//sql.append(") query WHERE rownum<=200");
 			sql.append(" AND rownum<=200");
-			sql.append(" ORDER BY IDINSTITUCION, ANIO DESC");
+			sql.append(" ORDER BY ANIO DESC, NUMERO DESC");
 		}
 
 		return sql.toString();

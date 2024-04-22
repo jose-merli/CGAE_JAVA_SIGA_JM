@@ -4,7 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class ModRelPlantillaSufijoExtendsSqlProvider {
 	
-	public String selectSufijosPlantilla(Long idModeloComunicacion, Long idInforme, Long idPlantillaDocumento, String idLenguaje){
+	public String selectSufijosPlantilla(Long idModeloComunicacion, Long idInforme, String idLenguaje){
 		
 		SQL sql = new SQL();		
 				
@@ -16,7 +16,7 @@ public class ModRelPlantillaSufijoExtendsSqlProvider {
 
 		sql.INNER_JOIN("MOD_PLANTILLADOC_SUFIJO sufijo ON sufijo.IDSUFIJO = relSufijo.IDSUFIJO");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = sufijo.NOMBRE AND rec.idlenguaje = '" + idLenguaje+ "'");
-		sql.WHERE("relSufijo.Idmodelocomunicacion = " + idModeloComunicacion + " AND relSufijo.IDINFORME = " + idInforme + "  AND relSufijo.IDPLANTILLADOCUMENTO = " + idPlantillaDocumento);
+		sql.WHERE("relSufijo.Idmodelocomunicacion = " + idModeloComunicacion + " AND relSufijo.IDINFORME = " + idInforme);
 		
 		sql.GROUP_BY("relSufijo.Idsufijo,rec.DESCRIPCION, relSufijo.orden");
 		sql.ORDER_BY("relSufijo.orden ASC");
