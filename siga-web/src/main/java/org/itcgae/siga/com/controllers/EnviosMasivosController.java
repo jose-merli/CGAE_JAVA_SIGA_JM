@@ -284,15 +284,6 @@ public class EnviosMasivosController {
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 
-	@RequestMapping(value = "/detalle/descargarDocumento2", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> obtenerAdjunto2(@RequestBody String documentoDTO) throws Exception {
-		LOGGER.info("INI TEST");
-		System.out.println(documentoDTO.getClass());
-		System.out.println(documentoDTO.toString());
-		LOGGER.info("END TEST");
-		return ResponseEntity.ok("Test");
-	}
-
 	@RequestMapping(value = "/detalle/nombreFicheroLog", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FileInfoDTO> nombreFicheroLog(@RequestBody ResponseDocumentoDTO documentoDTO) {
 
