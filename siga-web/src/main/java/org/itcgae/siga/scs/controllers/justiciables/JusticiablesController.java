@@ -123,7 +123,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -135,7 +135,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 	
@@ -147,7 +147,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -159,7 +159,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@RequestMapping(value = "/gestionJusticiables/getSolicitante", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -170,7 +170,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<ScsUnidadfamiliarejgDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@RequestMapping(value = "/gestionJusticiables/updateDatosSolicitudJusticiable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -181,7 +181,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -221,7 +221,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -233,7 +233,7 @@ public class JusticiablesController {
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
