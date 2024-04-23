@@ -2707,6 +2707,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// error =
 			// "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
 			// }
+			
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+				validacionSexo = true;
+			}
 		}
 
 		LOGGER.info("validateDatosTipoPcajg2y3() -> Salida del servicio para validar los datos segun tipo Pcajg 2y3");
@@ -2756,6 +2760,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
 			// validacionParentesco = true;
 			// }
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2775,6 +2781,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
 				validacionPais = true;
 			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2782,6 +2790,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
 				validacionPais = true;
+			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+				validacionSexo = true;
 			}
 		}
 
@@ -2812,6 +2823,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionPais = true;
 			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
 			// validacionParentesco = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2842,6 +2855,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionFechaNacimiento = true;
 			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
 			// validacionParentesco = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2858,6 +2873,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
 		// validacionParentesco = true;
 		// }
+		
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+			validacionSexo = true;
+		}
 
 		LOGGER.info("validateDatosTipoPcajg8() -> Salida del servicio para validar los datos segun tipo Pcajg 8");
 
