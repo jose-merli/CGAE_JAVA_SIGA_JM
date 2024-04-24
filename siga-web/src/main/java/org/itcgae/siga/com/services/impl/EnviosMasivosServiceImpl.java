@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
@@ -1187,9 +1186,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					for (DocumentoEnvioItem documento : documentos) {
 						
 						String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(idInstitucion, Long.parseLong(documento.getIdEnvio()),null);
+						String pathDocumento = documento.getPathDocumento();
 						
-						String nombreFichero = documento.getNombreDocumento();
-						//String idEnvio = documentoDTO.getIdEnvio();
 						
 						File file = null;
 						if(filePath.contains("\\")) {
@@ -1197,7 +1195,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							filePath = String.join("\\",Arrays.copyOf(partsPath, partsPath.length-1));
 							file = new File(filePath, partsPath[partsPath.length-1]);
 						} else {
-		                    file = new File(filePath, nombreFichero);
+		                    file = new File(filePath, pathDocumento);
 						}
 						
 						if(file.exists()) {
@@ -2332,7 +2330,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Object idDocumento) {
 
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
 		Resource inputStreamResource = null;
@@ -2341,7 +2339,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			try {
 				EnvDestinatariosBurosmsExample envDestinatariosBurosmsExample = new EnvDestinatariosBurosmsExample();
 				envDestinatariosBurosmsExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(idDocumento);
+						.andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(Integer.getInteger(idDocumento.toString()));
 				List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms = envDestinatariosBurosmsMapper
 						.selectByExample(envDestinatariosBurosmsExample);
 				if (listEnvDestinatariosBurosms != null && listEnvDestinatariosBurosms.size() == 1) {// solo puede haber

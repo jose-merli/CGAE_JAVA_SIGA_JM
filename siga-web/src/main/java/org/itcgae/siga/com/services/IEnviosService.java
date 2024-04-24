@@ -17,6 +17,7 @@ public interface IEnviosService {
 	public Short envioMail(String idInstitucion, String idEnvio, RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception;
 	public Sheet creaLogGenericoExcel(EnvEnvios envio) throws IOException, InvalidFormatException;
 	public void insertaExcelRowLogGenerico(EnvEnvios envio, Sheet sheet, String error);
+	public void insertaExcelRow(EnvEnvios envEnvio, Sheet sheet, String from, String descFrom, String documentosAdjuntos, DestinatarioItem destinatarioItem, String mensaje);
 	public void writeCloseLogFileGenerico(Short valueOf, Long idenvio, Sheet sheet);
 
 }
