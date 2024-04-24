@@ -58,7 +58,7 @@ public class FichaDatosBancariosController {
 		
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	
@@ -80,7 +80,7 @@ public class FichaDatosBancariosController {
 		InsertResponseDTO response = tarjetaDatosBancariosService.insertBanksData(datosBancariosInsertDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@RequestMapping(value = "fichaDatosBancarios/comboEsquema",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -109,7 +109,7 @@ public class FichaDatosBancariosController {
 		UpdateResponseDTO response = tarjetaDatosBancariosService.updateBanksData(datosBancariosInsertDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@RequestMapping(value = "fichaDatosBancarios/AnexosSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
