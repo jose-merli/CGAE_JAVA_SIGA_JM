@@ -12744,42 +12744,6 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 	}
-	
-	public ByteArrayInputStream descargarExcelLog(HttpServletRequest request, DatosCalendarioyProgramacionItem[] calyprogItem) throws Exception {
-		
-		ByteArrayOutputStream byteArrayOutputStream = null;
-		
-		try {
-
-			byteArrayOutputStream = new ByteArrayOutputStream();
-			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-			ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-			
-			for (DatosCalendarioyProgramacionItem item : calyprogItem) {
-				DatosDocumentoItem datos = descargarExcelLog(request, item);
-				zipOutputStream.putNextEntry(new ZipEntry(datos.getFileName()));
-				FileInputStream fileInputStream = new FileInputStream(datos.getDocumentoFile());
-				IOUtils.copy(fileInputStream, zipOutputStream);
-				fileInputStream.close();
-			}
-			
-			zipOutputStream.closeEntry();
-
-			if (zipOutputStream != null) {
-				zipOutputStream.finish();
-				zipOutputStream.flush();
-				IOUtils.closeQuietly(zipOutputStream);
-			}
-
-			IOUtils.closeQuietly(bufferedOutputStream);
-			IOUtils.closeQuietly(byteArrayOutputStream);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-	}
 
 	@Override
 	public DatosDocumentoItem descargarExcelLog(HttpServletRequest request,

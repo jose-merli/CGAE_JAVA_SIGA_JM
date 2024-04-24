@@ -2243,13 +2243,6 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 						// Se elimina su propiedad como solicitante y su rol
 						record.setSolicitante((short) 0);
-						
-						ScsEjgKey ejgKey = new ScsEjgKey();
-
-						ejgKey.setAnio(Short.parseShort(datos.get(i).getUf_anio()));
-						ejgKey.setIdinstitucion(idInstitucion);
-						ejgKey.setIdtipoejg(Short.parseShort(datos.get(i).getUf_idTipoejg()));
-						ejgKey.setNumero(Long.parseLong(datos.get(i).getUf_numero()));
 
 						// Actualizamos el ejg correspondientemente para que no lo considere su
 						// solicitante principal
