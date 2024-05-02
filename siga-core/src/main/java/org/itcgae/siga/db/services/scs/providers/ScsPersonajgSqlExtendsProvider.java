@@ -660,6 +660,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 		sqlUnidadFamiliar.FROM("SCS_UNIDADFAMILIAREJG unidadFamiliar");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idinstitucion = '" + idInstitucion + "'");
 		sqlUnidadFamiliar.WHERE("unidadFamiliar.idpersona = '" + idPersona + "'");
+		sqlUnidadFamiliar.WHERE("unidadFamiliar.fechabaja IS NULL");
 
 		SQL sqlContrarioEjg = new SQL();
 		sqlContrarioEjg.SELECT("CONTRARIOEJG.idinstitucion");
