@@ -27,7 +27,7 @@ public class JusticiableItem {
 	private String idProvincia;
 	private String idPoblacion;
 	private Short idEstadoCivil;
-	private String tipoPersonajg;
+	private String tipoPersonaJG;
 	private Short idTipoIdentificacion;
 	private String observaciones;
 	private Long idRepresentantejg;
@@ -382,17 +382,17 @@ public class JusticiableItem {
 	/**
 	 **/
 	public JusticiableItem tipoPersonajg(String tipoPersonajg) {
-		this.tipoPersonajg = tipoPersonajg;
+		this.tipoPersonaJG = tipoPersonajg;
 		return this;
 	}
 
 	@JsonProperty("tipopersonajg")
 	public String getTipoPersonajg() {
-		return tipoPersonajg;
+		return tipoPersonaJG;
 	}
 
 	public void setTipoPersonajg(String tipoPersonajg) {
-		this.tipoPersonajg = tipoPersonajg;
+		this.tipoPersonaJG = tipoPersonajg;
 	}
 
 	/**
@@ -1165,7 +1165,7 @@ public class JusticiableItem {
 		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
 		result = prime * result + ((telefonos == null) ? 0 : telefonos.hashCode());
 		result = prime * result + ((tipoJusticiable == null) ? 0 : tipoJusticiable.hashCode());
-		result = prime * result + ((tipoPersonajg == null) ? 0 : tipoPersonajg.hashCode());
+		result = prime * result + ((tipoPersonaJG == null) ? 0 : tipoPersonaJG.hashCode());
 		result = prime * result + (validacionRepeticion ? 1231 : 1237);
 		return result;
 	}
@@ -1483,10 +1483,10 @@ public class JusticiableItem {
 				return false;
 		} else if (!tipoJusticiable.equals(other.tipoJusticiable))
 			return false;
-		if (tipoPersonajg == null) {
-			if (other.tipoPersonajg != null)
+		if (tipoPersonaJG == null) {
+			if (other.tipoPersonaJG != null)
 				return false;
-		} else if (!tipoPersonajg.equals(other.tipoPersonajg))
+		} else if (!tipoPersonaJG.equals(other.tipoPersonaJG))
 			return false;
 		if (validacionRepeticion != other.validacionRepeticion)
 			return false;
@@ -1501,7 +1501,7 @@ public class JusticiableItem {
 				+ ", apellidos=" + apellidos + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", direccion="
 				+ direccion + ", codigoPostal=" + codigoPostal + ", idProfesion=" + idProfesion + ", regimen_conyugal="
 				+ regimen_conyugal + ", idProvincia=" + idProvincia + ", idPoblacion=" + idPoblacion
-				+ ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonajg=" + tipoPersonajg + ", idTipoIdentificacion="
+				+ ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonajg=" + tipoPersonaJG + ", idTipoIdentificacion="
 				+ idTipoIdentificacion + ", observaciones=" + observaciones + ", idRepresentantejg=" + idRepresentantejg
 				+ ", idTipoencalidad=" + idTipoencalidad + ", sexo=" + sexo + ", idLenguaje=" + idLenguaje
 				+ ", numeroHijos=" + numeroHijos + ", fax=" + fax + ", correoElectronico=" + correoElectronico

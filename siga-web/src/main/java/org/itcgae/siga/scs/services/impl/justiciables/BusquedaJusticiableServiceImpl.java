@@ -210,8 +210,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 							tamMaximo = null;
 						}
 						
-						idPersonaJusticiables = scsPersonajgExtendsMapper
-								.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion, tamMaximo);
+						idPersonaJusticiables = scsPersonajgExtendsMapper.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion, tamMaximo);
 
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener las personas justiciables");
@@ -223,8 +222,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
 
-						justiciablesItems = scsPersonajgExtendsMapper.searchJusticiables(idPersonaJusticiables,
-								idInstitucion);
+						justiciablesItems = scsPersonajgExtendsMapper.searchJusticiables(idPersonaJusticiables,idInstitucion);
 
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
