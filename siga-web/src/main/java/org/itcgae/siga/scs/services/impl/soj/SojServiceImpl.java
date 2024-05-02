@@ -1,43 +1,32 @@
 package org.itcgae.siga.scs.services.impl.soj;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.scs.DocumentacionAsistenciaItem;
 import org.itcgae.siga.DTOs.scs.DocumentacionSojDTO;
 import org.itcgae.siga.DTOs.scs.DocumentacionSojItem;
-import org.itcgae.siga.DTOs.scs.EjgItem;
 import org.itcgae.siga.DTOs.scs.FichaSojDTO;
 import org.itcgae.siga.DTOs.scs.FichaSojItem;
-import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.ScsAsistencia;
-import org.itcgae.siga.db.entities.ScsAsistenciaExample;
-import org.itcgae.siga.db.entities.ScsDocumentacionasi;
 import org.itcgae.siga.db.entities.ScsDocumentacionsoj;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgExample;
-import org.itcgae.siga.db.entities.ScsEjgKey;
-import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
 import org.itcgae.siga.db.entities.ScsPersonajg;
-import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsSoj;
 import org.itcgae.siga.db.entities.ScsSojExample;
 import org.itcgae.siga.db.entities.ScsSojKey;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejg;
 import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgExample;
-import org.itcgae.siga.db.mappers.ScsDocumentacionasiMapper;
 import org.itcgae.siga.db.mappers.ScsDocumentacionsojMapper;
-import org.itcgae.siga.db.mappers.ScsSojMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSojExtendsMapper;
@@ -47,15 +36,9 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,9 +61,6 @@ public class SojServiceImpl implements ISojService {
 	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
 
 	@Autowired
-	private ScsSojExtendsMapper ScsSojExtendsMapper;
-	
-	@Autowired
 	private ScsEjgExtendsMapper scsEjgExtendsMapper;
 	
 	@Autowired
@@ -88,13 +68,14 @@ public class SojServiceImpl implements ISojService {
 	
 	@Autowired
 	private ScsDocumentacionsojMapper scsDocumentacionsojMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Override
 	public FichaSojDTO getDetallesSoj(FichaSojItem fichaSojItem, HttpServletRequest request) throws Exception {
 		LOGGER.info("getDetallesSoj() -> Entrando al servicio que obtiene los datos de un SOJ");
 		FichaSojDTO fichaSojDTO = new FichaSojDTO();
-		Error error = new Error();
-
 		// Conseguimos información del usuario logeado
 		LOGGER.info("getDetallesSoj() -> Entrando al servicio de autenticación");
 		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
@@ -117,17 +98,15 @@ public class SojServiceImpl implements ISojService {
 			throws Exception {
 		LOGGER.info("getDocumentosSOJ() -> Entrando al servicio que obtiene los documentos de un SOJ");
 		DocumentacionSojDTO documentacionSOJ = new DocumentacionSojDTO();
-		Error error = new Error();
-
 		// Conseguimos información del usuario logeado
-		LOGGER.info("getDocumentosSOJ() -> Entrando al servicio de autenticación");
-		AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
-		LOGGER.info("getDocumentosSOJ() -> Saliendo del servicio de autenticación");
+		//LOGGER.info("getDocumentosSOJ() -> Entrando al servicio de autenticación");
+		//AdmUsuarios usuario = authenticationProvider.checkAuthentication(request);
+		//LOGGER.info("getDocumentosSOJ() -> Saliendo del servicio de autenticación");
 
 		LOGGER.info("getDocumentosSOJ() -> Entrando del servicio que obtiene los documentos de un SOJ");
 		List<DocumentacionSojItem> documentos = scsSojExtendsMapper.busquedaDocumentosSOJ(fichaSojItem);
 		
-		documentacionSOJ.setDocumentacionEjgItems(scsSojExtendsMapper.busquedaDocumentosSOJ(fichaSojItem));
+		documentacionSOJ.setDocumentacionEjgItems(documentos);
 		LOGGER.info("getDocumentosSOJ() -> Saliendo del servicio que obtiene los documentos de un SOJ");
 		return documentacionSOJ;
 	}
@@ -313,7 +292,7 @@ public class SojServiceImpl implements ISojService {
 					record.setEjganio(ejg.get(0).getAnio());
 					record.setEjgidtipoejg(ejg.get(0).getIdtipoejg());
 					record.setEjgnumero(ejg.get(0).getNumero());
-					int respuesta = scsSojExtendsMapper.updateByExample(soj.get(0), exampleSOJ);
+					int responseUnidad = scsSojExtendsMapper.updateByExample(soj.get(0), exampleSOJ);
 
 				} catch (Exception e) {
 					LOGGER.debug(
@@ -341,6 +320,39 @@ public class SojServiceImpl implements ISojService {
 	private ScsSoj traducirFichaASOJ(FichaSojItem datos, Short idInstitucion, List<AdmUsuarios> usuarios) {
 		ScsSoj sojItem = new ScsSoj();
 		
+		String numSoj = "";
+		
+		numSoj = scsSojExtendsMapper.selectNuevoNumeroSOJ(datos, idInstitucion);
+		
+		// Obtenemos el parametro de limite para el campo CODIGO en BBDD
+		StringDTO parametros = new StringDTO();
+		Integer longitudSOJ;
+
+		ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+		parametroRequestDTO.setIdInstitucion(idInstitucion.toString());
+		parametroRequestDTO.setModulo("SCS");
+		parametroRequestDTO.setParametrosGenerales("LONGITUD_CODSOJ");
+		
+		parametros = genParametrosExtendsMapper.getParameterFunction(1, parametroRequestDTO);
+
+		// comprobamos la longitud para la institucion, si no tiene nada, cogemos el de
+		// la institucion 0
+		if (parametros != null && parametros.getValor() != null) {
+			longitudSOJ = Integer.parseInt(parametros.getValor());
+		} else {
+			parametros = genParametrosExtendsMapper.selectParametroPorInstitucion("LONGITUD_CODDESIGNA", "0");
+			longitudSOJ = Integer.parseInt(parametros.getValor());
+		}
+
+		if (numSoj == null || numSoj.isEmpty()) {
+			numSoj = "1";
+		}
+
+		// Rellenamos por la izquierda ceros hasta llegar a longitudDesigna
+		while (numSoj.length() < longitudSOJ) {
+			numSoj = "0" + numSoj;
+		}
+		
 		//Campos obligatorios
 		sojItem.setAnio(Short.valueOf(datos.getAnio()));
 		sojItem.setEstado("A");
@@ -349,7 +361,7 @@ public class SojServiceImpl implements ISojService {
 		sojItem.setFechaapertura(datos.getFechaApertura());
 		sojItem.setIdtiposoj(Short.valueOf(datos.getIdTipoSoj()));
 		sojItem.setNumero(Long.valueOf(scsSojExtendsMapper.selectNuevoNumero(datos, idInstitucion)));
-		sojItem.setNumsoj(scsSojExtendsMapper.selectNuevoNumeroSOJ(datos, idInstitucion));
+		sojItem.setNumsoj(numSoj);
 		sojItem.setIdinstitucion(idInstitucion);
 		
 		//Campos opcionales
@@ -657,8 +669,6 @@ public class SojServiceImpl implements ISojService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
-		ObjectMapper objectMapper = new ObjectMapper();
-		int affectedRows = 0;
 		int idDocumentacion = 1;
 		boolean actualizarDoc = false;
 		try {
@@ -822,9 +832,6 @@ public class SojServiceImpl implements ISojService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		Error error = new Error();
-		ObjectMapper objectMapper = new ObjectMapper();
-		int affectedRows = 0;
-		int idDocumentacion = 1;
 		try {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
