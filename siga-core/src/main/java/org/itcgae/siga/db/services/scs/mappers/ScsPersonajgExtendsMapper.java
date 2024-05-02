@@ -39,7 +39,8 @@ public interface ScsPersonajgExtendsMapper extends ScsPersonajgMapper{
 		@Result(column = "NOMBRESOLO", property = "nombreSolo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROASUNTOS", property = "numeroAsuntos", jdbcType = JdbcType.VARCHAR),	
-		@Result(column = "ULTIMOASUNTO", property = "ultimoAsunto", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "ULTIMOASUNTO", property = "ultimoAsunto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOPERSONAJG", property = "tipoPersonaJG", jdbcType = JdbcType.VARCHAR)
 	})
 	List<JusticiableBusquedaItem> searchJusticiables(List<StringDTO> justiciableBusquedaItems, Short idInstitucion);
 	

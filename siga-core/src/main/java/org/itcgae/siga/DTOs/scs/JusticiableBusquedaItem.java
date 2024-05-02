@@ -27,6 +27,7 @@ public class JusticiableBusquedaItem {
 	private String numeroAsuntos;
 	private String ultimoAsunto;
 	private String filas;
+	private String tipoPersonaJG;
 	
 	/**
 	 **/
@@ -417,5 +418,14 @@ public class JusticiableBusquedaItem {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+	
+	@JsonProperty("tipopersonajg")
+	public String getTipoPersonaJG() {
+		return tipoPersonaJG;
+	}
+
+	public void setTipoPersonaJG(String tipoPersonaJG) {
+		this.tipoPersonaJG = tipoPersonaJG;
 	}
 }
