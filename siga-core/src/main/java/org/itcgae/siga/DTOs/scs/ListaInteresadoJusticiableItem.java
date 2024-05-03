@@ -14,6 +14,7 @@ public class ListaInteresadoJusticiableItem {
 	private String idPersona;
 	private String direccion;
 	private String representante;
+	private String idPersonaRepresentante;
 	
 	public String getIdPersona() {
 		return idPersona;
@@ -68,5 +69,11 @@ public class ListaInteresadoJusticiableItem {
 	}
 	public void setRepresentante(String representante) {
 		this.representante = representante;
+	}
+	public String getIdPersonaRepresentante() {
+		return idPersonaRepresentante;
+	}
+	public void setIdPersonaRepresentante(String idPersonaRepresentante) {
+		this.idPersonaRepresentante = idPersonaRepresentante;
 	}
 }
