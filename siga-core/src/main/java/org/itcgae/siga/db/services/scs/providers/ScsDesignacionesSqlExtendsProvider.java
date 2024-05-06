@@ -3463,6 +3463,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (!historico) {
 			consulta += " AND scs_contrariosdesigna.fechabaja is null \r\n";
 		}
+		
+		if(item.getIdPersona() != null) {
+			consulta += " AND scs_contrariosdesigna.idpersona = " + item.getIdPersona() + "\r\n";
+		}
+		
 		consulta += "              AND scs_contrariosdesigna.idturno = " + item.getIdTurno() + " )\r\n" + "    ) t1\r\n"
 				+ "\r\n" + "";
 

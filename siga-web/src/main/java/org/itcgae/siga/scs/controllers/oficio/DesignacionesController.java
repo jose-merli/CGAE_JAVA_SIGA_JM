@@ -540,6 +540,11 @@ public class DesignacionesController {
 		designa.setNombreTurno(item[1]);
 		designa.setIdTurno(Integer.parseInt(item[0]));
 		designa.setNumero(Integer.parseInt(item[2]));
+		
+		if(item.length >= 6) {
+			designa.setIdPersona(item[5]);			
+		}
+		
 		List<ListaContrarioJusticiableItem> response = designacionesService.busquedaListaContrarios(designa, request,
 				Boolean.parseBoolean(item[4]));
 		if (response != null) {
