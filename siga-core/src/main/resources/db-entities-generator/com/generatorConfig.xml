@@ -16,7 +16,7 @@
 		
 		<table schema="USCGAE_INT" tableName="ENV_HISTORICOESTADOENVIO" >
  			<property name="ignoreQualifiersAtRuntime" value="true"/>
- 			<generatedKey column="idhistorico" sqlStatement="SELECT MAX(IDHISTORICO) + 1 from ENV_HISTORICOESTADOENVIO where IDINSTITUCION = #{idinstitucion} AND IDENVIO = #{idenvio}" />
+ 			<generatedKey column="idhistorico" sqlStatement="SELECT NVL(MAX(IDHISTORICO) + 1,1) from ENV_HISTORICOESTADOENVIO where IDINSTITUCION = #{idinstitucion} AND IDENVIO = #{idenvio}" />
  		</table>
 
 	</context>
