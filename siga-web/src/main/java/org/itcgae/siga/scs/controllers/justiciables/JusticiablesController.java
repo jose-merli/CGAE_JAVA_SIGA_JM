@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.controllers.justiciables;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/justiciables")
+@Validated
 public class JusticiablesController {
 
 	@Autowired
@@ -116,7 +119,7 @@ public class JusticiablesController {
 	}
 
 	@RequestMapping(value = "/gestionJusticiables/createJusticiable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> createJusticiable(@RequestBody JusticiableItem justiciableItem,
+	ResponseEntity<InsertResponseDTO> createJusticiable(@Valid @RequestBody JusticiableItem justiciableItem,
 			HttpServletRequest request) {
 
 		InsertResponseDTO response = gestionJusticiableService.createJusticiable(justiciableItem, request);
