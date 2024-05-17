@@ -3,6 +3,7 @@ package org.itcgae.siga.DTOs.scs;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -73,8 +74,17 @@ public class JusticiableItem {
 	private AsuntosJusticiableItem [] datosAsuntos;
 	private boolean validacionRepeticion;
 	private Boolean asociarRepresentante;
-
+	private String direccionExtranjera;
 	
+	@JsonProperty("direccionExtranjera")
+	public String getDireccionExtranjera() {
+		return direccionExtranjera;
+	}
+
+	public void setDireccionExtranjera(String direccionExtranjera) {
+		this.direccionExtranjera = direccionExtranjera;
+	}
+
 	/**
 	 **/
 	public JusticiableItem idPersona(String idPersona) {
@@ -387,11 +397,11 @@ public class JusticiableItem {
 	}
 
 	@JsonProperty("tipopersonajg")
-	public String getTipoPersonajg() {
+	public String getTipoPersonaJG() {
 		return tipoPersonaJG;
 	}
 
-	public void setTipoPersonajg(String tipoPersonajg) {
+	public void setTipoPersonaJG(String tipoPersonajg) {
 		this.tipoPersonaJG = tipoPersonajg;
 	}
 
@@ -1166,6 +1176,7 @@ public class JusticiableItem {
 		result = prime * result + ((telefonos == null) ? 0 : telefonos.hashCode());
 		result = prime * result + ((tipoJusticiable == null) ? 0 : tipoJusticiable.hashCode());
 		result = prime * result + ((tipoPersonaJG == null) ? 0 : tipoPersonaJG.hashCode());
+		result = prime * result + ((direccionExtranjera == null) ? 0 : direccionExtranjera.hashCode());
 		result = prime * result + (validacionRepeticion ? 1231 : 1237);
 		return result;
 	}
@@ -1488,6 +1499,11 @@ public class JusticiableItem {
 				return false;
 		} else if (!tipoPersonaJG.equals(other.tipoPersonaJG))
 			return false;
+		if (direccionExtranjera == null) {
+			if (other.direccionExtranjera != null)
+				return false;
+		} else if (!direccionExtranjera.equals(other.direccionExtranjera))
+			return false;
 		if (validacionRepeticion != other.validacionRepeticion)
 			return false;
 		return true;
@@ -1501,7 +1517,7 @@ public class JusticiableItem {
 				+ ", apellidos=" + apellidos + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", direccion="
 				+ direccion + ", codigoPostal=" + codigoPostal + ", idProfesion=" + idProfesion + ", regimen_conyugal="
 				+ regimen_conyugal + ", idProvincia=" + idProvincia + ", idPoblacion=" + idPoblacion
-				+ ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonajg=" + tipoPersonaJG + ", idTipoIdentificacion="
+				+ ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonaJG=" + tipoPersonaJG + ", idTipoIdentificacion="
 				+ idTipoIdentificacion + ", observaciones=" + observaciones + ", idRepresentantejg=" + idRepresentantejg
 				+ ", idTipoencalidad=" + idTipoencalidad + ", sexo=" + sexo + ", idLenguaje=" + idLenguaje
 				+ ", numeroHijos=" + numeroHijos + ", fax=" + fax + ", correoElectronico=" + correoElectronico
@@ -1518,7 +1534,8 @@ public class JusticiableItem {
 				+ telefonos + ", parentesco=" + parentesco + ", tipoJusticiable=" + tipoJusticiable
 				+ ", checkNoInformadaDireccion=" + checkNoInformadaDireccion + ", datosAsuntos="
 				+ Arrays.toString(datosAsuntos) + ", validacionRepeticion=" + validacionRepeticion
-				+ ", asociarRepresentante=" + asociarRepresentante + "]";
+				+ ", asociarRepresentante=" + asociarRepresentante + ", direccionExtranjera=" + direccionExtranjera
+				+ "]";
 	}
 
 
