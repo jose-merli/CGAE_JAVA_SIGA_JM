@@ -43,9 +43,10 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				" CEN_COLEGIADO COL  ON (PER.IDPERSONA = COL.IDPERSONA AND CLI.IDINSTITUCION = COL.IDINSTITUCION)");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('10','30','40','50')");
 		
-		
 		if (busquedaPerFisicaSearchDTO.isFromDesignaciones()) {
-			sql.WHERE("ESTADOCOLEGIAL.IDESTADO IN ('10','20')");	
+			sql.LEFT_OUTER_JOIN("CEN_DATOSCOLEGIALESESTADO cd ON cd.IDINSTITUCION = col.IDINSTITUCION AND cd.idpersona = col.IDPERSONA"
+					+ " AND cd.FECHAESTADO = (SELECT MAX(FECHAESTADO) FROM CEN_DATOSCOLEGIALESESTADO cd2 WHERE cd2.IDINSTITUCION= col.IDINSTITUCION AND cd2.idpersona = col.IDPERSONA)");
+			sql.WHERE("CD.IDESTADO IN ('10','20')");	
 		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
@@ -160,9 +161,10 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 //				"CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('10','30','40','50')");
 		
-		
 		if (busquedaPerFisicaSearchDTO.isFromDesignaciones()) {
-			sql.WHERE("ESTADOCOLEGIAL.IDESTADO IN ('10','20')");	
+			sql.LEFT_OUTER_JOIN("CEN_DATOSCOLEGIALESESTADO cd ON cd.IDINSTITUCION = col.IDINSTITUCION AND cd.idpersona = col.IDPERSONA"
+					+ " AND cd.FECHAESTADO = (SELECT MAX(FECHAESTADO) FROM CEN_DATOSCOLEGIALESESTADO cd2 WHERE cd2.IDINSTITUCION= col.IDINSTITUCION AND cd2.idpersona = col.IDPERSONA)");
+			sql.WHERE("CD.IDESTADO IN ('10','20')");
 		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
