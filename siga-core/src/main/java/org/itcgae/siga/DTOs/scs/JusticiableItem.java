@@ -17,7 +17,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JusticiableItem {
-	
+
 	@JsonProperty("idpersona")
 	@Size(max = 10)
 	@Pattern(regexp = "\\d+", message = "El id persona debe contener solo números")
@@ -29,7 +29,7 @@ public class JusticiableItem {
 	private String idInstitucion;
 
 	/************** DATOS PERSONALES *****************/
-	
+
 	@JsonProperty("nif")
 	@Size(max = 20)
 	private String nif;
@@ -66,7 +66,7 @@ public class JusticiableItem {
 	@Max(value = 999)
 	@Min(value = 0)
 	private Short edad;
-	
+
 	@JsonProperty("idpais")
 	@Size(max = 3)
 	@Pattern(regexp = "\\d+", message = "La edad debe contener solo números")
@@ -117,7 +117,7 @@ public class JusticiableItem {
 	@JsonProperty("direccion")
 	@Size(max = 100)
 	private String direccion;
-	
+
 	@JsonProperty("direccionExtranjera")
 	private String direccionExtranjera;
 
@@ -199,7 +199,7 @@ public class JusticiableItem {
 	private AsuntosJusticiableItem[] datosAsuntos;
 
 	/****************************************************************** OTROS ****************************************************/
-	
+
 	@JsonProperty("asuntos")
 	private String asuntos;
 
@@ -218,6 +218,350 @@ public class JusticiableItem {
 
 	@JsonProperty("asociarRepresentante")
 	private Boolean asociarRepresentante;
+
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+
+	public String getNif() {
+		return nif;
+	}
+
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+
+	public Short getIdTipoIdentificacion() {
+		return idTipoIdentificacion;
+	}
+
+	public void setIdTipoIdentificacion(Short idTipoIdentificacion) {
+		this.idTipoIdentificacion = idTipoIdentificacion;
+	}
+
+	public String getTipoPersonaJG() {
+		return tipoPersonaJG;
+	}
+
+	public void setTipoPersonaJG(String tipoPersonaJG) {
+		this.tipoPersonaJG = tipoPersonaJG;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getApellido1() {
+		return apellido1;
+	}
+
+	public void setApellido1(String apellido1) {
+		this.apellido1 = apellido1;
+	}
+
+	public String getApellido2() {
+		return apellido2;
+	}
+
+	public void setApellido2(String apellido2) {
+		this.apellido2 = apellido2;
+	}
+
+	public Date getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+
+	public void setFechaNacimiento(Date fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
+
+	public Short getEdad() {
+		return edad;
+	}
+
+	public void setEdad(Short edad) {
+		this.edad = edad;
+	}
+
+	public String getIdPais() {
+		return idPais;
+	}
+
+	public void setIdPais(String idPais) {
+		this.idPais = idPais;
+	}
+
+	public Date getFechaAlta() {
+		return fechaAlta;
+	}
+
+	public void setFechaAlta(Date fechaAlta) {
+		this.fechaAlta = fechaAlta;
+	}
+
+	public String getIdLenguaje() {
+		return idLenguaje;
+	}
+
+	public void setIdLenguaje(String idLenguaje) {
+		this.idLenguaje = idLenguaje;
+	}
+
+	public String getSexo() {
+		return sexo;
+	}
+
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
+	}
+
+	public Short getIdEstadoCivil() {
+		return idEstadoCivil;
+	}
+
+	public void setIdEstadoCivil(Short idEstadoCivil) {
+		this.idEstadoCivil = idEstadoCivil;
+	}
+
+	public String getRegimen_conyugal() {
+		return regimen_conyugal;
+	}
+
+	public void setRegimen_conyugal(String regimen_conyugal) {
+		this.regimen_conyugal = regimen_conyugal;
+	}
+
+	public Short getIdProfesion() {
+		return idProfesion;
+	}
+
+	public void setIdProfesion(Short idProfesion) {
+		this.idProfesion = idProfesion;
+	}
+
+	public Short getIdMinusvalia() {
+		return idMinusvalia;
+	}
+
+	public void setIdMinusvalia(Short idMinusvalia) {
+		this.idMinusvalia = idMinusvalia;
+	}
+
+	public String getIdTipoVia() {
+		return idTipoVia;
+	}
+
+	public void setIdTipoVia(String idTipoVia) {
+		this.idTipoVia = idTipoVia;
+	}
+
+	public String getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public String getDireccionExtranjera() {
+		return direccionExtranjera;
+	}
+
+	public void setDireccionExtranjera(String direccionExtranjera) {
+		this.direccionExtranjera = direccionExtranjera;
+	}
+
+	public String getNumeroDir() {
+		return numeroDir;
+	}
+
+	public void setNumeroDir(String numeroDir) {
+		this.numeroDir = numeroDir;
+	}
+
+	public String getEscaleraDir() {
+		return escaleraDir;
+	}
+
+	public void setEscaleraDir(String escaleraDir) {
+		this.escaleraDir = escaleraDir;
+	}
+
+	public String getPisoDir() {
+		return pisoDir;
+	}
+
+	public void setPisoDir(String pisoDir) {
+		this.pisoDir = pisoDir;
+	}
+
+	public String getPuertaDir() {
+		return puertaDir;
+	}
+
+	public void setPuertaDir(String puertaDir) {
+		this.puertaDir = puertaDir;
+	}
+
+	public String getIdpaisDir1() {
+		return idpaisDir1;
+	}
+
+	public void setIdpaisDir1(String idpaisDir1) {
+		this.idpaisDir1 = idpaisDir1;
+	}
+
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
+
+	public String getIdPoblacion() {
+		return idPoblacion;
+	}
+
+	public void setIdPoblacion(String idPoblacion) {
+		this.idPoblacion = idPoblacion;
+	}
+
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
+
+	public List<JusticiableTelefonoItem> getTelefonos() {
+		return telefonos;
+	}
+
+	public void setTelefonos(List<JusticiableTelefonoItem> telefonos) {
+		this.telefonos = telefonos;
+	}
+
+	public String getAsistidoSolicitajg() {
+		return asistidoSolicitajg;
+	}
+
+	public void setAsistidoSolicitajg(String asistidoSolicitajg) {
+		this.asistidoSolicitajg = asistidoSolicitajg;
+	}
+
+	public String getAsistidoAutorizaeejg() {
+		return asistidoAutorizaeejg;
+	}
+
+	public void setAsistidoAutorizaeejg(String asistidoAutorizaeejg) {
+		this.asistidoAutorizaeejg = asistidoAutorizaeejg;
+	}
+
+	public String getAutorizaAvisoTelematico() {
+		return autorizaAvisoTelematico;
+	}
+
+	public void setAutorizaAvisoTelematico(String autorizaAvisoTelematico) {
+		this.autorizaAvisoTelematico = autorizaAvisoTelematico;
+	}
+
+	public Long getIdRepresentantejg() {
+		return idRepresentantejg;
+	}
+
+	public void setIdRepresentantejg(Long idRepresentantejg) {
+		this.idRepresentantejg = idRepresentantejg;
+	}
+
+	public AsuntosJusticiableItem[] getDatosAsuntos() {
+		return datosAsuntos;
+	}
+
+	public void setDatosAsuntos(AsuntosJusticiableItem[] datosAsuntos) {
+		this.datosAsuntos = datosAsuntos;
+	}
+
+	public String getAsuntos() {
+		return asuntos;
+	}
+
+	public void setAsuntos(String asuntos) {
+		this.asuntos = asuntos;
+	}
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+	public String getTipoJusticiable() {
+		return tipoJusticiable;
+	}
+
+	public void setTipoJusticiable(String tipoJusticiable) {
+		this.tipoJusticiable = tipoJusticiable;
+	}
+
+	public boolean isValidacionRepeticion() {
+		return validacionRepeticion;
+	}
+
+	public void setValidacionRepeticion(boolean validacionRepeticion) {
+		this.validacionRepeticion = validacionRepeticion;
+	}
+
+	public Boolean getAsociarRepresentante() {
+		return asociarRepresentante;
+	}
+
+	public void setAsociarRepresentante(Boolean asociarRepresentante) {
+		this.asociarRepresentante = asociarRepresentante;
+	}
 
 	@Override
 	public int hashCode() {
