@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -11,141 +14,206 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
-public class JusticiableItem {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class JusticiableItem {
+	
+	@JsonProperty("idpersona")
+	@Size(max = 10)
+	@Pattern(regexp = "\\d+", message = "El id persona debe contener solo números")
 	private String idPersona;
 
+	@JsonProperty("idinstitucion")
+	@Size(max = 4)
+	@Pattern(regexp = "\\d+", message = "El id institucion debe contener solo números")
 	private String idInstitucion;
 
 	/************** DATOS PERSONALES *****************/
-
+	
+	@JsonProperty("nif")
 	@Size(max = 20)
 	private String nif;
 
-	@Pattern(regexp = "\\d+", message = "El tipo de identificacion debe contener solo números")
+	@JsonProperty("idtipoidentificacion")
+	@Max(value = 99)
+	@Min(value = 0)
 	private Short idTipoIdentificacion;
 
+	@JsonProperty("tipopersonajg")
+	@Size(max = 1)
 	@NotBlank(message = "El tipo persona del justiciable no puede estar en blanco")
 	@Pattern(regexp = "[FJ]", message = "El tipo persona debe ser F o J")
 	private String tipoPersonaJG;
 
+	@JsonProperty("nombre")
 	@NotBlank(message = "El nombre del justiciable no puede estar en blanco")
 	@Size(max = 100)
 	private String nombre;
 
+	@JsonProperty("apellido1")
 	@NotBlank(message = "El primer apellido del justiciable no puede estar en blanco")
 	@Size(max = 100)
 	private String apellido1;
 
+	@JsonProperty("apellido2")
 	@Size(max = 100)
 	private String apellido2;
 
+	@JsonProperty("fechanacimiento")
 	private Date fechaNacimiento;
 
-	@Size(max = 3)
-	@Pattern(regexp = "\\d+", message = "La edad debe contener solo números")
+	@JsonProperty("edad")
+	@Max(value = 999)
+	@Min(value = 0)
 	private Short edad;
-
+	
+	@JsonProperty("idpais")
+	@Size(max = 3)
 	@Pattern(regexp = "\\d+", message = "La edad debe contener solo números")
 	private String idPais;
 
+	@JsonProperty("fechaalta")
 	@NotNull(message = "La fecha de alta del justiciable no puede estar en blanco")
 	private Date fechaAlta;
 
+	@JsonProperty("idlenguaje")
+	@Size(max = 3)
 	@Pattern(regexp = "\\d+", message = "El id de lenguaje debe contener solo números")
 	private String idLenguaje;
 
+	@JsonProperty("sexo")
+	@Size(max = 1)
 	@NotBlank(message = "El sexo del justiciable no puede estar en blanco")
 	@Pattern(regexp = "[HMN]", message = "El sexo debe ser H, M o N")
 	private String sexo;
 
-	@Pattern(regexp = "\\d+", message = "El estado civil debe contener solo números")
+	@JsonProperty("idestadocivil")
+	@Max(value = 99)
+	@Min(value = 0)
 	private Short idEstadoCivil;
 
+	@JsonProperty("regimenConyugal")
+	@Size(max = 1)
 	@Pattern(regexp = "[IGS]", message = "El regimen conyungal debe ser I, G o S")
 	private String regimen_conyugal;
 
-	@Pattern(regexp = "\\d+", message = "El id de profesión debe contener solo números")
+	@JsonProperty("idprofesion")
+	@Max(value = 999)
+	@Min(value = 0)
 	private Short idProfesion;
 
-	@Pattern(regexp = "\\d+", message = "La id minusvalia contener solo números")
+	@JsonProperty("idminusvalia")
+	@Max(value = 999)
+	@Min(value = 0)
 	private Short idMinusvalia;
 
 	/************** DATOS DE CONTACTO *****************/
 
+	@JsonProperty("idtipovia")
+	@Size(max = 3)
 	@Pattern(regexp = "\\d+", message = "El id del tipo via debe contener solo números")
 	private String idTipoVia;
 
+	@JsonProperty("direccion")
 	@Size(max = 100)
 	private String direccion;
 
+	@JsonProperty("numerodir")
 	@Size(max = 10)
 	private String numeroDir;
 
+	@JsonProperty("escaleradir")
 	@Size(max = 10)
 	private String escaleraDir;
 
+	@JsonProperty("pisodir")
 	@Size(max = 10)
 	private String pisoDir;
 
+	@JsonProperty("puertadir")
 	@Size(max = 10)
 	private String puertaDir;
 
+	@JsonProperty("idpaisdir1")
 	@Size(max = 10)
 	@NotBlank(message = "El pais del justiciable no puede estar en blanco")
 	private String idpaisDir1;
 
+	@JsonProperty("codigopostal")
 	@Pattern(regexp = "\\d+", message = "El código postal debe contener solo números")
 	@Size(max = 5)
 	private String codigoPostal;
 
+	@JsonProperty("idprovincia")
+	@Size(max = 2)
 	@Pattern(regexp = "\\d+", message = "El idprovincia debe contener solo números")
 	private String idProvincia;
 
+	@JsonProperty("idpoblacion")
+	@Size(max = 10)
 	@Pattern(regexp = "\\d+", message = "El id poblacion debe contener solo números")
 	private String idPoblacion;
 
+	@JsonProperty("correoelectronico")
+	@Size(max = 100)
 	@Email(message = "Debe ser una dirección de correo electrónico válida")
 	private String correoElectronico;
 
+	@JsonProperty("fax")
 	@Size(max = 20)
-	@Pattern(regexp = "/^(\\(\\+[0-9]{2}\\)|[0-9]{4})?[ ]?[0-9]{9}$/", message = "El id poblacion debe contener solo números")
+	@Pattern(regexp = "^(\\(\\+[0-9]{2}\\)|[0-9]{4})?[ ]?[0-9]{9}$", message = "El fax formato no valido")
 	private String fax;
 
+	@JsonProperty("telefonos")
+	@Valid
 	private List<JusticiableTelefonoItem> telefonos;
 
 	/************** DATOS DE SOLICITUD *****************/
 
+	@JsonProperty("asistidosolicitajg")
+	@Size(max = 1)
 	@Pattern(regexp = "[01]")
 	private String asistidoSolicitajg;
 
+	@JsonProperty("asistidoautorizaeejg")
+	@Size(max = 1)
 	@Pattern(regexp = "[01]")
 	private String asistidoAutorizaeejg;
 
+	@JsonProperty("autorizaavisotelematico")
+	@Size(max = 1)
 	@Pattern(regexp = "[01]")
 	private String autorizaAvisoTelematico;
 
 	/*************** DATOS REPRESENTANTE *******************/
 
+	@JsonProperty("idrepresentantejg")
 	private Long idRepresentantejg;
 
 	/************** ASUNTO ******************************/
 
+	@JsonProperty("datosAsuntos")
 	private AsuntosJusticiableItem[] datosAsuntos;
 
 	/****************************************************************** OTROS ****************************************************/
-
+	
+	@JsonProperty("asuntos")
 	private String asuntos;
 
+	@JsonProperty("fechamodificacion")
 	private Date fechaModificacion;
 
+	@JsonProperty("apellidos")
 	private String apellidos;
 
+	@JsonProperty("tipojusticiable")
 	private String tipoJusticiable;
 
+	@JsonProperty("validacionRepeticion")
 	@NotNull()
 	private boolean validacionRepeticion;
 
+	@JsonProperty("asociarRepresentante")
 	private Boolean asociarRepresentante;
 
 	// private String observaciones;
