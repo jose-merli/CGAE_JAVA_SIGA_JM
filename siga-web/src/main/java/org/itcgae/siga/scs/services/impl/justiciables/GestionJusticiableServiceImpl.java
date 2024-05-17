@@ -497,6 +497,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		justiciableItem.setIdPais(personajg.getIdpais());
 
+		justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
+
 		if (personajg.getIdpersona() != null) {
 			justiciableItem.setIdPersona(String.valueOf(personajg.getIdpersona()));
 		}
@@ -523,6 +525,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		justiciableItem.setTipoPersonaJG(personajg.getTipopersonajg());
 
 		justiciableItem.setFechaAlta(personajg.getFechaalta());
+		justiciableItem.setDireccionExtranjera(personajg.getDireccionextranjera());
 
 		// justiciableItem.setNumeroHijos(personajg.getNumerohijos());
 		// justiciableItem.setObservaciones(personajg.getObservaciones());
@@ -777,10 +780,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			scsPersonajg.setIdpais(justiciableItem.getIdPais());
 
-			// if (justiciableItem.getIdPersona() != null && justiciableItem.getIdPersona()
-			// != "") {
-			// scsPersonajg.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
-			// }
+			scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
 
 			scsPersonajg.setIdpoblacion(justiciableItem.getIdPoblacion());
 
@@ -843,6 +843,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		}
 
 		scsPersonajg.setFechamodificacion(new Date());
+		scsPersonajg.setDireccionextranjera(justiciableItem.getDireccionExtranjera());
 
 		return scsPersonajg;
 	}
@@ -932,27 +933,28 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						LOGGER.info("updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para buscar al justiciable a editar");
 
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
-						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(new ScsPersonajg(), datosGenerales, idInstitucion, justiciableItem);
-						justiciable.setUsumodificacion(usuario.getIdusuario());
-						justiciable.setFechamodificacion(new Date());
+						ScsPersonajg personaJgJusticiable = fillScsPersonasjsOfJusticiableItem(new ScsPersonajg(), datosGenerales, idInstitucion, justiciableItem);
+						personaJgJusticiable.setUsumodificacion(usuario.getIdusuario());
+						personaJgJusticiable.setFechamodificacion(new Date());
 						if (justiciableItem.getDireccion() != null) {
 							scsPersonajg.setExistedomicilio("S");
 						}
-						scsPersonajg.setIdtipovia(justiciable.getIdtipovia());
-						scsPersonajg.setDireccion(justiciable.getDireccion());
-						scsPersonajg.setNumerodir(justiciable.getNumerodir());
-						scsPersonajg.setEscaleradir(justiciable.getEscaleradir());
-						scsPersonajg.setPisodir(justiciable.getPisodir());
-						scsPersonajg.setPuertadir(justiciable.getPuertadir());
-						scsPersonajg.setIdpais(justiciable.getIdpais());
-						scsPersonajg.setIdpaisdir1(justiciable.getIdpaisdir1());
-						scsPersonajg.setIdpaisdir2(justiciable.getIdpaisdir2());
-						scsPersonajg.setCodigopostal(justiciable.getCodigopostal());
-						scsPersonajg.setIdprovincia(justiciable.getIdprovincia());
-						scsPersonajg.setIdpoblacion(justiciable.getIdpoblacion());
-						scsPersonajg.setCorreoelectronico(justiciable.getCorreoelectronico());
-						scsPersonajg.setFax(justiciable.getFax());
-						scsPersonajg.setFechamodificacion(justiciable.getFechamodificacion());
+						scsPersonajg.setIdtipovia(personaJgJusticiable.getIdtipovia());
+						scsPersonajg.setDireccion(personaJgJusticiable.getDireccion());
+						scsPersonajg.setNumerodir(personaJgJusticiable.getNumerodir());
+						scsPersonajg.setEscaleradir(personaJgJusticiable.getEscaleradir());
+						scsPersonajg.setPisodir(personaJgJusticiable.getPisodir());
+						scsPersonajg.setPuertadir(personaJgJusticiable.getPuertadir());
+						scsPersonajg.setIdpais(personaJgJusticiable.getIdpais());
+						scsPersonajg.setIdpaisdir1(personaJgJusticiable.getIdpaisdir1());
+						scsPersonajg.setIdpaisdir2(personaJgJusticiable.getIdpaisdir2());
+						scsPersonajg.setCodigopostal(personaJgJusticiable.getCodigopostal());
+						scsPersonajg.setIdprovincia(personaJgJusticiable.getIdprovincia());
+						scsPersonajg.setIdpoblacion(personaJgJusticiable.getIdpoblacion());
+						scsPersonajg.setCorreoelectronico(personaJgJusticiable.getCorreoelectronico());
+						scsPersonajg.setFax(personaJgJusticiable.getFax());
+						scsPersonajg.setFechamodificacion(personaJgJusticiable.getFechamodificacion());
+						scsPersonajg.setDireccionextranjera(personaJgJusticiable.getDireccionextranjera());
 
 						response = scsPersonajgExtendsMapper.updateByPrimaryKey(scsPersonajg);
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
