@@ -791,6 +791,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							response = scsProcedimientosExtendsMapper.deleteByPrimaryKey(modulo);
 						}else if(modulosDTO.getBaja().equals("reactivar")) {
 							modulo.setFechahastavigor(null);
+							modulo.setFechabaja(null);
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 						}
 						
