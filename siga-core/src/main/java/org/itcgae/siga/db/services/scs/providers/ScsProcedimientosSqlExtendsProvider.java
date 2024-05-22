@@ -154,12 +154,6 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		}
 
 		if (!moduloItem.isHistorico()) {
-			if (moduloItem.isVerSoloAlta()) {
-				sql.WHERE("(procedimiento.fechadesdevigor <= sysdate AND procedimiento.fechahastavigor is null)");
-			} else {
-				sql.WHERE(
-						"(procedimiento.fechadesdevigor <= sysdate AND (procedimiento.FECHAHASTAVIGOR > sysdate OR procedimiento.fechahastavigor is null))");
-			}
 
 			sql.WHERE("(procedimiento.fechabaja is null)");
 		}
