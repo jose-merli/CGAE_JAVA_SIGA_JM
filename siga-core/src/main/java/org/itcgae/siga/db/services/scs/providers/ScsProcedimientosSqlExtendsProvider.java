@@ -86,7 +86,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 							+ idioma + "')");
 			;
 
-			sql2.WHERE("proc.idinstitucion = '" + moduloItem.getidInstitucion() + "'");
+			sql2.WHERE("proc.idinstitucion = '" + moduloItem.getIdInstitucion() + "'");
 
 			if (!moduloItem.isHistorico()) {
 				sql2.WHERE(
@@ -120,7 +120,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 
 		sql.FROM("SCS_PROCEDIMIENTOS PROCEDIMIENTO");
 
-		sql.WHERE("procedimiento.idinstitucion = '" + moduloItem.getidInstitucion() + "'");
+		sql.WHERE("procedimiento.idinstitucion = '" + moduloItem.getIdInstitucion() + "'");
 
 		sql.LEFT_OUTER_JOIN(
 				"SCS_PRETENSIONESPROCED prepro on (prepro.idprocedimiento = procedimiento.idprocedimiento AND PREPRO.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");

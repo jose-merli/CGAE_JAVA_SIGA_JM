@@ -170,7 +170,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Entrada a scsProcedimientosMapper para obtener los modulos");
-				modulosItem.setidInstitucion(idInstitucion.toString());
+				modulosItem.setIdInstitucion(idInstitucion.toString());
 				
 				modulosItem.setNombre(UtilidadesString.tratamientoApostrofes(modulosItem.getNombre()));
 				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem, usuarios.get(0).getIdlenguaje(), null);
@@ -216,7 +216,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Entrada a scsProcedimientosMapper para obtener los modulos");
-				modulosJuzgadoItem.getModulo().setidInstitucion(idInstitucion.toString());
+				modulosJuzgadoItem.getModulo().setIdInstitucion(idInstitucion.toString());
 				
 				modulosJuzgadoItem.getModulo().setNombre(UtilidadesString.tratamientoApostrofes(modulosJuzgadoItem.getModulo().getNombre()));
 				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosJuzgadoItem.getModulo(), usuarios.get(0).getIdlenguaje(), modulosJuzgadoItem.getIdJuzgado());
@@ -1063,7 +1063,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 				ModulosItem moduloItem = new ModulosItem();
 				moduloItem.setIdProcedimiento(idProcedimiento);
-				moduloItem.setidInstitucion(idInstitucion.toString());
+				moduloItem.setIdInstitucion(idInstitucion.toString());
 				
 				acreditaciones = scsAcreditacionExtendsMapper.searchAcreditaciones(moduloItem);
 

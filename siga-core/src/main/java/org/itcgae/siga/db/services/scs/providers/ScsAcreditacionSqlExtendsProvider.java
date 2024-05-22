@@ -22,7 +22,7 @@ public class ScsAcreditacionSqlExtendsProvider extends ScsAcreditacionSqlProvide
 		sql.INNER_JOIN("SCS_ACREDITACIONPROCEDIMIENTO acre on acre.idacreditacion = acreditacion.idacreditacion");
 		
 		sql.WHERE("idprocedimiento = '" + modulosItem.getIdProcedimiento() + "'");
-		sql.WHERE("idInstitucion = '" + modulosItem.getidInstitucion() + "'");
+		sql.WHERE("idInstitucion = '" + modulosItem.getIdInstitucion() + "'");
 
 		sql.ORDER_BY("descripcion");
 	
