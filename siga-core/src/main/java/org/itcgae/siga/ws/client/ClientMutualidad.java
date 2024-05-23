@@ -50,14 +50,14 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
 		    MutualidadClient client = context.getBean(MutualidadClient.class);
-		    EstadoMutualistaResponseDocument responsefinal = client.getEstadoMutualista(request);
+		    EstadoMutualistaResponseDocument responsefinal = client.getEstadoMutualista(uriService,request);
 		        
 			
 			IntegracionSolicitudRespuesta estadoMutualista = responsefinal.getEstadoMutualistaResponse().getEstadoMutualistaResult();
 			
 			return estadoMutualista;
 		}catch(Exception e) {
-			logger.error("ClienteMutualidad -> Error al obtener el Estado Mutualista");
+			logger.error("ClienteMutualidad -> Error al obtener el Estado Mutualista", e);
 			return null;
 		}
 		
@@ -69,7 +69,7 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
 		    MutualidadClient client = context.getBean(MutualidadClient.class);
-		    EstadoSolicitudResponseDocument responsefinal = client.getEstadoSolicitud(request);
+		    EstadoSolicitudResponseDocument responsefinal = client.getEstadoSolicitud(uriService, request);
 		
 	
 			
@@ -77,7 +77,7 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 			
 			return estadoSolicitud;
 		}catch(Exception e) {
-			logger.error("ClienteMutualidad -> Error al obtener el Estado Solicitud");
+			logger.error("ClienteMutualidad -> Error al obtener el Estado Solicitud", e);
 			return null;
 		}
 		
@@ -89,13 +89,13 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
 			MutualidadClient client = context.getBean(MutualidadClient.class);
-		    GetEnumsResponseDocument responsefinal = client.getMutualidad(request);
+		    GetEnumsResponseDocument responsefinal = client.getMutualidad(uriService, request);
 		        
 			
 			IntegracionEnumsCombos enumCombos = responsefinal.getGetEnumsResponse().getGetEnumsResult();
 			return enumCombos;
 		}catch (Exception e) {
-			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos");
+			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos", e);
 		}
 		
 	}
@@ -108,14 +108,14 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
 			MutualidadClient client = context.getBean(MutualidadClient.class);
-		    MGASolicitudPolizaAccuGratuitosResponseDocument responsefinal = client.mGASolicitudPolizaAccuGratuitos(request);
+		    MGASolicitudPolizaAccuGratuitosResponseDocument responsefinal = client.mGASolicitudPolizaAccuGratuitos(uriService, request);
 		        
 			IntegracionSolicitudRespuesta response = responsefinal.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
 			
 			return response;
 
 		}catch (Exception e) {
-			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos");
+			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos", e);
 		}
 
 		
@@ -128,14 +128,14 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
 			MutualidadClient client = context.getBean(MutualidadClient.class);
-		    MGASolicitudPolizaProfesionalResponseDocument responsefinal = client.mGASolicitudPolizaProfesional(request);
+		    MGASolicitudPolizaProfesionalResponseDocument responsefinal = client.mGASolicitudPolizaProfesional(uriService, request);
 		        
 			IntegracionSolicitudRespuesta response = responsefinal.getMGASolicitudPolizaProfesionalResponse().getMGASolicitudPolizaProfesionalResult();
 			
 			return response;
 
 		}catch (Exception e) {
-			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos");
+			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos", e);
 		}
 		
 	}
@@ -148,13 +148,13 @@ public class ClientMutualidad extends  WebServiceGatewaySupport  {
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(WebServiceClientConfig.class))
 		{
 		    MutualidadClient client = context.getBean(MutualidadClient.class);
-		    ObtenerCuotaYCapObjetivoResponseDocument responsefinal = client.getCuotaYCapObjetivo(request);
+		    ObtenerCuotaYCapObjetivoResponseDocument responsefinal = client.getCuotaYCapObjetivo(uriService, request);
 		        
 			
 			IntegracionCuotaYCapitalObjetivoJubilacion enumCuotaCapital = responsefinal.getObtenerCuotaYCapObjetivoResponse().getObtenerCuotaYCapObjetivoResult();
 			return enumCuotaCapital;
 		}catch (Exception e) {
-			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos");
+			throw new Exception("Imposible comunicar con la mutualidad en estos momentos. Inténtelo de nuevo en unos minutos", e);
 		}
 		
 	}

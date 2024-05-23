@@ -26,10 +26,10 @@ import org.itcgae.siga.db.entities.PysColaSuscripcionesAutoExample;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.entities.PysServiciosinstitucionExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
-import org.itcgae.siga.db.mappers.PysColaSuscripcionesAutoMapper;
 import org.itcgae.siga.db.mappers.PysSuscripcionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
+import org.itcgae.siga.db.services.fac.mappers.PysColaSuscripcionesAutoExtendsMapper;
 import org.itcgae.siga.db.services.fac.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMapper;
 import org.itcgae.siga.fac.services.ISuscripcionServiciosService;
@@ -69,7 +69,7 @@ public class SuscripcionServiciosServiceImpl implements ISuscripcionServiciosSer
 	private EjecucionPlsServicios ejecucionPlsServicios;
 	
 	@Autowired
-	private PysColaSuscripcionesAutoMapper pysColaSuscripcionesAutoMapper;
+	private PysColaSuscripcionesAutoExtendsMapper pysColaSuscripcionesAutoMapper;
 
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;

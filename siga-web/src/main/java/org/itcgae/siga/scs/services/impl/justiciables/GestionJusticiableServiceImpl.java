@@ -1,10 +1,7 @@
 package org.itcgae.siga.scs.services.impl.justiciables;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.fac.ScsPersonaJGBean;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
@@ -36,8 +32,6 @@ import org.itcgae.siga.DTOs.scs.JusticiableItem;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoDTO;
 import org.itcgae.siga.DTOs.scs.JusticiableTelefonoItem;
 import org.itcgae.siga.DTOs.scs.ScsUnidadfamiliarejgDTO;
-import org.itcgae.siga.DTOs.scs.TurnosItem;
-import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGDTO;
 import org.itcgae.siga.DTOs.scs.UnidadFamiliarEJGItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -50,15 +44,10 @@ import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.ScsAsistencia;
 import org.itcgae.siga.db.entities.ScsAsistenciaExample;
 import org.itcgae.siga.db.entities.ScsDefendidosdesigna;
-import org.itcgae.siga.db.entities.ScsDefendidosdesignaKey;
-import org.itcgae.siga.db.entities.ScsDesigna;
-import org.itcgae.siga.db.entities.ScsDesignaExample;
-import org.itcgae.siga.db.entities.ScsDesignaKey;
 import org.itcgae.siga.db.entities.ScsEjg;
 import org.itcgae.siga.db.entities.ScsEjgExample;
 import org.itcgae.siga.db.entities.ScsEjgKey;
 import org.itcgae.siga.db.entities.ScsEjgWithBLOBs;
-import org.itcgae.siga.db.entities.ScsEjgdesigna;
 import org.itcgae.siga.db.entities.ScsPersonajg;
 import org.itcgae.siga.db.entities.ScsPersonajgExample;
 import org.itcgae.siga.db.entities.ScsPersonajgKey;
@@ -73,7 +62,6 @@ import org.itcgae.siga.db.entities.ScsUnidadfamiliarejgKey;
 import org.itcgae.siga.db.mappers.ScsAsistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsDefendidosDesignaMapperExtends;
 import org.itcgae.siga.db.mappers.ScsDefendidosdesignaMapper;
-import org.itcgae.siga.db.mappers.ScsDesignaMapper;
 import org.itcgae.siga.db.mappers.ScsEjgMapper;
 import org.itcgae.siga.db.mappers.ScsPersonajgMapper;
 import org.itcgae.siga.db.mappers.ScsUnidadfamiliarejgMapper;
@@ -179,10 +167,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	@Autowired
 	private ScsDefendidosDesignaMapperExtends scsDefendidosDesignaMapperExtends;
-	
+
 	@Autowired
 	private ScsAsistenciaMapper ScsAsistenciaMapper;
-	
+
 	@Autowired
 	private GestionEJGServiceImpl gestionEJGService;
 
@@ -212,24 +200,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getMinusvalia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getMinusvalia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getMinusvalia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getMinusvalia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				LOGGER.info(
-						"getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Entrada a scsMinusvaliaExtendsMapper para obtener minusvalias");
+				LOGGER.info("getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Entrada a scsMinusvaliaExtendsMapper para obtener minusvalias");
 
-				List<ComboItem> comboItems = scsMinusvaliaExtendsMapper.getMinusvalias(idInstitucion,
-						usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsMinusvaliaExtendsMapper.getMinusvalias(idInstitucion, usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info(
-						"getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Salida a scsMinusvaliaExtendsMapper para obtener minusvalias");
+				LOGGER.info("getMinusvalia() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Salida a scsMinusvaliaExtendsMapper para obtener minusvalias");
 
 				combo.setCombooItems(comboItems);
 			}
@@ -253,24 +236,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getGruposLaborales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getGruposLaborales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getGruposLaborales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getGruposLaborales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				LOGGER.info(
-						"getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Entrada a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
+				LOGGER.info("getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Entrada a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
 
-				List<ComboItem> comboItems = scsTipoGrupoLaboralExtendsMapper.getGruposLaborales(idInstitucion,
-						usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsTipoGrupoLaboralExtendsMapper.getGruposLaborales(idInstitucion, usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info(
-						"getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Salida a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
+				LOGGER.info("getGruposLaborales() / scsTipoGrupoLaboralExtendsMapper.getGruposLaborales() -> Salida a scsTipoGrupoLaboralExtendsMapper para obtener grupos laborales");
 
 				combo.setCombooItems(comboItems);
 			}
@@ -294,24 +272,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getParentesco() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getParentesco() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getParentesco() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getParentesco() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				LOGGER.info(
-						"getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo parentesco");
+				LOGGER.info("getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo parentesco");
 
-				List<ComboItem> comboItems = scsParentescoExtendsMapper.getParentesco(idInstitucion,
-						usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsParentescoExtendsMapper.getParentesco(idInstitucion, usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info(
-						"getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo parentesco");
+				LOGGER.info("getParentesco() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo parentesco");
 
 				combo.setCombooItems(comboItems);
 			}
@@ -335,24 +308,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getTipoIngresos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getTipoIngresos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getTipoIngresos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getTipoIngresos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				LOGGER.info(
-						"getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo tipoIngresos");
+				LOGGER.info("getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Entrada a scsParentescoExtendsMapper para obtener combo tipoIngresos");
 
-				List<ComboItem> comboItems = scsTipoIngresoExtendsMapper
-						.getTiposIngresos(usuarios.get(0).getIdlenguaje());
+				List<ComboItem> comboItems = scsTipoIngresoExtendsMapper.getTiposIngresos(usuarios.get(0).getIdlenguaje());
 
-				LOGGER.info(
-						"getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo tipoIngresos");
+				LOGGER.info("getTipoIngresos() / scsParentescoExtendsMapper.getParentesco() -> Salida a scsParentescoExtendsMapper para obtener combo tipoIngresos");
 
 				combo.setCombooItems(comboItems);
 			}
@@ -376,25 +344,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getProfesiones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getProfesiones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getProfesiones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getProfesiones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
 
-				LOGGER.info(
-						"getProfesiones() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Entrada a scsMinusvaliaExtendsMapper para obtener minusvalias");
+				LOGGER.info("getProfesiones() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Entrada a scsMinusvaliaExtendsMapper para obtener minusvalias");
 
 				List<ComboItem> comboItems = scsProfesionExtendsMapper.getProfesiones(usuario.getIdlenguaje());
 
-				LOGGER.info(
-						"getProfesiones() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Salida a scsMinusvaliaExtendsMapper para obtener minusvalias");
+				LOGGER.info("getProfesiones() / scsMinusvaliaExtendsMapper.getJurisdicciones() -> Salida a scsMinusvaliaExtendsMapper para obtener minusvalias");
 
 				combo.setCombooItems(comboItems);
 			}
@@ -405,8 +369,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	@Override
-	public JusticiableDTO searchJusticiable(JusticiableBusquedaItem justiciableBusquedaItem,
-			HttpServletRequest request) {
+	public JusticiableDTO searchJusticiable(JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request) {
 
 		LOGGER.info("searchJusticiable() -> Entrada al servicio para obtener los justiciables");
 
@@ -436,14 +399,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					LOGGER.info("searchJusticiable() / scsPersonajgExtendsMapper.searchJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
 
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-					scsPersonajgExample.createCriteria()
-							.andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()))
-							.andIdinstitucionEqualTo(Short.valueOf(justiciableBusquedaItem.getIdInstitucion()));
+					scsPersonajgExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona())).andIdinstitucionEqualTo(Short.valueOf(justiciableBusquedaItem.getIdInstitucion()));
 
 					personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
 
-					LOGGER.info(
-							"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
+					LOGGER.info("searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
 
 					if (personajgList != null && personajgList.size() > 0) {
 
@@ -451,8 +411,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						JusticiableItem justiciable = fillJusticiableItemOfScsPersonasjg(personajg);
 
-						LOGGER.info(
-								"searchJusticiable() / scsTelefonospersonaMapper.selectByExample() -> Entrada a scsTelefonospersonaMapper para obtener los telefonos del justiciables");
+						LOGGER.info("searchJusticiable() / scsTelefonospersonaMapper.selectByExample() -> Entrada a scsTelefonospersonaMapper para obtener los telefonos del justiciables");
 
 						ScsTelefonospersonaExample scsTelefonospersonaExamples = new ScsTelefonospersonaExample();
 						scsTelefonospersonaExamples.createCriteria().andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona())).andIdinstitucionEqualTo(Short.valueOf(justiciableBusquedaItem.getIdInstitucion()));
@@ -499,21 +458,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		JusticiableItem justiciableItem = new JusticiableItem();
 
 		justiciableItem.setApellido1(personajg.getApellido1());
-		if(personajg.getApellido2() == null) {
-			justiciableItem.setApellido2(" ");
-		}else {
+		if (personajg.getApellido2() == null) {
+			justiciableItem.setApellido2("");
+		} else {
 			justiciableItem.setApellido2(personajg.getApellido2());
 		}
-		
 
-		String apellidos = "";
-
-		if (personajg.getApellido1() != null) {
-			apellidos += personajg.getApellido1() + " ";
-		}
-
-		if (personajg.getApellido2() != null &&  !personajg.getApellido2().equalsIgnoreCase(" ")) {
-			apellidos += personajg.getApellido2();
+		String apellidos = personajg.getApellido1();
+		if (personajg.getApellido2() != null && !personajg.getApellido2().equalsIgnoreCase(" ")) {
+			apellidos = apellidos + " " + personajg.getApellido2();
 		}
 
 		justiciableItem.setApellidos(apellidos);
@@ -521,20 +474,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		justiciableItem.setAsistidoSolicitajg(personajg.getAsistidosolicitajg());
 		justiciableItem.setAutorizaAvisoTelematico(personajg.getAutorizaavisotelematico());
 		justiciableItem.setAutorizaAvisoTelematico(personajg.getAutorizaavisotelematico());
-		justiciableItem.setCnae(personajg.getCnae());
 		justiciableItem.setCodigoPostal(personajg.getCodigopostal());
-		justiciableItem.setCodigoPostal2(personajg.getCodigopostal2());
 		justiciableItem.setCorreoElectronico(personajg.getCorreoelectronico());
-		justiciableItem.setDescPaisDir1(personajg.getDescpaisdir1());
-		justiciableItem.setDescPaisDir2(personajg.getDescpaisdir2());
 		justiciableItem.setDireccion(personajg.getDireccion());
-		justiciableItem.setDireccion2(personajg.getDireccion2());
 
 		justiciableItem.setEdad(personajg.getEdad());
 
 		justiciableItem.setEscaleraDir(personajg.getEscaleradir());
-		justiciableItem.setEscaleraDir2(personajg.getEscaleradir2());
-		justiciableItem.setExisteDomicilio(personajg.getExistedomicilio());
 		justiciableItem.setFax(personajg.getFax());
 		justiciableItem.setFechaModificacion(new Date());
 		justiciableItem.setFechaNacimiento(personajg.getFechanacimiento());
@@ -551,56 +497,62 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		justiciableItem.setIdPais(personajg.getIdpais());
 
-		// justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
-		// justiciableItem.setIdpaisDir2(personajg.getIdpaisdir2());
+		justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
 
 		if (personajg.getIdpersona() != null) {
 			justiciableItem.setIdPersona(String.valueOf(personajg.getIdpersona()));
 		}
 
 		justiciableItem.setIdPoblacion(personajg.getIdpoblacion());
-		justiciableItem.setIdPoblacion2(personajg.getIdpoblacion2());
 
 		justiciableItem.setIdProfesion(personajg.getIdprofesion());
 
 		justiciableItem.setIdProvincia(personajg.getIdprovincia());
-		justiciableItem.setIdProvincia2(personajg.getIdprovincia2());
 
 		justiciableItem.setIdRepresentantejg(personajg.getIdrepresentantejg());
 
-		justiciableItem.setIdTipodir(personajg.getIdtipodir());
-		justiciableItem.setIdTipodir2(personajg.getIdtipodir2());
-
-		justiciableItem.setIdTipoencalidad(personajg.getIdtipoencalidad());
-
 		justiciableItem.setIdTipoIdentificacion(personajg.getIdtipoidentificacion());
 
-		justiciableItem.setIdTipoIdentificacionotros(personajg.getIdtipoidentificacionotros());
 		justiciableItem.setIdTipoVia(personajg.getIdtipovia());
-		justiciableItem.setIdTipoVia2(personajg.getIdtipovia2());
 		justiciableItem.setNif(personajg.getNif());
 		justiciableItem.setNombre(personajg.getNombre());
 		justiciableItem.setNumeroDir(personajg.getNumerodir());
-		justiciableItem.setNumeroDir2(personajg.getNumerodir2());
 
-		justiciableItem.setNumeroHijos(personajg.getNumerohijos());
-
-		justiciableItem.setObservaciones(personajg.getObservaciones());
 		justiciableItem.setPisoDir(personajg.getPisodir());
-		justiciableItem.setPisoDir2(personajg.getPisodir2());
 		justiciableItem.setPuertaDir(personajg.getPuertadir());
-		justiciableItem.setPuertaDir2(personajg.getPuertadir2());
 		justiciableItem.setRegimen_conyugal(personajg.getRegimenConyugal());
 		justiciableItem.setSexo(personajg.getSexo());
-		justiciableItem.setTipoPersonajg(personajg.getTipopersonajg());
+		justiciableItem.setTipoPersonaJG(personajg.getTipopersonajg());
 
 		justiciableItem.setFechaAlta(personajg.getFechaalta());
+		justiciableItem.setDireccionExtranjera(personajg.getDireccionextranjera());
+
+		// justiciableItem.setNumeroHijos(personajg.getNumerohijos());
+		// justiciableItem.setObservaciones(personajg.getObservaciones());
+		// justiciableItem.setCnae(personajg.getCnae());
+		// justiciableItem.setDescPaisDir1(personajg.getDescpaisdir1());
+		// justiciableItem.setExisteDomicilio(personajg.getExistedomicilio());
+		// justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
+		// justiciableItem.setIdpaisDir2(personajg.getIdpaisdir2());
+		// justiciableItem.setIdTipodir(personajg.getIdtipodir());
+		// justiciableItem.setIdTipoencalidad(personajg.getIdtipoencalidad());
+		// justiciableItem.setIdTipoIdentificacionotros(personajg.getIdtipoidentificacionotros());
+		// justiciableItem.setCodigoPostal2(personajg.getCodigopostal2());
+		// justiciableItem.setDescPaisDir2(personajg.getDescpaisdir2());
+		// justiciableItem.setDireccion2(personajg.getDireccion2());
+		// justiciableItem.setEscaleraDir2(personajg.getEscaleradir2());
+		// justiciableItem.setIdPoblacion2(personajg.getIdpoblacion2());
+		// justiciableItem.setIdProvincia2(personajg.getIdprovincia2());
+		// justiciableItem.setIdTipodir2(personajg.getIdtipodir2());
+		// justiciableItem.setIdTipoVia2(personajg.getIdtipovia2());
+		// justiciableItem.setNumeroDir2(personajg.getNumerodir2());
+		// justiciableItem.setPisoDir2(personajg.getPisodir2());
+		// justiciableItem.setPuertaDir2(personajg.getPuertadir2());
 
 		return justiciableItem;
 	}
 
-	private JusticiableTelefonoItem fillJusticiableTelefonosItemOfScsTelefonospersona(
-			ScsTelefonospersona scsTelefonospersona) {
+	private JusticiableTelefonoItem fillJusticiableTelefonosItemOfScsTelefonospersona(ScsTelefonospersona scsTelefonospersona) {
 
 		JusticiableTelefonoItem justiciableTelefonoItem = new JusticiableTelefonoItem();
 
@@ -675,13 +627,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"createJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("createJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"createJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("createJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -690,23 +640,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				try {
 
 					List<ScsPersonajg> personasList = new ArrayList<>();
-					
-					if(justiciableItem.getNif() == null) {
-						justiciableItem.setNif("");
 
-					}else {
+					if (justiciableItem.getNif() == null) {
+						justiciableItem.setNif("");
+					} else {
 						ScsPersonajgExample example = new ScsPersonajgExample();
-						example.createCriteria().andNifEqualTo(justiciableItem.getNif())
-						.andIdinstitucionEqualTo(idInstitucion);
+						example.createCriteria().andNifEqualTo(justiciableItem.getNif()).andIdinstitucionEqualTo(idInstitucion);
 						example.setOrderByClause("FECHAMODIFICACION DESC");
-	
-						LOGGER.info(
-								"createJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
-	
+
+						LOGGER.info("createJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
+
 						personasList = scsPersonajgExtendsMapper.selectByExample(example);
-	
-						LOGGER.info(
-								"createJusticiable() / scsTelefonospersonaMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
+
+						LOGGER.info("createJusticiable() / scsTelefonospersonaMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para comprobar que no este registrado el nif del nuevo justiciable");
 					}
 					if (null != personasList && personasList.size() > 0 && !justiciableItem.isValidacionRepeticion()) {
 
@@ -718,19 +664,16 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					} else {
 						ScsPersonajg scsPersonajg = new ScsPersonajg();
-						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, null, idInstitucion,
-								justiciableItem);
+						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, null, idInstitucion, justiciableItem);
 
 						justiciable.setIdinstitucion(idInstitucion);
 						justiciable.setUsumodificacion(usuario.getIdusuario());
 
-						LOGGER.info(
-								"createJusticiable() / scsPersonajgExtendsMapper.getIdPersonajg() -> Entrada a scsPersonajgExtendsMapper para obtener idPersonajg");
+						LOGGER.info("createJusticiable() / scsPersonajgExtendsMapper.getIdPersonajg() -> Entrada a scsPersonajgExtendsMapper para obtener idPersonajg");
 
 						NewIdDTO idP = scsPersonajgExtendsMapper.getIdPersonajg(idInstitucion);
 
-						LOGGER.info(
-								"createJusticiable() / scsTelefonospersonaMapper.getIdPersonajg() -> Salida de scsPersonajgExtendsMapper para obtener idPersonajg");
+						LOGGER.info("createJusticiable() / scsTelefonospersonaMapper.getIdPersonajg() -> Salida de scsPersonajgExtendsMapper para obtener idPersonajg");
 
 						if (idP == null) {
 							justiciable.setIdpersona((long) 1);
@@ -740,18 +683,17 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							idPersona = String.valueOf(idPersonajg);
 							justiciable.setIdpersona(idPersonajg);
 						}
-						
+
+						justiciable.setExistedomicilio("S");
 						if (justiciableItem.getDireccion() == null) {
 							justiciable.setExistedomicilio("N");
 						}
 
-						LOGGER.info(
-								"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Entrada de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
+						LOGGER.info("createJusticiable() / scsPersonajgExtendsMapper.insert() -> Entrada de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
 
 						response = scsPersonajgExtendsMapper.insert(justiciable);
 
-						LOGGER.info(
-								"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Salida de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
+						LOGGER.info("createJusticiable() / scsPersonajgExtendsMapper.insert() -> Salida de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
 
 						long count = 1;
 
@@ -774,13 +716,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 								scsTelefonospersona.setFechamodificacion(new Date());
 								scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
 
-								LOGGER.info(
-										"updateJusticiable() / scsTelefonospersonaMapper.insert() -> Entrada a scsTelefonospersonaMapper para insertar los telefonos del justiciable");
+								LOGGER.info("updateJusticiable() / scsTelefonospersonaMapper.insert() -> Entrada a scsTelefonospersonaMapper para insertar los telefonos del justiciable");
 
 								response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
 
-								LOGGER.info(
-										"updateJusticiable() / scsTelefonospersonaMapper.insert() -> Salida de scsTelefonospersonaMapper para insertar los telefonos del justiciable");
+								LOGGER.info("updateJusticiable() / scsTelefonospersonaMapper.insert() -> Salida de scsTelefonospersonaMapper para insertar los telefonos del justiciable");
 
 								count += 1;
 							}
@@ -814,27 +754,19 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		return insertResponseDTO;
 	}
 
-	private ScsPersonajg fillScsPersonasjsOfJusticiableItem(ScsPersonajg scsPersonajg, Boolean datosGenerales,
-			Short idInstitucion, JusticiableItem justiciableItem) {
+	private ScsPersonajg fillScsPersonasjsOfJusticiableItem(ScsPersonajg scsPersonajg, Boolean datosGenerales, Short idInstitucion, JusticiableItem justiciableItem) {
 
 		if (datosGenerales == null || datosGenerales) {
 
 			scsPersonajg.setApellido1(justiciableItem.getApellido1());
 			scsPersonajg.setApellido2(justiciableItem.getApellido2());
-			scsPersonajg.setCnae(justiciableItem.getCnae());
 			scsPersonajg.setCodigopostal(justiciableItem.getCodigoPostal());
-			scsPersonajg.setCodigopostal2(justiciableItem.getCodigoPostal2());
 			scsPersonajg.setCorreoelectronico(justiciableItem.getCorreoElectronico());
-			scsPersonajg.setDescpaisdir1(justiciableItem.getDescPaisDir1());
-			scsPersonajg.setDescpaisdir2(justiciableItem.getDescPaisDir2());
 			scsPersonajg.setDireccion(justiciableItem.getDireccion());
-			scsPersonajg.setDireccion2(justiciableItem.getDireccion2());
 
 			scsPersonajg.setEdad(justiciableItem.getEdad());
 
 			scsPersonajg.setEscaleradir(justiciableItem.getEscaleraDir());
-			scsPersonajg.setEscaleradir2(justiciableItem.getEscaleraDir2());
-			scsPersonajg.setExistedomicilio(justiciableItem.getExisteDomicilio());
 			scsPersonajg.setFax(justiciableItem.getFax());
 			scsPersonajg.setFechanacimiento(justiciableItem.getFechaNacimiento());
 
@@ -848,56 +780,57 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			scsPersonajg.setIdpais(justiciableItem.getIdPais());
 
-			// scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
-			// scsPersonajg.setIdpaisdir2(justiciableItem.getIdpaisDir2());
-
-			// if (justiciableItem.getIdPersona() != null && justiciableItem.getIdPersona()
-			// != "") {
-			// scsPersonajg.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
-			// }
+			scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
 
 			scsPersonajg.setIdpoblacion(justiciableItem.getIdPoblacion());
-			scsPersonajg.setIdpoblacion2(justiciableItem.getIdPoblacion2());
 
 			scsPersonajg.setIdprofesion(justiciableItem.getIdProfesion());
 
 			scsPersonajg.setIdprovincia(justiciableItem.getIdProvincia());
-			scsPersonajg.setIdprovincia2(justiciableItem.getIdProvincia2());
 
 			if (justiciableItem.getAsociarRepresentante() != null && justiciableItem.getAsociarRepresentante()) {
 				scsPersonajg.setIdrepresentantejg(justiciableItem.getIdRepresentantejg());
 			}
 
-			scsPersonajg.setIdtipodir(justiciableItem.getIdTipodir());
-			scsPersonajg.setIdtipodir2(justiciableItem.getIdTipodir2());
-
-			scsPersonajg.setIdtipoencalidad(justiciableItem.getIdTipoencalidad());
-
 			scsPersonajg.setIdtipoidentificacion(justiciableItem.getIdTipoIdentificacion());
 
-			scsPersonajg.setIdtipoidentificacionotros(justiciableItem.getIdTipoIdentificacionotros());
 			scsPersonajg.setIdtipovia(justiciableItem.getIdTipoVia());
-			scsPersonajg.setIdtipovia2(justiciableItem.getIdTipoVia2());
-			
-			if(justiciableItem.getNif() == null) {
+
+			if (justiciableItem.getNif() == null) {
 				scsPersonajg.setNif("");
-			}else {
+			} else {
 				scsPersonajg.setNif(justiciableItem.getNif().toUpperCase());
 			}
 			scsPersonajg.setNombre(justiciableItem.getNombre());
 			scsPersonajg.setNumerodir(justiciableItem.getNumeroDir());
-			scsPersonajg.setNumerodir2(justiciableItem.getNumeroDir2());
 
-			scsPersonajg.setNumerohijos(justiciableItem.getNumeroHijos());
-
-			scsPersonajg.setObservaciones(justiciableItem.getObservaciones());
 			scsPersonajg.setPisodir(justiciableItem.getPisoDir());
-			scsPersonajg.setPisodir2(justiciableItem.getPisoDir2());
 			scsPersonajg.setPuertadir(justiciableItem.getPuertaDir());
-			scsPersonajg.setPuertadir2(justiciableItem.getPuertaDir2());
 			scsPersonajg.setRegimenConyugal(justiciableItem.getRegimen_conyugal());
 			scsPersonajg.setSexo(justiciableItem.getSexo());
-			scsPersonajg.setTipopersonajg(justiciableItem.getTipoPersonajg());
+			scsPersonajg.setTipopersonajg(justiciableItem.getTipoPersonaJG());
+
+			// scsPersonajg.setCnae(justiciableItem.getCnae());
+			// scsPersonajg.setDescpaisdir1(justiciableItem.getDescPaisDir1());
+			// scsPersonajg.setExistedomicilio(justiciableItem.getExisteDomicilio());
+			// scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
+			// scsPersonajg.setIdpaisdir2(justiciableItem.getIdpaisDir2());
+			// scsPersonajg.setIdtipodir(justiciableItem.getIdTipodir());
+			// scsPersonajg.setIdtipoencalidad(justiciableItem.getIdTipoencalidad());
+			// scsPersonajg.setIdtipoidentificacionotros(justiciableItem.getIdTipoIdentificacionotros());
+			// scsPersonajg.setNumerohijos(justiciableItem.getNumeroHijos());
+			// scsPersonajg.setObservaciones(justiciableItem.getObservaciones());
+			// scsPersonajg.setCodigopostal2(justiciableItem.getCodigoPostal2());
+			// scsPersonajg.setDescpaisdir2(justiciableItem.getDescPaisDir2());
+			// scsPersonajg.setDireccion2(justiciableItem.getDireccion2());
+			// scsPersonajg.setEscaleradir2(justiciableItem.getEscaleraDir2());
+			// scsPersonajg.setIdpoblacion2(justiciableItem.getIdPoblacion2());
+			// scsPersonajg.setIdprovincia2(justiciableItem.getIdProvincia2());
+			// scsPersonajg.setIdtipodir2(justiciableItem.getIdTipodir2());
+			// scsPersonajg.setIdtipovia2(justiciableItem.getIdTipoVia2());
+			// scsPersonajg.setNumerodir2(justiciableItem.getNumeroDir2());
+			// scsPersonajg.setPisodir2(justiciableItem.getPisoDir2());
+			// scsPersonajg.setPuertadir2(justiciableItem.getPuertaDir2());
 
 			scsPersonajg.setFechaalta(new Date());
 
@@ -910,15 +843,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		}
 
 		scsPersonajg.setFechamodificacion(new Date());
+		scsPersonajg.setDireccionextranjera(justiciableItem.getDireccionExtranjera());
 
 		return scsPersonajg;
 	}
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateJusticiableDatosPersonales(JusticiableItem justiciableItem, boolean datosGenerales, HttpServletRequest request) {
 
-		
 		LOGGER.info("updateJusticiable() ->  Entrada al servicio para modificar un justiciable");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -964,7 +897,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							validacion = validacionDatosSegunTipoPcajg(rolJusticiable, idInstitucion, justiciableItem);
 						}
 					}
-					if (validacionCodigoPostal || validacionDireccion|| validacionPoblacion || validacionProvincia || validacionTipoVia) {
+					if (validacionCodigoPostal || validacionDireccion || validacionPoblacion || validacionProvincia || validacionTipoVia) {
 
 						error.setCode(600);
 
@@ -992,7 +925,6 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					} else {
 
-
 						LOGGER.info("updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para buscar al justiciable a editar");
 						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
 						personajgKey.setIdinstitucion(idInstitucion);
@@ -1001,28 +933,29 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						LOGGER.info("updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Salida de scsPersonajgMapper para buscar al justiciable a editar");
 
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
-						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(new ScsPersonajg(), datosGenerales, idInstitucion, justiciableItem);
-						justiciable.setUsumodificacion(usuario.getIdusuario());
-						justiciable.setFechamodificacion(new Date());
+						ScsPersonajg personaJgJusticiable = fillScsPersonasjsOfJusticiableItem(new ScsPersonajg(), datosGenerales, idInstitucion, justiciableItem);
+						personaJgJusticiable.setUsumodificacion(usuario.getIdusuario());
+						personaJgJusticiable.setFechamodificacion(new Date());
 						if (justiciableItem.getDireccion() != null) {
 							scsPersonajg.setExistedomicilio("S");
-						}			
-						scsPersonajg.setIdtipovia(justiciable.getIdtipovia());
-						scsPersonajg.setDireccion(justiciable.getDireccion());
-						scsPersonajg.setNumerodir(justiciable.getNumerodir());
-						scsPersonajg.setEscaleradir(justiciable.getEscaleradir());
-						scsPersonajg.setPisodir(justiciable.getPisodir());
-						scsPersonajg.setPuertadir(justiciable.getPuertadir());
-						scsPersonajg.setIdpais(justiciable.getIdpais());
-						scsPersonajg.setIdpaisdir1(justiciable.getIdpaisdir1());
-						scsPersonajg.setIdpaisdir2(justiciable.getIdpaisdir2());
-						scsPersonajg.setCodigopostal(justiciable.getCodigopostal());
-						scsPersonajg.setIdprovincia(justiciable.getIdprovincia());
-						scsPersonajg.setIdpoblacion(justiciable.getIdpoblacion());
-						scsPersonajg.setCorreoelectronico(justiciable.getCorreoelectronico());
-						scsPersonajg.setFax(justiciable.getFax());
-						scsPersonajg.setFechamodificacion(justiciable.getFechamodificacion());
-						
+						}
+						scsPersonajg.setIdtipovia(personaJgJusticiable.getIdtipovia());
+						scsPersonajg.setDireccion(personaJgJusticiable.getDireccion());
+						scsPersonajg.setNumerodir(personaJgJusticiable.getNumerodir());
+						scsPersonajg.setEscaleradir(personaJgJusticiable.getEscaleradir());
+						scsPersonajg.setPisodir(personaJgJusticiable.getPisodir());
+						scsPersonajg.setPuertadir(personaJgJusticiable.getPuertadir());
+						scsPersonajg.setIdpais(personaJgJusticiable.getIdpais());
+						scsPersonajg.setIdpaisdir1(personaJgJusticiable.getIdpaisdir1());
+						scsPersonajg.setIdpaisdir2(personaJgJusticiable.getIdpaisdir2());
+						scsPersonajg.setCodigopostal(personaJgJusticiable.getCodigopostal());
+						scsPersonajg.setIdprovincia(personaJgJusticiable.getIdprovincia());
+						scsPersonajg.setIdpoblacion(personaJgJusticiable.getIdpoblacion());
+						scsPersonajg.setCorreoelectronico(personaJgJusticiable.getCorreoelectronico());
+						scsPersonajg.setFax(personaJgJusticiable.getFax());
+						scsPersonajg.setFechamodificacion(personaJgJusticiable.getFechamodificacion());
+						scsPersonajg.setDireccionextranjera(personaJgJusticiable.getDireccionextranjera());
+
 						response = scsPersonajgExtendsMapper.updateByPrimaryKey(scsPersonajg);
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
 
@@ -1047,15 +980,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							}
 						}
 
-						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0 && datosGenerales && !checkTelefonoPorDefecto(justiciableItem.getTelefonos().get(0))){
+						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0 && datosGenerales && !checkTelefonoPorDefecto(justiciableItem.getTelefonos().get(0))) {
 
 							// Añadimos los telefonos nuevos
 							for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
 
 								ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
-								
+
 								LOGGER.info("updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Entrada a scsTelefonospersonaMapper para obtener idTelefono a crear");
-								NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem,idInstitucion);
+								NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem, idInstitucion);
 								if (idT == null) {
 									scsTelefonospersona.setIdtelefono((long) 1);
 								} else {
@@ -1099,13 +1032,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		updateResponseDTO.setError(error);
 		LOGGER.info("updateJusticiable() -> Salida del servicio para modificar un justiciable");
 		return updateResponseDTO;
-	
+
 	}
 
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateJusticiable(JusticiableItem justiciableItem, boolean datosGenerales, HttpServletRequest request) {
-		
+
 		LOGGER.info("updateJusticiable() ->  Entrada al servicio para modificar un justiciable");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -1151,7 +1084,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							validacion = validacionDatosSegunTipoPcajg(rolJusticiable, idInstitucion, justiciableItem);
 						}
 					}
-					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil || validacionFechaNacimiento || validacionPais || validacionParentesco	|| validacionPoblacion || validacionProvincia || validacionRegimenConyugal || validacionSexo || validacionTipoVia) {
+					if (validacionCodigoPostal || validacionDireccion || validacionEstadoCivil || validacionFechaNacimiento || validacionPais || validacionParentesco || validacionPoblacion || validacionProvincia || validacionRegimenConyugal || validacionSexo || validacionTipoVia) {
 
 						error.setCode(600);
 
@@ -1191,7 +1124,6 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 					} else {
 
-
 						LOGGER.info("updateJusticiable() / scsPersonajgMapper.selectByPrimaryKey() -> Entrada a scsPersonajgMapper para buscar al justiciable a editar");
 						ScsPersonajgKey personajgKey = new ScsPersonajgKey();
 						personajgKey.setIdinstitucion(idInstitucion);
@@ -1205,7 +1137,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						justiciable.setFechamodificacion(new Date());
 						if (justiciableItem.getDireccion() != null) {
 							justiciable.setExistedomicilio("S");
-						}				
+						}
 						response = scsPersonajgExtendsMapper.updateByPrimaryKey(justiciable);
 						LOGGER.info("updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
 
@@ -1230,15 +1162,15 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							}
 						}
 
-						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0 && datosGenerales && !checkTelefonoPorDefecto(justiciableItem.getTelefonos().get(0))){
+						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0 && datosGenerales && !checkTelefonoPorDefecto(justiciableItem.getTelefonos().get(0))) {
 
 							// Añadimos los telefonos nuevos
 							for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
 
 								ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
-								
+
 								LOGGER.info("updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Entrada a scsTelefonospersonaMapper para obtener idTelefono a crear");
-								NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem,idInstitucion);
+								NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem, idInstitucion);
 								if (idT == null) {
 									scsTelefonospersona.setIdtelefono((long) 1);
 								} else {
@@ -1286,17 +1218,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 	private boolean checkTelefonoPorDefecto(JusticiableTelefonoItem justiciableTelefonoItem) {
 		boolean telefonoPorDefecto = false;
-		
-		if (justiciableTelefonoItem.getIdInstitucion() == null
-			&& justiciableTelefonoItem.getIdPersona() == null
-			&& justiciableTelefonoItem.getIdTelefono() == null
-			&& justiciableTelefonoItem.getNombreTelefono() == null
-			&& justiciableTelefonoItem.getNumeroTelefono() == null
-			&& "0".equals(justiciableTelefonoItem.getPreferenteSms())
-			&& justiciableTelefonoItem.getFechaModificacion() == null) {
+
+		if (justiciableTelefonoItem.getIdInstitucion() == null && justiciableTelefonoItem.getIdPersona() == null && justiciableTelefonoItem.getIdTelefono() == null && justiciableTelefonoItem.getNombreTelefono() == null && justiciableTelefonoItem.getNumeroTelefono() == null && "0".equals(justiciableTelefonoItem.getPreferenteSms()) && justiciableTelefonoItem.getFechaModificacion() == null) {
 			telefonoPorDefecto = true;
 		}
-		
+
 		return telefonoPorDefecto;
 	}
 
@@ -1331,30 +1257,24 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				ScsTelefonospersonaExample scsTelefonospersonaExample = new ScsTelefonospersonaExample();
-				scsTelefonospersonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()));
+				scsTelefonospersonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()));
 
 				scsTelefonospersonaExample.setOrderByClause("NOMBRETELEFONO asc");
 
-				LOGGER.info(
-						"getTelefonos() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para obtener los telefonos de un justiciable");
+				LOGGER.info("getTelefonos() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Entrada a scsTelefonosPersonaExtendsMapper para obtener los telefonos de un justiciable");
 
-				List<ScsTelefonospersona> telefonospersonaList = scsTelefonosPersonaExtendsMapper
-						.selectByExample(scsTelefonospersonaExample);
+				List<ScsTelefonospersona> telefonospersonaList = scsTelefonosPersonaExtendsMapper.selectByExample(scsTelefonospersonaExample);
 
-				LOGGER.info(
-						"getTelefonos() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Salida de scsTelefonosPersonaExtendsMapper para obtener los telefonos de un justiciable");
+				LOGGER.info("getTelefonos() / scsTelefonosPersonaExtendsMapper.selectByExample() -> Salida de scsTelefonosPersonaExtendsMapper para obtener los telefonos de un justiciable");
 
 				if (telefonospersonaList != null && telefonospersonaList.size() > 0) {
 
@@ -1391,26 +1311,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getTipoVias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getTipoVias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getTipoVias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getTipoVias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
 
-				LOGGER.info(
-						"getTipoVias() / cenTipoviaExtendsMapper.getJurisdicciones() -> Entrada a cenTipoviaExtendsMapper para obtener minusvalias");
+				LOGGER.info("getTipoVias() / cenTipoviaExtendsMapper.getJurisdicciones() -> Entrada a cenTipoviaExtendsMapper para obtener minusvalias");
 
-				List<ComboItem> comboItems = cenTipoviaExtendsMapper.getTipoVias(idInstitucion,
-						usuario.getIdlenguaje(), idTipoViaJusticiable);
+				List<ComboItem> comboItems = cenTipoviaExtendsMapper.getTipoVias(idInstitucion, usuario.getIdlenguaje(), idTipoViaJusticiable);
 
-				LOGGER.info(
-						"getTipoVias() / cenTipoviaExtendsMapper.getJurisdicciones() -> Salida a cenTipoviaExtendsMapper para obtener minusvalias");
+				LOGGER.info("getTipoVias() / cenTipoviaExtendsMapper.getJurisdicciones() -> Salida a cenTipoviaExtendsMapper para obtener minusvalias");
 
 				combo.setCombooItems(comboItems);
 			}
@@ -1439,34 +1354,28 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"searchAsuntosJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("searchAsuntosJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"searchAsuntosJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("searchAsuntosJusticiable() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				try {
 
-					LOGGER.info(
-							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Entrada a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
+					LOGGER.info("searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Entrada a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
 
 					// Comprobamos si es representante legal de algún asunto en cuyo caso devolveremos las personas representadas
 					personasRepresentadas = scsPersonajgExtendsMapper.getPersonaRepresentanteJG(idPersona, idInstitucion);
-					
+
 					if (personasRepresentadas != null && personasRepresentadas.size() > 0) {
-						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiableRepresentanteJG(idPersona, personasRepresentadas,
-								idInstitucion, origen);
+						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiableRepresentanteJG(idPersona, personasRepresentadas, idInstitucion, origen);
 					} else {
-						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona,
-								idInstitucion, origen);
+						asuntosClaveJusticiableItem = scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable(idPersona, idInstitucion, origen);
 					}
 
-					LOGGER.info(
-							"searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Salida a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
+					LOGGER.info("searchAsuntosJusticiable() / scsPersonajgExtendsMapper.searchClaveAsuntosJusticiable() -> Salida a scsPersonajgExtendsMapper para obtener las claves de los asuntos");
 
 					if (asuntosClaveJusticiableItem != null && asuntosClaveJusticiableItem.size() > 0) {
 
@@ -1485,11 +1394,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	@Override
-	public AsuntosJusticiableDTO searchAsuntosConClave(List<AsuntosClaveJusticiableItem> asuntosClaveList,
-			boolean fromJusticiable, HttpServletRequest request) {
+	public AsuntosJusticiableDTO searchAsuntosConClave(List<AsuntosClaveJusticiableItem> asuntosClaveList, boolean fromJusticiable, HttpServletRequest request) {
 
-		LOGGER.info(
-				"searchAsuntosConClave() -> Entrada al servicio para obtener los asuntos a partir de las claves de un justiciable");
+		LOGGER.info("searchAsuntosConClave() -> Entrada al servicio para obtener los asuntos a partir de las claves de un justiciable");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1504,13 +1411,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"searchAsuntosConClave() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("searchAsuntosConClave() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"searchAsuntosConClave() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("searchAsuntosConClave() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
@@ -1524,35 +1429,35 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 							AsuntosJusticiableItem asunto = null;
 
 							switch (asuntoClave.getTipo()) {
-								case SigaConstants.TIPO_ASUNTO_EJG:
-									asunto = getAsuntoTipoEjg(asuntoClave, idInstitucion, fromJusticiable, usuario);
-									break;
-								case SigaConstants.TIPO_ASUNTO_DESIGNA:
-									asunto = getAsuntoTipoDesigna(asuntoClave, idInstitucion, fromJusticiable, usuario);
-									break;
-								case SigaConstants.TIPO_ASUNTO_ASISTENCIA:
-									asunto = getAsuntoTipoAsistencia(asuntoClave, idInstitucion, fromJusticiable, usuario);
-									break;
-								case SigaConstants.TIPO_ASUNTO_SOJ:
-									asunto = getAsuntoTipoSOJ(asuntoClave, idInstitucion, fromJusticiable, usuario);
-									break;
-	
-								default:
-									break;
+							case SigaConstants.TIPO_ASUNTO_EJG:
+								asunto = getAsuntoTipoEjg(asuntoClave, idInstitucion, fromJusticiable, usuario);
+								break;
+							case SigaConstants.TIPO_ASUNTO_DESIGNA:
+								asunto = getAsuntoTipoDesigna(asuntoClave, idInstitucion, fromJusticiable, usuario);
+								break;
+							case SigaConstants.TIPO_ASUNTO_ASISTENCIA:
+								asunto = getAsuntoTipoAsistencia(asuntoClave, idInstitucion, fromJusticiable, usuario);
+								break;
+							case SigaConstants.TIPO_ASUNTO_SOJ:
+								asunto = getAsuntoTipoSOJ(asuntoClave, idInstitucion, fromJusticiable, usuario);
+								break;
+
+							default:
+								break;
 							}
-							if(asuntoClave.getAnio() != null && !asuntoClave.getAnio().isEmpty()) {
+							if (asuntoClave.getAnio() != null && !asuntoClave.getAnio().isEmpty()) {
 								asunto.setAnio(asuntoClave.getAnio());
 							}
-							if(asuntoClave.getNumero() != null && !asuntoClave.getNumero().isEmpty()) {
+							if (asuntoClave.getNumero() != null && !asuntoClave.getNumero().isEmpty()) {
 								asunto.setNumero(asuntoClave.getNumero());
 							}
-							if(asuntoClave.getTipo() != null && !asuntoClave.getTipo().isEmpty()) {
+							if (asuntoClave.getTipo() != null && !asuntoClave.getTipo().isEmpty()) {
 								asunto.setTipo(asuntoClave.getTipo());
 							}
-							if(asuntoClave.getClave() != null && !asuntoClave.getClave().isEmpty()) {
+							if (asuntoClave.getClave() != null && !asuntoClave.getClave().isEmpty()) {
 								asunto.setClave(asuntoClave.getClave());
 							}
-							if(asuntoClave.getRol() != null && !asuntoClave.getRol().isEmpty()) {
+							if (asuntoClave.getRol() != null && !asuntoClave.getRol().isEmpty()) {
 								asunto.setRol(asuntoClave.getRol());
 							}
 							if (asunto != null) {
@@ -1562,16 +1467,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 						if (asuntosJusticiableItem != null && asuntosJusticiableItem.size() > 0) {
 
-							/*Collections.sort(asuntosJusticiableItem, new Comparator<Object>() {
-								@Override
-								public int compare(Object item1, Object item2) {
-									// use instanceof to verify the references are indeed of the type in question
-									return ((AsuntosJusticiableItem) item1).getFecha()
-											.compareTo(((AsuntosJusticiableItem) item2).getFecha());
-								}
-							});
-
-							Collections.reverse(asuntosJusticiableItem);*/
+							/*
+							 * Collections.sort(asuntosJusticiableItem, new Comparator<Object>() {
+							 * 
+							 * @Override public int compare(Object item1, Object item2) { // use instanceof to verify the references are indeed of the type in question return ((AsuntosJusticiableItem) item1).getFecha() .compareTo(((AsuntosJusticiableItem) item2).getFecha()); } });
+							 * 
+							 * Collections.reverse(asuntosJusticiableItem);
+							 */
 
 							asuntosJusticiableDTO.setAsuntosJusticiableItems(asuntosJusticiableItem);
 						}
@@ -1586,26 +1488,22 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info(
-				"searchAsuntosConClave() -> Salida del servicio para obtener los asuntos a partir de las claves de un justiciable");
+		LOGGER.info("searchAsuntosConClave() -> Salida del servicio para obtener los asuntos a partir de las claves de un justiciable");
 		return asuntosJusticiableDTO;
 	}
 
-	private AsuntosJusticiableItem getAsuntoTipoEjg(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion,
-			boolean fromJusticiable, AdmUsuarios usuario) {
+	private AsuntosJusticiableItem getAsuntoTipoEjg(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion, boolean fromJusticiable, AdmUsuarios usuario) {
 
 		LOGGER.info("getAsuntoTipoEjg() -> Entrada del servicio para obtener asunto EJG");
 
 		AsuntosJusticiableItem asunto = new AsuntosJusticiableItem();
 		AsuntosEjgItem asuntoEjg = new AsuntosEjgItem();
 
-		LOGGER.info(
-				"getAsuntoTipoEjg() / scsEjgExtendsMapper.getAsuntoTipoEjg() -> Entrada a scsEjgExtendsMapper para obtener el asunto tipo EJG");
+		LOGGER.info("getAsuntoTipoEjg() / scsEjgExtendsMapper.getAsuntoTipoEjg() -> Entrada a scsEjgExtendsMapper para obtener el asunto tipo EJG");
 
 		asuntoEjg = scsEjgExtendsMapper.getAsuntoTipoEjg(asuntoClave, usuario.getIdlenguaje());
 
-		LOGGER.info(
-				"getAsuntoTipoEjg() / scsEjgExtendsMapper.getAsuntoTipoEjg() -> Salida a scsEjgExtendsMapper para obtener el asunto tipo EJG");
+		LOGGER.info("getAsuntoTipoEjg() / scsEjgExtendsMapper.getAsuntoTipoEjg() -> Salida a scsEjgExtendsMapper para obtener el asunto tipo EJG");
 
 		asunto.setAsunto(asuntoEjg.getAsunto());
 		asunto.setFecha(asuntoEjg.getFecha());
@@ -1619,14 +1517,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (asuntoEjg.getIdPersonaLetrado() != null) {
 
-			LOGGER.info(
-					"getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+			LOGGER.info("getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
-			colegiado = getColegiadoByIdPersona(asuntoEjg.getIdPersonaLetrado(),
-					Short.valueOf(asuntoClave.getIdInstitucion()));
+			colegiado = getColegiadoByIdPersona(asuntoEjg.getIdPersonaLetrado(), Short.valueOf(asuntoClave.getIdInstitucion()));
 
-			LOGGER.info(
-					"getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+			LOGGER.info("getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		}
 
@@ -1647,13 +1542,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				scsPersonajgKey.setIdpersona(Long.valueOf(asuntoEjg.getIdPersonajg()));
 				scsPersonajgKey.setIdinstitucion(idInstitucion);
 
-				LOGGER.info(
-						"getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+				LOGGER.info("getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 				ScsPersonajg interesado = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgKey);
 
-				LOGGER.info(
-						"getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+				LOGGER.info("getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 				if (interesado != null) {
 					String nombre = "";
@@ -1682,13 +1575,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		// Datos Interes
 
-		LOGGER.info(
-				"getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+		LOGGER.info("getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		EstadoEjgItem estadoEjg = scsEstadoejgExtendsMapper.getEstadoEjg(asuntoClave, usuario.getIdlenguaje());
 
-		LOGGER.info(
-				"getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+		LOGGER.info("getAsuntoTipoEjg() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		String datosInteres = "";
 
@@ -1702,8 +1593,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			datosInteres += "<br/>";
 		}
 
-		if (estadoEjg.getIdEstadoejg() != null
-				&& estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_DICTAMINADO)) {
+		if (estadoEjg.getIdEstadoejg() != null && estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_DICTAMINADO)) {
 
 			if (asuntoEjg.getDictamen() != null) {
 				datosInteres += "<b>Tipo Dictamen</b>: " + asuntoEjg.getDictamen();
@@ -1721,8 +1611,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				datosInteres += "<b>Fecha</b>: " + fecha;
 			}
 
-		} else if (estadoEjg.getIdEstadoejg() != null
-				&& estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_RESUELTO_COMISION)) {
+		} else if (estadoEjg.getIdEstadoejg() != null && estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_RESUELTO_COMISION)) {
 
 			if (asuntoEjg.getTipoResolucion() != null) {
 				datosInteres += "<b>Resolución</b>: " + asuntoEjg.getTipoResolucion();
@@ -1740,8 +1629,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				datosInteres += "<b>Fecha</b>: " + fecha;
 			}
 
-		} else if (estadoEjg.getIdEstadoejg() != null
-				&& estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION)) {
+		} else if (estadoEjg.getIdEstadoejg() != null && estadoEjg.getIdEstadoejg().equals(SigaConstants.TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION)) {
 
 			if (asuntoEjg.getTipoResolucionAuto() != null) {
 				datosInteres += "<b>Auto Resolutorio</b>: " + asuntoEjg.getTipoResolucionAuto();
@@ -1772,32 +1660,27 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		FichaPersonaItem colegiado = null;
 
-		LOGGER.info(
-				"getColegiadoByIdPersona() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+		LOGGER.info("getColegiadoByIdPersona() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		colegiado = cenPersonaExtendsMapper.getColegiadoByIdPersona(idPersona, idInstitucion);
 
-		LOGGER.info(
-				"getColegiadoByIdPersona() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+		LOGGER.info("getColegiadoByIdPersona() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		return colegiado;
 	}
 
-	private AsuntosJusticiableItem getAsuntoTipoDesigna(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion,
-			boolean fromJusticiable, AdmUsuarios usuario) {
+	private AsuntosJusticiableItem getAsuntoTipoDesigna(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion, boolean fromJusticiable, AdmUsuarios usuario) {
 
 		LOGGER.info("getAsuntoTipoDesigna() -> Entrada del servicio para obtener asunto designa");
 
 		AsuntosJusticiableItem asunto = new AsuntosJusticiableItem();
 		AsuntosDesignaItem asuntoDesigna = new AsuntosDesignaItem();
 
-		LOGGER.info(
-				"getAsuntoTipoDesigna() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Entrada a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
+		LOGGER.info("getAsuntoTipoDesigna() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Entrada a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
 
 		asuntoDesigna = scsDesignacionesExtendsMapper.getAsuntoTipoDesigna(asuntoClave, usuario.getIdlenguaje());
 
-		LOGGER.info(
-				"getAsuntoTipoDesigna() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Salida a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
+		LOGGER.info("getAsuntoTipoDesigna() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Salida a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
 
 		asunto.setAsunto(asuntoDesigna.getAsunto());
 		asunto.setFecha(asuntoDesigna.getFecha());
@@ -1812,13 +1695,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		FichaPersonaItem colegiado = null;
 
-		LOGGER.info(
-				"getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+		LOGGER.info("getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		colegiado = getDesignaLetrado(asuntoClave, usuario, idInstitucion);
 
-		LOGGER.info(
-				"getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+		LOGGER.info("getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 		if (colegiado != null) {
 			asunto.setLetrado(colegiado.getColegiado().replace(colegiado.getNumeroColegiado(), ""));
@@ -1832,14 +1713,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// Interesado
 		} else {
 
-			LOGGER.info(
-					"getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+			LOGGER.info("getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
-			StringDTO interesado = scsDefendidosdesignasExtendsMapper.getInteresadosDesigna(asuntoClave,
-					usuario.getIdlenguaje());
+			StringDTO interesado = scsDefendidosdesignasExtendsMapper.getInteresadosDesigna(asuntoClave, usuario.getIdlenguaje());
 
-			LOGGER.info(
-					"getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+			LOGGER.info("getAsuntoTipoDesigna() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 			asunto.setInteresado(interesado.getValor());
 
@@ -1850,41 +1728,35 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		return asunto;
 	}
 
-	private FichaPersonaItem getDesignaLetrado(AsuntosClaveJusticiableItem asuntoClave, AdmUsuarios usuario,
-			short idInstitucion) {
+	private FichaPersonaItem getDesignaLetrado(AsuntosClaveJusticiableItem asuntoClave, AdmUsuarios usuario, short idInstitucion) {
 
 		LOGGER.info("getDesignaLetrado() -> Entrada del servicio para obtener colegiado del asunto designa");
 
 		FichaPersonaItem designaLetrado = null;
 
-		LOGGER.info(
-				"getDesignaLetrado() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Entrada a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
+		LOGGER.info("getDesignaLetrado() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Entrada a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
 
 		designaLetrado = scsDesignasLetradoExtendsMapper.getDesignaLetrado(asuntoClave, usuario.getIdlenguaje());
 
-		LOGGER.info(
-				"getDesignaLetrado() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Salida a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
+		LOGGER.info("getDesignaLetrado() / scsDesignaExtendsMapper.getAsuntoTipoDesigna() -> Salida a scsDesignaExtendsMapper para obtener el asunto tipo Designa");
 
 		LOGGER.info("getDesignaLetrado() -> Salida del servicio para obtener colegiado del asunto designa");
 
 		return designaLetrado;
 	}
 
-	private AsuntosJusticiableItem getAsuntoTipoAsistencia(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion,
-			boolean fromJusticiable, AdmUsuarios usuario) {
+	private AsuntosJusticiableItem getAsuntoTipoAsistencia(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion, boolean fromJusticiable, AdmUsuarios usuario) {
 
 		LOGGER.info("getAsuntoTipoAsistencia() -> Entrada del servicio para obtener asunto asistencia");
 
 		AsuntosJusticiableItem asunto = new AsuntosJusticiableItem();
 		AsuntosAsistenciaItem asuntoAsistencia = new AsuntosAsistenciaItem();
 
-		LOGGER.info(
-				"getAsuntoTipoAsistencia() / scsAsistenciaExtendsMapper.getAsuntoTipoAsistencia() -> Entrada a scsAsistenciaExtendsMapper para obtener el asunto tipo Asistencia");
+		LOGGER.info("getAsuntoTipoAsistencia() / scsAsistenciaExtendsMapper.getAsuntoTipoAsistencia() -> Entrada a scsAsistenciaExtendsMapper para obtener el asunto tipo Asistencia");
 
 		asuntoAsistencia = scsAsistenciaExtendsMapper.getAsuntoTipoAsistencia(asuntoClave, usuario.getIdlenguaje());
 
-		LOGGER.info(
-				"getAsuntoTipoAsistencia() / scsAsistenciaExtendsMapper.getAsuntoTipoAsistencia() -> Salida a scsAsistenciaExtendsMapper para obtener el asunto tipo Asistencia");
+		LOGGER.info("getAsuntoTipoAsistencia() / scsAsistenciaExtendsMapper.getAsuntoTipoAsistencia() -> Salida a scsAsistenciaExtendsMapper para obtener el asunto tipo Asistencia");
 
 		asunto.setAsunto(asuntoAsistencia.getAsunto());
 		asunto.setFecha(asuntoAsistencia.getFecha());
@@ -1898,8 +1770,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (asuntoAsistencia.getIdPersonaColegiado() != null) {
 
-			colegiado = getColegiadoByIdPersona(asuntoAsistencia.getIdPersonaColegiado(),
-					Short.valueOf(asuntoClave.getIdInstitucion()));
+			colegiado = getColegiadoByIdPersona(asuntoAsistencia.getIdPersonaColegiado(), Short.valueOf(asuntoClave.getIdInstitucion()));
 
 			if (colegiado != null) {
 				asunto.setLetrado(colegiado.getApellido1() + " " + colegiado.getApellido2() + ", " + colegiado.getNombre());
@@ -1920,13 +1791,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				scsPersonajgKey.setIdpersona(Long.valueOf(asuntoAsistencia.getIdPersonaAsistido()));
 				scsPersonajgKey.setIdinstitucion(idInstitucion);
 
-				LOGGER.info(
-						"getAsuntoTipoAsistencia() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+				LOGGER.info("getAsuntoTipoAsistencia() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Entrada a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 				ScsPersonajg interesado = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgKey);
 
-				LOGGER.info(
-						"getAsuntoTipoAsistencia() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
+				LOGGER.info("getAsuntoTipoAsistencia() / cenPersonaExtendsMapper.getColegiadoByIdPersona() -> Salida a cenPersonaExtendsMapper para obtener el colegiado del asunto");
 
 				if (interesado != null) {
 					String nombre = "";
@@ -1957,21 +1826,18 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		return asunto;
 	}
 
-	private AsuntosJusticiableItem getAsuntoTipoSOJ(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion,
-			boolean fromJusticiable, AdmUsuarios usuario) {
+	private AsuntosJusticiableItem getAsuntoTipoSOJ(AsuntosClaveJusticiableItem asuntoClave, short idInstitucion, boolean fromJusticiable, AdmUsuarios usuario) {
 
 		LOGGER.info("getAsuntoTipoSOJ() -> Entrada del servicio para obtener asunto SOJ");
 
 		AsuntosJusticiableItem asunto = new AsuntosJusticiableItem();
 		AsuntosSOJItem asuntosSOJ = new AsuntosSOJItem();
 
-		LOGGER.info(
-				"getAsuntoTipoSOJ() / scsSojExtendsMapper.getAsuntoTipoSoj() -> Entrada a scsSojExtendsMapper para obtener el asunto tipo SOJ");
+		LOGGER.info("getAsuntoTipoSOJ() / scsSojExtendsMapper.getAsuntoTipoSoj() -> Entrada a scsSojExtendsMapper para obtener el asunto tipo SOJ");
 
 		asuntosSOJ = scsSojExtendsMapper.getAsuntoTipoSoj(asuntoClave, usuario.getIdlenguaje());
 
-		LOGGER.info(
-				"getAsuntoTipoSOJ() / scsSojExtendsMapper.getAsuntoTipoSoj() -> Salida a scsSojExtendsMapper para obtener el asunto tipo SOJ");
+		LOGGER.info("getAsuntoTipoSOJ() / scsSojExtendsMapper.getAsuntoTipoSoj() -> Salida a scsSojExtendsMapper para obtener el asunto tipo SOJ");
 
 		asunto.setAsunto(asuntosSOJ.getAsunto());
 		asunto.setFecha(asuntosSOJ.getFecha());
@@ -1985,8 +1851,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (asuntosSOJ.getIdPersonaColegiado() != null) {
 
-			colegiado = getColegiadoByIdPersona(asuntosSOJ.getIdPersonaColegiado(),
-					Short.valueOf(asuntoClave.getIdInstitucion()));
+			colegiado = getColegiadoByIdPersona(asuntosSOJ.getIdPersonaColegiado(), Short.valueOf(asuntoClave.getIdInstitucion()));
 
 			if (colegiado != null) {
 				asunto.setLetrado(colegiado.getApellido1() + " " + colegiado.getApellido2() + ", " + colegiado.getNombre());
@@ -2007,13 +1872,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				scsPersonajgKey.setIdpersona(Long.valueOf(asuntosSOJ.getIdPersonaSoj()));
 				scsPersonajgKey.setIdinstitucion(idInstitucion);
 
-				LOGGER.info(
-						"getAsuntoTipoSOJ() / cenPersonaExtendsMapper.selectByPrimaryKey() -> Entrada a cenPersonaExtendsMapper para obtener el interesado del asunto");
+				LOGGER.info("getAsuntoTipoSOJ() / cenPersonaExtendsMapper.selectByPrimaryKey() -> Entrada a cenPersonaExtendsMapper para obtener el interesado del asunto");
 
 				ScsPersonajg interesado = scsPersonajgExtendsMapper.selectByPrimaryKey(scsPersonajgKey);
 
-				LOGGER.info(
-						"getAsuntoTipoSOJ() / cenPersonaExtendsMapper.selectByPrimaryKey() -> Salida a cenPersonaExtendsMapper para obtener el interesado del asunto");
+				LOGGER.info("getAsuntoTipoSOJ() / cenPersonaExtendsMapper.selectByPrimaryKey() -> Salida a cenPersonaExtendsMapper para obtener el interesado del asunto");
 
 				if (interesado != null) {
 					String nombre = "";
@@ -2045,11 +1908,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	@Override
-	public JusticiableDTO getJusticiableByNif(JusticiableBusquedaItem justiciableBusquedaItem,
-			HttpServletRequest request) {
+	public JusticiableDTO getJusticiableByNif(JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request) {
 
-		LOGGER.info(
-				"getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable by nif");
+		LOGGER.info("getJusticiableByNif() -> Entrada al servicio para obtener el representante del justiciable by nif");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -2064,31 +1925,26 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-			LOGGER.info(
-					"getJusticiableByNif() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getJusticiableByNif() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getJusticiableByNif() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getJusticiableByNif() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				try {
 
-					LOGGER.info(
-							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
+					LOGGER.info("getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
 
-					scsPersonajgExample.createCriteria().andNifEqualTo(justiciableBusquedaItem.getNif().toUpperCase())
-							.andIdinstitucionEqualTo(idInstitucion);
+					scsPersonajgExample.createCriteria().andNifEqualTo(justiciableBusquedaItem.getNif().toUpperCase()).andIdinstitucionEqualTo(idInstitucion);
 
 					scsPersonajgExample.setOrderByClause("FECHAMODIFICACION DESC");
 
 					personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
 
-					LOGGER.info(
-							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
+					LOGGER.info("getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
 
 					if (personajgList != null && personajgList.size() > 0) {
 
@@ -2117,8 +1973,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info(
-				"getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable by nif");
+		LOGGER.info("getJusticiableByNif() -> Salida del servicio para obtener el representante del justiciable by nif");
 		return justiciableDTO;
 	}
 
@@ -2140,13 +1995,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-			LOGGER.info(
-					"associateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("associateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"associateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("associateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
@@ -2155,16 +2008,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				try {
 
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()));
+					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()));
 
-					LOGGER.info(
-							"associateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener justiciable");
+					LOGGER.info("associateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener justiciable");
 
 					List<ScsPersonajg> personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
 
-					LOGGER.info(
-							"associateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener justiciable");
+					LOGGER.info("associateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener justiciable");
 
 					if (personajgList != null && personajgList.size() > 0) {
 
@@ -2174,13 +2024,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						personajg.setUsumodificacion(usuario.getIdusuario());
 						personajg.setIdrepresentantejg(Long.valueOf(justiciableItem.getIdRepresentantejg()));
 
-						LOGGER.info(
-								"associateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para asociar representante a justiciable");
+						LOGGER.info("associateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para asociar representante a justiciable");
 
 						response = scsPersonajgExtendsMapper.updateByPrimaryKey(personajg);
 
-						LOGGER.info(
-								"associateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida a scsPersonajgExtendsMapper para asociar representante a justiciable");
+						LOGGER.info("associateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida a scsPersonajgExtendsMapper para asociar representante a justiciable");
 
 					}
 
@@ -2207,8 +2055,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	@Override
 	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request) {
 
-		LOGGER.info(
-				"disassociateRepresentante() -> Entrada al servicio para desasociar un representante del justiciable");
+		LOGGER.info("disassociateRepresentante() -> Entrada al servicio para desasociar un representante del justiciable");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -2217,21 +2064,17 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 2;
-		long miliseconds = System.currentTimeMillis();
-		Date date = new Date(miliseconds);
 
 		if (idInstitucion != null) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-			LOGGER.info(
-					"disassociateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("disassociateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"disassociateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("disassociateRepresentante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
@@ -2240,16 +2083,13 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				try {
 
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()));
+					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()));
 
-					LOGGER.info(
-							"disassociateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener justiciable");
+					LOGGER.info("disassociateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener justiciable");
 
 					List<ScsPersonajg> personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
 
-					LOGGER.info(
-							"disassociateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener justiciable");
+					LOGGER.info("disassociateRepresentante() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener justiciable");
 
 					if (personajgList != null && personajgList.size() > 0) {
 
@@ -2259,13 +2099,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						personajg.setUsumodificacion(usuario.getIdusuario());
 						personajg.setIdrepresentantejg(null);
 
-						LOGGER.info(
-								"disassociateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para asociar representante a justiciable");
+						LOGGER.info("disassociateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para asociar representante a justiciable");
 
 						response = scsPersonajgExtendsMapper.updateByPrimaryKey(personajg);
 
-						LOGGER.info(
-								"disassociateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida a scsPersonajgExtendsMapper para asociar representante a justiciable");
+						LOGGER.info("disassociateRepresentante() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida a scsPersonajgExtendsMapper para asociar representante a justiciable");
 
 					}
 
@@ -2285,8 +2123,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info(
-				"disassociateRepresentante() -> Salida del servicio para desasociar un representante del justiciable");
+		LOGGER.info("disassociateRepresentante() -> Salida del servicio para desasociar un representante del justiciable");
 		return updateResponseDTO;
 	}
 
@@ -2303,24 +2140,20 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		int response = 0;
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarDesignacion() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarDesignacion() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a una designacion");
+				LOGGER.debug("GestionEJGServiceImpl.asociarDesignacion() -> Entrada para asociar un Justiciable a una designacion");
 				try {
 
 					datosdesigna.setIdinstitucion(idInstitucion);
-					List<ScsDefendidosdesigna> designas = scsDefendidosDesignaMapperExtends
-							.seleccionarDesigna(datosdesigna);
+					List<ScsDefendidosdesigna> designas = scsDefendidosDesignaMapperExtends.seleccionarDesigna(datosdesigna);
 
 					if (designas != null && designas.size() > 0) {
 						ScsDefendidosdesigna interesadoDesigna = new ScsDefendidosdesigna();
@@ -2356,16 +2189,14 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					// respuesta si se actualiza correctamente
 					if (response != 1) {
 						error.setCode(400);
-						LOGGER.error(
-								"GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
+						LOGGER.error("GestionEJGServiceImpl.asociarDesignacion() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
 						updateResponseDTO.setStatus(SigaConstants.OK);
-						LOGGER.info(
-								"GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
+						LOGGER.info("GestionEJGServiceImpl.asociarDesignacion() -> Se ha asociado el elemento correctamente");
 					}
 				}
-				
+
 				updateResponseDTO.setError(error);
 			}
 		}
@@ -2386,41 +2217,36 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		int response = 0;
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarEJG() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarEJG() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarEJG() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarEJG() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.asociarEJG() -> Entrada para asociar un Justiciable a un EJG");
+				LOGGER.debug("GestionEJGServiceImpl.asociarEJG() -> Entrada para asociar un Justiciable a un EJG");
 				try {
 					// Identificar el EJG
 					ScsEjgExample paramejg = new ScsEjgExample();
 
-					paramejg.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-							.andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumeroEqualTo(Long.valueOf(itemEjg.get(1)))
-							.andIdtipoejgEqualTo(Short.valueOf(itemEjg.get(2)));
+					paramejg.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andAnioEqualTo(Short.valueOf(itemEjg.get(0))).andNumeroEqualTo(Long.valueOf(itemEjg.get(1))).andIdtipoejgEqualTo(Short.valueOf(itemEjg.get(2)));
 
 					List<ScsEjgWithBLOBs> ejg = scsEjgMapper.selectByExampleWithBLOBs(paramejg);
-					
+
 					// Actualizar con Justiciable seleccionado.
 					if (ejg != null && ejg.size() > 0) {
 						ScsEjgWithBLOBs ejgItem = ejg.get(0);
 						ejgItem.setFechamodificacion(date); // Fecha Modificación
 						ejgItem.setIdinstitucion(Short.valueOf(idInstitucion));
-						
+
 						if (ejgItem.getIdpersonajg() == null) {
 							ejgItem.setIdpersonajg(Long.valueOf(itemEjg.get(3))); // Solicitante.
 						}
 						response = scsEjgMapper.updateByPrimaryKeySelective(ejgItem);
-						
-						//Lo añadimos en la Unidad Familiar como solicitante.
+
+						// Lo añadimos en la Unidad Familiar como solicitante.
 						List<String> newUnidadFamiliar = new ArrayList<>();
 						newUnidadFamiliar.add(idInstitucion.toString());
 						newUnidadFamiliar.add(itemEjg.get(3));
@@ -2437,23 +2263,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				} finally {
 					if (response != 1) {
 						error.setCode(400);
-						LOGGER.error(
-								"GestionEJGServiceImpl.asociarEJG() -> ERROR. No se ha asociado ningun elemento");
+						LOGGER.error("GestionEJGServiceImpl.asociarEJG() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
 						updateResponseDTO.setStatus(SigaConstants.OK);
-						LOGGER.info(
-								"GestionEJGServiceImpl.asociarEJG() -> Se ha asociado el elemento correctamente");
+						LOGGER.info("GestionEJGServiceImpl.asociarEJG() -> Se ha asociado el elemento correctamente");
 					}
 				}
-				
+
 				updateResponseDTO.setError(error);
 			}
 		}
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO asociarAsistencia(List<String> itemAsistencia, HttpServletRequest request) {
@@ -2467,25 +2291,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		int response = 0;
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarAsistencia() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarAsistencia() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarAsistencia() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarAsistencia() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.asociarAsistencia() -> Entrada para asociar un Justiciable a una asistencia");
+				LOGGER.debug("GestionEJGServiceImpl.asociarAsistencia() -> Entrada para asociar un Justiciable a una asistencia");
 				try {
 					// Identificar la Asistencia
 					ScsAsistenciaExample paramAsis = new ScsAsistenciaExample();
 
-					paramAsis.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-							.andAnioEqualTo(Short.valueOf(itemAsistencia.get(0))).andNumeroEqualTo(Long.valueOf(itemAsistencia.get(1)));
+					paramAsis.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andAnioEqualTo(Short.valueOf(itemAsistencia.get(0))).andNumeroEqualTo(Long.valueOf(itemAsistencia.get(1)));
 
 					List<ScsAsistencia> asistencia = scsAsistenciaExtendsMapper.selectByExample(paramAsis);
 					// Actualizar con Justiciable seleccionado.
@@ -2496,7 +2316,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						asisItem.setNumero(asistencia.get(0).getNumero());
 						asisItem.setIdpersonajg(Long.valueOf(itemAsistencia.get(2))); // Solicitante
 						asisItem.setFechamodificacion(date); // Fecha Modificación
-						response =  ScsAsistenciaMapper.updateByPrimaryKeySelective(asisItem);
+						response = ScsAsistenciaMapper.updateByPrimaryKeySelective(asisItem);
 					}
 
 				} catch (Exception e) {
@@ -2506,23 +2326,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				} finally {
 					if (response != 1) {
 						error.setCode(400);
-						LOGGER.error(
-								"GestionEJGServiceImpl.asociarAsistencia() -> ERROR. No se ha asociado ningun elemento");
+						LOGGER.error("GestionEJGServiceImpl.asociarAsistencia() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
 						updateResponseDTO.setStatus(SigaConstants.OK);
-						LOGGER.info(
-								"GestionEJGServiceImpl.asociarAsistencia() -> Se ha asociado el elemento correctamente");
+						LOGGER.info("GestionEJGServiceImpl.asociarAsistencia() -> Se ha asociado el elemento correctamente");
 					}
 				}
-				
+
 				updateResponseDTO.setError(error);
 			}
 		}
 
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO asociarSOJ(List<String> itemSOJ, HttpServletRequest request) {
@@ -2536,25 +2354,21 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		int response = 0;
 
 		if (idInstitucion != null) {
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarSOJ() -> Entrada para obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Entrada para obtener información del usuario logeado");
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.debug(
-					"GestionEJGServiceImpl.asociarSOJ() -> Salida de obtener información del usuario logeado");
+			LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Salida de obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-				LOGGER.debug(
-						"GestionEJGServiceImpl.asociarSOJ() -> Entrada para asociar un Justiciable a un SOJ");
+				LOGGER.debug("GestionEJGServiceImpl.asociarSOJ() -> Entrada para asociar un Justiciable a un SOJ");
 				try {
 					// Identificar el SOJ
 					ScsSojExample paramSOJ = new ScsSojExample();
 
-					paramSOJ.createCriteria().andIdtiposojEqualTo(Short.valueOf(itemSOJ.get(2))).andIdinstitucionEqualTo(idInstitucion)
-							.andAnioEqualTo(Short.valueOf(itemSOJ.get(0))).andNumsojEqualTo(String.valueOf(itemSOJ.get(1)));
+					paramSOJ.createCriteria().andIdtiposojEqualTo(Short.valueOf(itemSOJ.get(2))).andIdinstitucionEqualTo(idInstitucion).andAnioEqualTo(Short.valueOf(itemSOJ.get(0))).andNumsojEqualTo(String.valueOf(itemSOJ.get(1)));
 
 					List<ScsSoj> soj = scsSojExtendsMapper.selectByExample(paramSOJ);
 					// Actualizar con Justiciable seleccionado.
@@ -2565,12 +2379,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 						sojItem.setNumero(Long.valueOf(soj.get(0).getNumero()));
 						if (itemSOJ.get(2) != null) {
 							sojItem.setIdtiposoj(Short.valueOf(itemSOJ.get(2)));
-						}else {
+						} else {
 							sojItem.setIdtiposoj(soj.get(0).getIdtiposoj());
 						}
 						sojItem.setIdpersonajg(Long.valueOf(itemSOJ.get(3))); // justiciable
 						sojItem.setFechamodificacion(date); // Fecha Modificación
-						response =  scsSojExtendsMapper.updateByPrimaryKeySelective(sojItem);
+						response = scsSojExtendsMapper.updateByPrimaryKeySelective(sojItem);
 					}
 
 				} catch (Exception e) {
@@ -2580,16 +2394,14 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				} finally {
 					if (response != 1) {
 						error.setCode(400);
-						LOGGER.error(
-								"GestionEJGServiceImpl.asociarSOJ() -> ERROR. No se ha asociado ningun elemento");
+						LOGGER.error("GestionEJGServiceImpl.asociarSOJ() -> ERROR. No se ha asociado ningun elemento");
 					} else {
 						error.setCode(200);
 						updateResponseDTO.setStatus(SigaConstants.OK);
-						LOGGER.info(
-								"GestionEJGServiceImpl.asociarSOJ() -> Se ha asociado el elemento correctamente");
+						LOGGER.info("GestionEJGServiceImpl.asociarSOJ() -> Se ha asociado el elemento correctamente");
 					}
 				}
-				
+
 				updateResponseDTO.setError(error);
 			}
 		}
@@ -2597,14 +2409,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		return updateResponseDTO;
 	}
 
-	private String validacionDatosSegunTipoPcajg(String tipoJusticiable, Short idInstitucion,
-			JusticiableItem justiciableItem) {
+	private String validacionDatosSegunTipoPcajg(String tipoJusticiable, Short idInstitucion, JusticiableItem justiciableItem) {
 
 		/**
 		 * 
-		 * SCS_JUSTICIABLE = "0"; SCS_SOLICITANTE_EJG = "1"; SCS_UNIDAD_FAMILIAR_EJG =
-		 * "2"; SCS_CONTRARIO_EJG = "3"; SCS_DESIGNACION = "4"; SCS_CONTRARIO_ASISTENCIA
-		 * = "5"; SCS_SOLICITANTE_DESIGNACION = "6"; SCS_SOLICITANTE_ASISTENCIA = "7";
+		 * SCS_JUSTICIABLE = "0"; SCS_SOLICITANTE_EJG = "1"; SCS_UNIDAD_FAMILIAR_EJG = "2"; SCS_CONTRARIO_EJG = "3"; SCS_DESIGNACION = "4"; SCS_CONTRARIO_ASISTENCIA = "5"; SCS_SOLICITANTE_DESIGNACION = "6"; SCS_SOLICITANTE_ASISTENCIA = "7";
 		 * 
 		 **/
 
@@ -2707,6 +2516,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// error =
 			// "justiciaGratuita.justiciables.message.validacion.tipoPcajg.parentesco";
 			// }
+
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+				validacionSexo = true;
+			}
 		}
 
 		LOGGER.info("validateDatosTipoPcajg2y3() -> Salida del servicio para validar los datos segun tipo Pcajg 2y3");
@@ -2719,8 +2532,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg4() -> Entrada al servicio para validar los datos segun tipo Pcajg 4");
 		String error = null;
 
-		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
-				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)) {
+		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG) || tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
 				validacionDireccion = true;
@@ -2756,11 +2568,12 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco())) {
 			// validacionParentesco = true;
 			// }
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
-		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_DESIGNACION)
-				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)) {
+		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_DESIGNACION) || tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
 				validacionDireccion = true;
@@ -2775,6 +2588,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
 				validacionPais = true;
 			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2782,6 +2597,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getIdPais())) {
 				validacionPais = true;
+			}
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+				validacionSexo = true;
 			}
 		}
 
@@ -2795,8 +2613,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg5() -> Entrada al servicio para validar los datos segun tipo Pcajg 5");
 		String error = null;
 
-		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
-				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
+		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG) || tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
 				validacionDireccion = true;
@@ -2812,6 +2629,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionPais = true;
 			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
 			// validacionParentesco = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2825,8 +2644,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg6() -> Entrada al servicio para validar los datos segun tipo Pcajg 6");
 		String error = null;
 
-		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
-				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
+		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG) || tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getDireccion()))
 				validacionDireccion = true;
@@ -2842,6 +2660,8 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 				validacionFechaNacimiento = true;
 			// if (UtilidadesString.esCadenaVacia(justiciableItem.getParentesco))
 			// validacionParentesco = true;
+			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo()))
+				validacionSexo = true;
 
 		}
 
@@ -2859,6 +2679,10 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		// validacionParentesco = true;
 		// }
 
+		if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
+			validacionSexo = true;
+		}
+
 		LOGGER.info("validateDatosTipoPcajg8() -> Salida del servicio para validar los datos segun tipo Pcajg 8");
 
 		return error;
@@ -2869,10 +2693,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		LOGGER.info("validateDatosTipoPcajg9() -> Entrada al servicio para validar los datos segun tipo Pcajg 9");
 		String error = null;
 
-		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
-				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)
-				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_ASISTENCIA)
-				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
+		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG) || tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION) || tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_ASISTENCIA) || tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
 			if (UtilidadesString.esCadenaVacia(justiciableItem.getSexo())) {
 				validacionSexo = true;
@@ -2885,11 +2706,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 	}
 
 	@Override
-	public JusticiableDTO getJusticiableByIdPersona(JusticiableBusquedaItem justiciableBusquedaItem,
-			HttpServletRequest request) {
+	public JusticiableDTO getJusticiableByIdPersona(JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request) {
 
-		LOGGER.info(
-				"getJusticiableByIdPersona() -> Entrada al servicio para obtener el representante del justiciable por idpersona");
+		LOGGER.info("getJusticiableByIdPersona() -> Entrada al servicio para obtener el representante del justiciable por idpersona");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -2904,30 +2723,25 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 
-			LOGGER.info(
-					"getJusticiableByIdPersona() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getJusticiableByIdPersona() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getJusticiableByIdPersona() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getJusticiableByIdPersona() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				try {
 
-					LOGGER.info(
-							"getJusticiableByIdPersona() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
+					LOGGER.info("getJusticiableByIdPersona() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para obtener representante");
 					ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()));
+					scsPersonajgExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(justiciableBusquedaItem.getIdPersona()));
 
 					scsPersonajgExample.setOrderByClause("FECHAMODIFICACION DESC");
 
 					personajgList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
 
-					LOGGER.info(
-							"getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
+					LOGGER.info("getJusticiableByNif() / scsPersonajgExtendsMapper.selectByExample() -> Salida a scsPersonajgExtendsMapper para obtener representante");
 
 					if (personajgList != null && personajgList.size() > 0) {
 
@@ -2956,8 +2770,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			}
 
 		}
-		LOGGER.info(
-				"getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
+		LOGGER.info("getJusticiableByIdPersona() -> Salida del servicio para obtener el representante del justiciable por idpersona");
 		return justiciableDTO;
 	}
 
@@ -2979,13 +2792,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"updateUnidadFamiliar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("updateUnidadFamiliar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"updateUnidadFamiliar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("updateUnidadFamiliar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -3135,13 +2946,11 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-			LOGGER.info(
-					"getSolicitante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getSolicitante() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			LOGGER.info(
-					"getSolicitante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("getSolicitante() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -3150,10 +2959,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 					// Buscamos aquella entrada que es la solicitante principal de nuestro ejg
 					ScsUnidadfamiliarejgExample example = new ScsUnidadfamiliarejgExample();
 
-					example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnnio()))
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG()))
-							.andNumeroEqualTo(Long.parseLong(datos.getNumero())).andSolicitanteEqualTo((short) 1);
+					example.createCriteria().andAnioEqualTo(Short.parseShort(datos.getAnnio())).andIdinstitucionEqualTo(idInstitucion).andIdtipoejgEqualTo(Short.parseShort(datos.getTipoEJG())).andNumeroEqualTo(Long.parseLong(datos.getNumero())).andSolicitanteEqualTo((short) 1);
 
 					// Actualizamos la entrada
 					solicitante.setunidadFamiliarItems(scsUnidadfamiliarejgMapper.selectByExample(example));

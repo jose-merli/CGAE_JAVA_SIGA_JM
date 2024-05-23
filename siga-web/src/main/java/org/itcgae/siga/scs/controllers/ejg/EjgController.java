@@ -604,6 +604,11 @@ public class EjgController {
 		ejg.setAnnio(item[1]);
 		ejg.setNumero(item[0]);
 		ejg.setTipoEJG(item[2]);
+		
+		if(item.length >= 5) {
+			ejg.setIdPersona(item[4]);			
+		}
+		
 		List<ListaContrarioEJGJusticiableItem> response = gestionEJG.busquedaListaContrariosEJG(ejg, request,
 				Boolean.parseBoolean(item[3]));
 		if (response != null) {

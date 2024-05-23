@@ -183,18 +183,16 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 	
 	public String selectNuevoNumero(FichaSojItem datos, Short idInstitucion) {
 		SQL sql = new SQL();
-		//SELECT NVL(MAX(NUMERO)+1, 1)  FROM scs_SOJ WHERE IDINSTITUCION = 2061 AND ANIO = 2023 AND IDTIPOSOJ = 2; -- número máximo
 		sql.SELECT("NVL(MAX(NUMERO)+1, 1)");
 		sql.FROM("SCS_SOJ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("ANIO = " + datos.getAnio());
-		//sql.WHERE("IDTIPOSOJ = " + datos.getIdTipoSoj());
+		sql.WHERE("IDTIPOSOJ = " + datos.getIdTipoSoj());
 		return sql.toString();
 	}
 	
 	public String selectNuevoNumeroSOJ(FichaSojItem datos, Short idInstitucion) {
 		SQL sql = new SQL();
-		//SELECT NVL(MAX(NUMSOJ)+1, 1)  FROM scs_SOJ WHERE IDINSTITUCION = 2061 AND ANIO = 2023; -- número SOJ máximo
 		sql.SELECT("NVL(Max(CAST(NUMSOJ AS int))+1, 1)");
 		sql.FROM("SCS_SOJ");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
