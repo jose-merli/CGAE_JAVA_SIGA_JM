@@ -324,6 +324,17 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						modulo.setFechamodificacion(new Date());
 						modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
+						Date fechaActual = new Date();
+						
+						if (modulosItem.getFechadesdevigor().compareTo(fechaActual) <= 0
+								&& (modulosItem.getFechahastavigor() == null
+										|| modulosItem.getFechahastavigor().compareTo(fechaActual) > 0)
+								&& modulosItem.getFechabaja() == null) {
+							modulo.setVigente("1");
+						} else {
+							modulo.setVigente("0");
+						}
+						
 						LOGGER.info(
 								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar el modulo");
 
@@ -468,7 +479,6 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							modulo.setCodigo(modulosItem.getCodigo());
 							modulo.setCodigoext(modulosItem.getCodigoext());
 							modulo.setPrecio(precio);
-							modulo.setVigente("1");
 							modulo.setOrden(0);
 							modulo.setComplemento(modulosItem.getComplemento());
 							modulo.setFechadesdevigor(modulosItem.getFechadesdevigor());
@@ -478,6 +488,17 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							modulo.setObservaciones(modulosItem.getObservaciones());
 							modulo.setFechamodificacion(new Date());
 							modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
+							
+							Date fechaActual = new Date();
+							
+							if (modulosItem.getFechadesdevigor().compareTo(fechaActual) <= 0
+									&& (modulosItem.getFechahastavigor() == null
+											|| modulosItem.getFechahastavigor().compareTo(fechaActual) > 0)
+									&& modulosItem.getFechabaja() == null) {
+								modulo.setVigente("1");
+							} else {
+								modulo.setVigente("0");
+							}
 							
 							LOGGER.info(
 									"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
