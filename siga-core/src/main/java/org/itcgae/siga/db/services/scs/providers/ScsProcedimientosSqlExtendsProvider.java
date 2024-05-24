@@ -163,7 +163,7 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 				String fechaFormateada = formato.format(moduloItem.getFechadesdevigor());
 				
 				sql.WHERE("procedimiento.fechadesdevigor <= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
-				sql.WHERE("procedimiento.fechahastavigor >= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+				sql.WHERE("(procedimiento.fechahastavigor >= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy') OR procedimiento.fechahastavigor IS NULL)");
 			}
 		}
 
