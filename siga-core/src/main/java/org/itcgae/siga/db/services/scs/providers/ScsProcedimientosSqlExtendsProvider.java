@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -154,8 +156,15 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		}
 
 		if (!moduloItem.isHistorico()) {
-
-			sql.WHERE("(procedimiento.fechabaja is null)");
+			sql.WHERE("procedimiento.fechabaja is null");
+			
+			if (moduloItem.getFechadesdevigor() != null) {
+				SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaFormateada = formato.format(moduloItem.getFechadesdevigor());
+				
+				sql.WHERE("procedimiento.fechadesdevigor <= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+				sql.WHERE("procedimiento.fechahastavigor >= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+			}
 		}
 
 		if (idJuzgado != null) {
