@@ -598,7 +598,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		sql.GROUP_BY(
 				"idpersona , consulta.fechamodificacion, consulta.nif, consulta.nombre, consulta.apellido1, consulta.apellido2, consulta.idinstitucion, consulta.tipopersonajg");
-		sql.ORDER_BY("consulta.apellido1, consulta.apellido2, consulta.nombre, consulta.nif, consulta.fechamodificacion, consulta.tipopersonajg desc");
+		sql.ORDER_BY("consulta.apellido1, consulta.apellido2, consulta.nombre, consulta.nif, consulta.fechamodificacion, consulta.tipopersonajg asc");
 
 		LOGGER.info("MONTADA SQL JUSTICIABLES");
 
