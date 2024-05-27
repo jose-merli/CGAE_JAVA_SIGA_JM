@@ -1600,8 +1600,13 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 				// Campos opcionales
 				record.setFechapresentacion(datos.getFechapresentacion());
 				record.setFechalimitepresentacion(datos.getFechalimitepresentacion());
-				if (datos.getTipoEJGColegio() != null)
-					record.setIdtipoejgcolegio(Short.parseShort(datos.getTipoEJGColegio()));
+				
+				if (datos.getTipoEJGColegio() != null && !datos.getTipoEJGColegio().trim().isEmpty()) {
+					Short value = Short.parseShort(datos.getTipoEJGColegio());
+					if(value != 0) {
+						record.setIdtipoejgcolegio(value);
+					}
+				}
 
 				response = scsEjgMapper.insert(record);
 
@@ -2064,12 +2069,14 @@ public class GestionEJGServiceImpl implements IGestionEJG {
 
 		// tenemos q ver si devuleve id o nombre de tipo ejg
 		if (item.getTipoEJG() != null && !item.getTipoEJG().isEmpty()){
-
 			result.setIdtipoejg(Short.parseShort(item.getTipoEJG()));
 		}
 
-		if (item.getTipoEJGColegio() != null) {
-			result.setIdtipoejgcolegio(Short.parseShort(item.getTipoEJGColegio()));
+		if (item.getTipoEJGColegio() != null && !item.getTipoEJGColegio().trim().isEmpty()) {
+			Short value = Short.parseShort(item.getTipoEJGColegio());
+			if(value != 0) {
+				result.setIdtipoejgcolegio(value);				
+			}
 		}
 		if (item.getIdGuardia() == null) {
 			result.setGuardiaturnoIdguardia(null);

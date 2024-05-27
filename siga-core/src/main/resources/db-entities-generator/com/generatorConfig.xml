@@ -1,89 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\Users\acorral\Downloads\ojdbc6.jar" />
+	<classPathEntry location="C:\repositorio_weblogic\ojdbc6.jar" />
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//10.75.29.133:1521/cgae" 
+			connectionURL="jdbc:oracle:thin:@//192.168.18.18:1546/SIGADES" 
 			driverClass="oracle.jdbc.OracleDriver"
-			userId="uscgae"
-			password="uscgae" />
-			
-			
+			userId="USCGAE_INT"
+			password="oradesaINT19" />
+
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
-		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" />
+		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER"/>
 		
-
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_BOTONACCION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CERTIFICADOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONSULTAINFORME" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONFIG" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_CONTADOR" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-			<table schema="USCGAE" tableName="ADM_ENVIOINFORME" >
-				<property name="ignoreQualifiersAtRuntime" value="true"/>
-			</table> 
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_GESTORINTERFAZ" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
-			<table schema="USCGAE_DESA" tableName="ADM_INFORME" >
-				<property name="ignoreQualifiersAtRuntime" value="true"/>
-			</table> 
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_LENGUAJES" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_MODO_CONTADOR" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_PERFIL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>  -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_PERFIL_ROL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_ROL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOFILTROINFORME" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOINFORME" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOSACCESO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>    -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_TIPOSACCESO_HISTORICO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIO_EFECTIVO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS_EFECTIVOS_HIST" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_USUARIOS_EFECTIVOS_PERFIL" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-<!-- 		<table schema="USCGAE_DESA" tableName="ADM_VALORPREFERENTE" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table>   -->
-
-		
+		<table schema="USCGAE_INT" tableName="ENV_HISTORICOESTADOENVIO" >
+ 			<property name="ignoreQualifiersAtRuntime" value="true"/>
+ 			<generatedKey column="idhistorico" sqlStatement="SELECT NVL(MAX(IDHISTORICO) + 1,1) from ENV_HISTORICOESTADOENVIO where IDINSTITUCION = #{idinstitucion} AND IDENVIO = #{idenvio}" />
+ 		</table>
 
 	</context>
 </generatorConfiguration>

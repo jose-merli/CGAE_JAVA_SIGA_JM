@@ -3463,6 +3463,11 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		if (!historico) {
 			consulta += " AND scs_contrariosdesigna.fechabaja is null \r\n";
 		}
+		
+		if(item.getIdPersona() != null) {
+			consulta += " AND scs_contrariosdesigna.idpersona = " + item.getIdPersona() + "\r\n";
+		}
+		
 		consulta += "              AND scs_contrariosdesigna.idturno = " + item.getIdTurno() + " )\r\n" + "    ) t1\r\n"
 				+ "\r\n" + "";
 
@@ -3481,9 +3486,15 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		sql.SELECT("SCS_DEFENDIDOSDESIGNA.numero");
 		sql.SELECT("persona.nif");
 		sql.SELECT("F_SIGA_getRecurso(tv.descripcion,'1') ||' '|| persona.direccion || ' ' || persona.numerodir || ' ' || persona.pisodir || ' ' || persona.puertadir || ' ' || pol.nombre ||' ' || persona.codigopostal || ' ' || prov.nombre  as direccion");
-		sql.SELECT("    CASE\r\n" + "        WHEN nombrerepresentante IS NOT NULL THEN\r\n"
-				+ "            nombrerepresentante\r\n" + "        ELSE\r\n" + "            ''\r\n"
-				+ "    END AS representante\r\n");
+		sql.SELECT("    CASE\r\n" + 
+				"        WHEN nombrerepresentante IS NOT NULL THEN\r\n" +
+				"            nombrerepresentante\r\n" + 
+				"        ELSE\r\n" + 
+				"            (SELECT representante.apellido1 || ' ' || representante.apellido2 || ', ' || representante.nombre\r\n" +
+				"             FROM scs_personajg representante\r\n" +
+				"             WHERE representante.idpersona = persona.idrepresentantejg AND representante.idinstitucion = scs_DEFENDIDOSDESIGNA.idinstitucion AND ROWNUM < 2)\r\n" +
+				"    END AS representante\r\n");
+		sql.SELECT("(SELECT representante.IDPERSONA FROM scs_personajg representante WHERE representante.IDPERSONA = persona.IDREPRESENTANTEJG AND representante.IDINSTITUCION = scs_DEFENDIDOSDESIGNA.idinstitucion AND ROWNUM < 2) AS idpersonarepresentante");
 		sql.SELECT("            persona.apellido1\r\n"
 				+ "            || decode(persona.apellido2, NULL, '', ' ' || persona.apellido2)\r\n"
 				+ "            || ', '\r\n" + "            || persona.nombre AS apellidosnombre");

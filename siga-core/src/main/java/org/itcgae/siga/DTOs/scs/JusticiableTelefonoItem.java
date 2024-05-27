@@ -2,25 +2,29 @@ package org.itcgae.siga.DTOs.scs;
 
 import java.util.Date;
 
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JusticiableTelefonoItem {
 
 	private String idPersona;
-	private String idInstitucion;
-	private String idTelefono;
-	private String nombreTelefono;
-	private String numeroTelefono;
-	private Date fechaModificacion;
-	private String preferenteSms;
 	
-
-	/**
-	 **/
-	public JusticiableTelefonoItem idPersona(String idPersona) {
-		this.idPersona = idPersona;
-		return this;
-	}
+	private String idInstitucion;
+	
+	private String idTelefono;
+	
+	@Size(max = 100)
+	private String nombreTelefono;
+	
+	@Size(max = 20)
+	@Pattern(regexp = "^(\\(\\+[0-9]{2}\\)|[0-9]{4})?[ ]?[0-9]{9}$", message = "El telefono formato no valido")
+	private String numeroTelefono;
+	
+	private Date fechaModificacion;
+	
+	private String preferenteSms;
 
 	@JsonProperty("idpersona")
 	public String getIdPersona() {
@@ -29,13 +33,6 @@ public class JusticiableTelefonoItem {
 
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
-	}
-
-	/**
-	 **/
-	public JusticiableTelefonoItem idInstitucion(String idInstitucion) {
-		this.idInstitucion = idInstitucion;
-		return this;
 	}
 
 	@JsonProperty("idinstitucion")
@@ -47,13 +44,6 @@ public class JusticiableTelefonoItem {
 		this.idInstitucion = idInstitucion;
 	}
 
-	/**
-	 **/
-	public JusticiableTelefonoItem idTelefonok(String idTelefono) {
-		this.idTelefono = idTelefono;
-		return this;
-	}
-
 	@JsonProperty("idTelefono")
 	public String getIdTelefono() {
 		return idTelefono;
@@ -61,13 +51,6 @@ public class JusticiableTelefonoItem {
 
 	public void setIdTelefono(String idTelefono) {
 		this.idTelefono = idTelefono;
-	}
-
-	/**
-	 **/
-	public JusticiableTelefonoItem nombreTelefono(String nombreTelefono) {
-		this.nombreTelefono = nombreTelefono;
-		return this;
 	}
 
 	@JsonProperty("nombreTelefono")
@@ -79,13 +62,6 @@ public class JusticiableTelefonoItem {
 		this.nombreTelefono = nombreTelefono;
 	}
 
-	/**
-	 **/
-	public JusticiableTelefonoItem numeroTelefono(String numeroTelefono) {
-		this.numeroTelefono = numeroTelefono;
-		return this;
-	}
-
 	@JsonProperty("numeroTelefono")
 	public String getNumeroTelefono() {
 		return numeroTelefono;
@@ -93,29 +69,6 @@ public class JusticiableTelefonoItem {
 
 	public void setNumeroTelefono(String numeroTelefono) {
 		this.numeroTelefono = numeroTelefono;
-	}
-
-	/**
-	 **/
-	public JusticiableTelefonoItem fechaModificacion(Date fechaModificacion) {
-		this.fechaModificacion = fechaModificacion;
-		return this;
-	}
-
-	@JsonProperty("fechamodificacion")
-	public Date getFechaModificacion() {
-		return fechaModificacion;
-	}
-
-	public void setFechaModificacion(Date fechaModificacion) {
-		this.fechaModificacion = fechaModificacion;
-	}
-
-	/**
-	 **/
-	public JusticiableTelefonoItem preferenteSms(String preferenteSms) {
-		this.preferenteSms = preferenteSms;
-		return this;
 	}
 
 	@JsonProperty("preferenteSms")
@@ -126,21 +79,28 @@ public class JusticiableTelefonoItem {
 	public void setPreferenteSms(String preferenteSms) {
 		this.preferenteSms = preferenteSms;
 	}
+	
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
 		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
 		result = prime * result + ((idTelefono == null) ? 0 : idTelefono.hashCode());
 		result = prime * result + ((nombreTelefono == null) ? 0 : nombreTelefono.hashCode());
 		result = prime * result + ((numeroTelefono == null) ? 0 : numeroTelefono.hashCode());
 		result = prime * result + ((preferenteSms == null) ? 0 : preferenteSms.hashCode());
+		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
 		return result;
 	}
-	
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -151,11 +111,6 @@ public class JusticiableTelefonoItem {
 		if (getClass() != obj.getClass())
 			return false;
 		JusticiableTelefonoItem other = (JusticiableTelefonoItem) obj;
-		if (fechaModificacion == null) {
-			if (other.fechaModificacion != null)
-				return false;
-		} else if (!fechaModificacion.equals(other.fechaModificacion))
-			return false;
 		if (idInstitucion == null) {
 			if (other.idInstitucion != null)
 				return false;
@@ -180,6 +135,11 @@ public class JusticiableTelefonoItem {
 			if (other.numeroTelefono != null)
 				return false;
 		} else if (!numeroTelefono.equals(other.numeroTelefono))
+			return false;
+		if (fechaModificacion == null) {
+			if (other.fechaModificacion != null)
+				return false;
+		} else if (!fechaModificacion.equals(other.fechaModificacion))
 			return false;
 		if (preferenteSms != other.preferenteSms)
 			return false;

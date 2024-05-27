@@ -3290,8 +3290,7 @@ public class AsistenciaServiceImpl implements AsistenciaService {
 							scsPersonajg.setNombre(justiciable.getNombre());
 							scsPersonajg.setApellido1(justiciable.getApellido1());
 							scsPersonajg.setApellido2(justiciable.getApellido2());
-							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
-							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonajg());
+							scsPersonajg.setTipopersonajg(justiciable.getTipoPersonaJG());
 							scsPersonajg.setFechamodificacion(new Date());
 
 						} else {

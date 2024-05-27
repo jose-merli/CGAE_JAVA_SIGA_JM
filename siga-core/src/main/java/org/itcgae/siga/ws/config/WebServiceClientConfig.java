@@ -1,4 +1,5 @@
 package org.itcgae.siga.ws.config;
+
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -27,12 +28,11 @@ import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.soap.server.SoapMessageDispatcher;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
-
 @EnableWs
-@Configuration 
+@Configuration
 @SuppressWarnings("deprecation")
 public class WebServiceClientConfig extends WsConfigurerAdapter {
-	
+
 	@Bean
 	public GenericMarshallingMethodEndpointAdapter endpointAdapter() {
 		GenericMarshallingMethodEndpointAdapter endpointAdapter = new GenericMarshallingMethodEndpointAdapter();
@@ -40,24 +40,25 @@ public class WebServiceClientConfig extends WsConfigurerAdapter {
 		endpointAdapter.setUnmarshaller(new XmlBeansMarshaller());
 		return endpointAdapter;
 	}
-	
+
 	@Bean
-	public SoapMessageDispatcher dispatcher(GenericMarshallingMethodEndpointAdapter endpointAdapter, ApplicationContext applicationContext, PayloadRootAnnotationMethodEndpointMapping endpointMapping){
+	public SoapMessageDispatcher dispatcher(GenericMarshallingMethodEndpointAdapter endpointAdapter,
+			ApplicationContext applicationContext, PayloadRootAnnotationMethodEndpointMapping endpointMapping) {
 		SoapMessageDispatcher dispatcher = new SoapMessageDispatcher();
 		List<EndpointAdapter> endpointAdapterList = new ArrayList<EndpointAdapter>();
 		endpointAdapterList.add(endpointAdapter);
 		dispatcher.setEndpointAdapters(endpointAdapterList);
 		dispatcher.setApplicationContext(applicationContext);
-		
+
 		List<EndpointMapping> endpointMappings = new ArrayList<EndpointMapping>();
 		endpointMappings.add(endpointMapping);
 		dispatcher.setEndpointMappings(endpointMappings);
-		
+
 		return dispatcher;
 	}
-	
+
 	@Bean
-	public PayloadRootAnnotationMethodEndpointMapping endpointMapping(ApplicationContext applicationContext){
+	public PayloadRootAnnotationMethodEndpointMapping endpointMapping(ApplicationContext applicationContext) {
 		PayloadRootAnnotationMethodEndpointMapping endpointMapping = new PayloadRootAnnotationMethodEndpointMapping();
 		endpointMapping.setApplicationContext(applicationContext);
 		return endpointMapping;
@@ -78,29 +79,33 @@ public class WebServiceClientConfig extends WsConfigurerAdapter {
 		return httpComponentsMessageSender;
 	}
 
-	
+	@Bean
+	public MutualidadClient webServiceTemplateMutualidad()
+			throws SOAPException, KeyManagementException, NoSuchAlgorithmException {
+		MutualidadClient client = new MutualidadClient();
 
-	    @Bean
-	    public MutualidadClient webServiceTemplateMutualidad() throws SOAPException, KeyManagementException, NoSuchAlgorithmException {
-	        MutualidadClient client = new MutualidadClient();
-	        //request.setId(id);
-	    	WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
-			SSLContext sslContext = SSLContexts.custom().useProtocol("TLSv1.1").build();
-			CloseableHttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).addInterceptorFirst(new 
-			HttpComponentsMessageSender.RemoveSoapHeadersInterceptor()).build();
-			HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender(httpClient);
-	    	MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
-	    	SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
-	    	webServiceTemplate.setMessageFactory(newSoapMessageFactory);
-	    	webServiceTemplate.setDefaultUri("https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc");
-	    	webServiceTemplate.setMarshaller(new XmlBeansMarshaller());
-	    	webServiceTemplate.setUnmarshaller(new XmlBeansMarshaller());
-	    	webServiceTemplate.setMessageSender(messageSender);
-	    	client.setWebServiceTemplate(webServiceTemplate);
-	        return client;
-	    }
-	    
-	    
-
+		WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
+		
+		SSLContext sslContext = SSLContexts.custom().useProtocol("TLSv1.1").build();
+		
+		CloseableHttpClient httpClient = HttpClients.custom()
+				.setSSLContext(sslContext)
+				.addInterceptorFirst(new HttpComponentsMessageSender.RemoveSoapHeadersInterceptor())
+				.build();
+		
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender(httpClient);
+		
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
+		webServiceTemplate.setDefaultUri("https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc");
+		webServiceTemplate.setMarshaller(new XmlBeansMarshaller());
+		webServiceTemplate.setUnmarshaller(new XmlBeansMarshaller());
+		webServiceTemplate.setMessageSender(messageSender);
+		client.setWebServiceTemplate(webServiceTemplate);
+		
+		return client;
+	}
 
 }

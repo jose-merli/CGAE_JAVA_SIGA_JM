@@ -77,6 +77,11 @@ public class ScsContrariosejgSqlExtendsProvider extends ScsContrariosejgSqlProvi
 		if (!historico) {
 			from += " AND scs_contrariosejg.fechabaja is null \r\n";
 		}
+		
+		if(item.getIdPersona() != null) {
+			from += " AND scs_contrariosejg.idpersona = " + item.getIdPersona() + "\r\n";
+		}
+		
 		from += "   )) t1\r\n";
 
 		sql.FROM(from);
