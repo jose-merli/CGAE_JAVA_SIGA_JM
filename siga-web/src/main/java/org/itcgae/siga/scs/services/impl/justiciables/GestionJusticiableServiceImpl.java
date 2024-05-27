@@ -551,7 +551,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		justiciableItem.setIdPais(personajg.getIdpais());
 
-		// justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
+		justiciableItem.setIdpaisDir1(personajg.getIdpaisdir1());
 		// justiciableItem.setIdpaisDir2(personajg.getIdpaisdir2());
 
 		if (personajg.getIdpersona() != null) {
@@ -848,7 +848,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 			scsPersonajg.setIdpais(justiciableItem.getIdPais());
 
-			// scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
+			scsPersonajg.setIdpaisdir1(justiciableItem.getIdpaisDir1());
 			// scsPersonajg.setIdpaisdir2(justiciableItem.getIdpaisDir2());
 
 			// if (justiciableItem.getIdPersona() != null && justiciableItem.getIdPersona()
