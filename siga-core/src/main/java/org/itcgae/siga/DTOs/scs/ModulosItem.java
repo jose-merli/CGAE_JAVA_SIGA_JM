@@ -25,6 +25,9 @@ public class ModulosItem {
 	private String jurisdiccionDes;
 	private boolean verSoloAlta;
 	private boolean usado;
+    private String pretensiones; // Nueva propiedad
+    private String juzgados; // Nueva propiedad
+    private String acreditaciones;
 	
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -193,4 +196,30 @@ public class ModulosItem {
 	public void setUsado(boolean usado) {
 		this.usado = usado;
 	}
+	
+    public String getPretensiones() {
+        return pretensiones;
+    }
+
+    public void setPretensiones(String pretensiones) {
+        this.pretensiones = pretensiones;
+    }
+
+    public String getJuzgados() {
+        return juzgados;
+    }
+
+    public void setJuzgados(String juzgados) {
+        this.juzgados = juzgados;
+    }
+    
+    public String getAcreditaciones()
+    {
+    	return acreditaciones;
+    }
+    
+    public void setAcreditaciones(String acreditaciones)
+    {
+    	this.acreditaciones = acreditaciones;
+    }
 }
