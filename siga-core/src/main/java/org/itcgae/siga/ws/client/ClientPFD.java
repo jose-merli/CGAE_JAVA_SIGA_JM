@@ -6,10 +6,10 @@ import org.itcgae.siga.ws.config.WebServiceClientConfigPFD;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.pfd.ws.service.FirmaCorporativaPDFDocument;
-import com.pfd.ws.service.FirmaCorporativaPDFResponseDocument;
-import com.pfd.ws.service.ObtenerDocumentoDocument;
-import com.pfd.ws.service.ObtenerDocumentoResponseDocument;
+import com.pfd.ws.validacionFirma.ResultSolicitudDocumentoTO;
+import com.pfd.ws.validacionFirma.SolicitudDocumentoTO;
+import com.sis.firma.core.TO.DatosSelloFirmaPDFTO;
+import com.sis.firma.core.TO.FirmaResultadoTO;
 
 @Component
 public class ClientPFD extends DefaultClientWs{
@@ -17,9 +17,9 @@ public class ClientPFD extends DefaultClientWs{
 	private static final Logger LOGGER = Logger.getLogger(ClientPFD.class);
 
 	
-	public FirmaCorporativaPDFResponseDocument firmarPDF(String uriService, FirmaCorporativaPDFDocument request) throws Exception{
+	public FirmaResultadoTO firmarPDF(String idClientePFD, String uriService, DatosSelloFirmaPDFTO request, String base64File) throws Exception{
 		LOGGER.debug("Llamada a pfd firmarPDF");
-		FirmaCorporativaPDFResponseDocument response = null;
+		FirmaResultadoTO response = null;
 		AnnotationConfigApplicationContext context = null;
 		try{
 			LOGGER.info("La url de la PFD es: " + uriService);
@@ -27,7 +27,7 @@ public class ClientPFD extends DefaultClientWs{
 			context = new AnnotationConfigApplicationContext(WebServiceClientConfigPFD.class);
 			PFDClient client = context.getBean(PFDClient.class);
 			LOGGER.debug(request);
-			response = client.firmarPDF(uriService, request);
+			response = client.firmarPDF(idClientePFD, uriService, request, base64File);
 			LOGGER.debug(response);
 		} catch (Exception e){
 			LOGGER.error("Error al enviar a firma un documento", e);
@@ -41,10 +41,10 @@ public class ClientPFD extends DefaultClientWs{
 		return response;
 	}
 	
-	public ObtenerDocumentoResponseDocument obtenerDocumento(String uriService, ObtenerDocumentoDocument request){
+	public ResultSolicitudDocumentoTO obtenerDocumento(String uriService, SolicitudDocumentoTO request){
 		
 		LOGGER.debug("Llamada a obtener un documento firmado");
-		ObtenerDocumentoResponseDocument response = null;
+		ResultSolicitudDocumentoTO response = null;
 		AnnotationConfigApplicationContext context = null;
 		
 		try{
