@@ -4,20 +4,38 @@ import java.net.URISyntaxException;
 
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 
-import com.pfd.ws.service.FirmaCorporativaPDFDocument;
-import com.pfd.ws.service.FirmaCorporativaPDFResponseDocument;
-import com.pfd.ws.service.ObtenerDocumentoDocument;
-import com.pfd.ws.service.ObtenerDocumentoResponseDocument;
+import com.pfd.ws.validacionFirma.ResultSolicitudDocumentoTO;
+import com.pfd.ws.validacionFirma.SolicitudDocumentoTO;
+import com.sis.firma.core.TO.DatosSelloFirmaPDFTO;
+import com.sis.firma.core.TO.FirmaResultadoTO;
+import com.sis.firma.core.excepciones.ProblemasComunicacionWSException;
+import com.sis.firma.coreServer.accesoWS;
+
 
 public class PFDClient extends WebServiceGatewaySupport {
 	
 	
-    public FirmaCorporativaPDFResponseDocument firmarPDF(String uriService, FirmaCorporativaPDFDocument request) throws URISyntaxException {
-        return (FirmaCorporativaPDFResponseDocument) getWebServiceTemplate().marshalSendAndReceive(uriService, request);
+    public FirmaResultadoTO firmarPDF(String idCliente,String b64Pdf,DatosSelloFirmaPDFTO request, String uriService) throws URISyntaxException {
+    	
+    	FirmaResultadoTO firma = null;
+    	try {
+    		firma=accesoWS.solicitarFirmaCorporativaPDF(idCliente, b64Pdf, request, "0", uriService);
+
+    	}catch (ProblemasComunicacionWSException e){
+    		e.printStackTrace();
+    	}
+    	
+    	return firma;
     }
     
-    public ObtenerDocumentoResponseDocument obtenerDocumento(String uriService, ObtenerDocumentoDocument request) throws URISyntaxException {
-        return (ObtenerDocumentoResponseDocument) getWebServiceTemplate().marshalSendAndReceive(uriService, request);
+    public ResultSolicitudDocumentoTO obtenerDocumento(String uriService, SolicitudDocumentoTO request) throws URISyntaxException {
+    	ResultSolicitudDocumentoTO obtDoc = null;;
+		try {
+			obtDoc = accesoWS.obtenerDocumento(request, uriService);
+		} catch (ProblemasComunicacionWSException e) {
+			e.printStackTrace();
+		}
+    	return obtDoc;
     }	
 	
 
