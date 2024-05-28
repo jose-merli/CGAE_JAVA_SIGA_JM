@@ -31,6 +31,7 @@ public interface ScsSojExtendsMapper extends ScsSojMapper{
 		//@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMERO", property = "numero", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TURNOGUARDIA", property = "turnoGuardia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINTERESADO", property = "idInteresado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "INTERESADO", property = "interesado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAAPERTURA", property = "fecha", jdbcType = JdbcType.DATE),

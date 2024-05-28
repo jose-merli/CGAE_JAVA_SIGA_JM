@@ -22,7 +22,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		sql.SELECT("a.idinstitucion, a.anio, a.numero, ('A' ||a.anio || '/' || a.numero) asunto,"
 				+ "(nvl(t.abreviatura,'') || '/' || nvl(g.nombre,'')) turnoguardia,"
 				+ "f_siga_getrecurso(nvl(ta.descripcion,''),"+idLenguaje+") tipoasistencia,"
-				+ "(nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
+				+ "a.idpersonajg idinteresado, (nvl(pjg.nombre,'') || ' ' || nvl(pjg.apellido1,'') || ' ' || nvl(pjg.apellido2,'')) interesado,"
 				+ "(nvl(per.nombre,'') || ' ' || nvl(per.apellidos1,'') || ' ' || nvl(per.apellidos2,'')) letrado,"
 				+ "a.fechahora, NVL(a.numeroprocedimiento,'') numeroprocedimiento,"
 				+ "a.comisaria centrodetencion,"
