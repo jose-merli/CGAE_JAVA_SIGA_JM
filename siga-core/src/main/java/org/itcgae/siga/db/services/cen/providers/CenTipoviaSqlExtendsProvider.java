@@ -14,7 +14,7 @@ public class CenTipoviaSqlExtendsProvider extends CenTipoviaSqlProvider {
 		sql.FROM("CEN_TIPOVIA TIPOVIA");
 		sql.WHERE("TIPOVIA.IDINSTITUCION = '" + idInstitucion + "'");
 		if(idTipoViaJusticiable != null && !idTipoViaJusticiable.isEmpty() && !"undefined".equals(idTipoViaJusticiable)) {
-			sql.WHERE("TIPOVIA.FECHA_BAJA IS NULL OR TIPOVIA.IDTIPOVIA = " + idTipoViaJusticiable);
+			sql.WHERE("(TIPOVIA.FECHA_BAJA IS NULL OR TIPOVIA.IDTIPOVIA = " + idTipoViaJusticiable + ")");
 		} else {
 			sql.WHERE("TIPOVIA.FECHA_BAJA IS NULL");
 		}
