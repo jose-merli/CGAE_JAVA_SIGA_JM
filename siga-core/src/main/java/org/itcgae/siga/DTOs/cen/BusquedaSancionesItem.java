@@ -298,6 +298,14 @@ public class BusquedaSancionesItem implements Comparable<BusquedaSancionesItem>{
 	
 	@Override
 	public int compareTo(BusquedaSancionesItem o) {
-		return o.getFechaDesdeDate().compareTo(getFechaDesdeDate());
+		if (o.getFechaDesdeDate() != null && getFechaDesdeDate() == null) {
+			return -1;
+		} else if (o.getFechaDesdeDate() == null && getFechaDesdeDate() != null) {
+			return 1;
+		} else if (o.getFechaDesdeDate() == null && getFechaDesdeDate() == null){
+			return 0;
+		} else {
+			return o.getFechaDesdeDate().compareTo(getFechaDesdeDate());
+		}
     }
 }
