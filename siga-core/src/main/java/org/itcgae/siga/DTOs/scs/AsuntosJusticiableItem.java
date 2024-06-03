@@ -12,6 +12,7 @@ public class AsuntosJusticiableItem {
 	private String letrado;
 	private Date fechaModificacion;
 	private Date fecha;
+	private String idInteresado;
 	private String interesado;
 	private String datosInteres;
 	private String anio;
@@ -460,5 +461,14 @@ public class AsuntosJusticiableItem {
 
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
+	}
+
+	
+	public String getIdInteresado() {
+		return idInteresado;
+	}
+
+	public void setIdInteresado(String idInteresado) {
+		this.idInteresado = idInteresado;
 	}
 }

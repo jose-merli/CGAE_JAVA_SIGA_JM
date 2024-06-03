@@ -164,7 +164,7 @@ public class JusticiableItem {
 
 	@JsonProperty("fax")
 	@Size(max = 20)
-	@Pattern(regexp = "^(\\(\\+[0-9]{2}\\)|[0-9]{4})?[ ]?[0-9]{9}$", message = "El fax formato no valido")
+	@Pattern(regexp = "^$|^(\\(\\+[0-9]{2}\\)|[0-9]{4})?[ ]?[0-9]{9}$", message = "El fax formato no valido")
 	private String fax;
 
 	@JsonProperty("telefonos")
