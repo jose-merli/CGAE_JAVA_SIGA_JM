@@ -28,7 +28,9 @@ public class ModulosItem {
     private String pretensiones; // Nueva propiedad
     private String juzgados; // Nueva propiedad
     private String acreditaciones;
-	
+    private int numJuzgados;
+    private int numAcreditaciones;
+
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -222,4 +224,20 @@ public class ModulosItem {
     {
     	this.acreditaciones = acreditaciones;
     }
+    
+    public int getNumJuzgados() {
+		return numJuzgados;
+	}
+
+	public void setNumJuzgados(int numJuzgados) {
+		this.numJuzgados = numJuzgados;
+	}
+
+	public int getNumAcreditaciones() {
+		return numAcreditaciones;
+	}
+
+	public void setNumAcreditaciones(int numAcreditaciones) {
+		this.numAcreditaciones = numAcreditaciones;
+	}
 }

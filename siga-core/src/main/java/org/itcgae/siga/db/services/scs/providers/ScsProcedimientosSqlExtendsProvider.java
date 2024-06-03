@@ -1,8 +1,8 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.scs.ModulosItem;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;
 
 public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlProvider {
@@ -46,8 +46,9 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql1.LEFT_OUTER_JOIN(
 				"SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");
 		sql1.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
-		sql1.WHERE("procedimiento.idprocedimiento = '" + idProcedimiento + "'");
-
+		if (!idProcedimiento.equals("")) {
+			sql1.WHERE("procedimiento.idprocedimiento = '" + idProcedimiento + "'");
+		}
 		sql2.SELECT("pretension.idinstitucion");
 		sql2.SELECT("pretension.idpretension");
 		sql2.SELECT("f_siga_getrecurso(pretension.descripcion, " + idioma + ") nombre");
@@ -95,27 +96,70 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	    sql.SELECT("(SELECT LISTAGG(juzgado.nombre, ', ') WITHIN GROUP (ORDER BY juzgado.nombre) " +
 	                "FROM SCS_JUZGADO juzgado " +
 	                "INNER JOIN SCS_JUZGADOPROCEDIMIENTO juzgado_procedimiento ON juzgado.idjuzgado = juzgado_procedimiento.idjuzgado AND juzgado_procedimiento.IDINSTITUCION_JUZG = juzgado.IDINSTITUCION " +
-	                "WHERE juzgado_procedimiento.idprocedimiento = procedimiento.idprocedimiento AND juzgado_procedimiento.IDINSTITUCION = procedimiento.IDINSTITUCION) AS juzgados");
+	                "WHERE juzgado_procedimiento.idprocedimiento = procedimiento.idprocedimiento AND juzgado_procedimiento.IDINSTITUCION = procedimiento.IDINSTITUCION AND rownum <= 50) AS juzgados");
 	    sql.SELECT("(SELECT LISTAGG(acreditacion.descripcion, ', ') WITHIN GROUP (ORDER BY acreditacion.descripcion) " +
 	                "FROM SCS_ACREDITACION acreditacion " +
 	                "INNER JOIN SCS_ACREDITACIONPROCEDIMIENTO acre ON acre.idacreditacion = acreditacion.idacreditacion " +
-	                "WHERE acre.idprocedimiento = procedimiento.idprocedimiento AND acre.IDINSTITUCION = procedimiento.IDINSTITUCION) AS acreditaciones");
-
+	                "WHERE acre.idprocedimiento = procedimiento.idprocedimiento AND acre.IDINSTITUCION = procedimiento.IDINSTITUCION AND rownum <= 50) AS acreditaciones");
+	    sql.SELECT("(SELECT count(*) FROM SCS_JUZGADO juzgado INNER JOIN SCS_JUZGADOPROCEDIMIENTO juzgado_procedimiento ON"
+	    		+ " juzgado.idjuzgado = juzgado_procedimiento.idjuzgado AND juzgado_procedimiento.IDINSTITUCION_JUZG = juzgado.IDINSTITUCION"
+	    		+ "	WHERE juzgado_procedimiento.idprocedimiento = procedimiento.idprocedimiento AND juzgado_procedimiento.IDINSTITUCION = procedimiento.IDINSTITUCION) AS NUMJUZGADOS");
+	    sql.SELECT("(SELECT COUNT(*) FROM SCS_ACREDITACION acreditacion INNER JOIN SCS_ACREDITACIONPROCEDIMIENTO acre ON acre.idacreditacion = acreditacion.idacreditacion"
+	    		+ "	WHERE acre.idprocedimiento = procedimiento.idprocedimiento AND acre.IDINSTITUCION = procedimiento.IDINSTITUCION) AS NUMACREDITACIONES");
 	    sql.FROM("SCS_PROCEDIMIENTOS procedimiento");
 	    sql.INNER_JOIN("scs_jurisdiccion jurisdiccion ON jurisdiccion.idjurisdiccion = procedimiento.idjurisdiccion");
 	    sql.LEFT_OUTER_JOIN("gen_recursos_catalogos juris ON (juris.idrecurso = jurisdiccion.descripcion AND idlenguaje = '" + idioma + "')");
-
+	    sql.LEFT_OUTER_JOIN("SCS_PRETENSIONESPROCED sp ON sp.IDPROCEDIMIENTO = procedimiento.IDPROCEDIMIENTO AND sp.IDINSTITUCION = procedimiento.IDINSTITUCION");
+	    sql.LEFT_OUTER_JOIN("SCS_JUZGADOPROCEDIMIENTO sj ON sj.IDPROCEDIMIENTO = procedimiento.IDPROCEDIMIENTO AND sj.IDINSTITUCION = procedimiento.IDINSTITUCION");
+	    
 	    sql.WHERE("procedimiento.idinstitucion = '" + moduloItem.getIdInstitucion() + "'");
 
 	    if (!moduloItem.isHistorico()) {
 	        sql.WHERE("procedimiento.fechabaja IS NULL");
+	        
+	        if (moduloItem.getFechadesdevigor() != null) {
+				SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaFormateada = formato.format(moduloItem.getFechadesdevigor());
+				
+				sql.WHERE("(procedimiento.fechahastavigor >= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy') OR procedimiento.fechahastavigor IS NULL)");
+			}
+	        
+	        if (moduloItem.getFechahastavigor() != null) {
+	        	SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+				String fechaFormateada = formato.format(moduloItem.getFechahastavigor());
+				
+				sql.WHERE("procedimiento.fechadesdevigor <= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+	        }
 	    }
+	    
+		if (moduloItem.getIdjurisdiccion() != null && !moduloItem.getIdjurisdiccion().equals("")) {
+			String[] listaId = moduloItem.getIdjurisdiccion().split(",");
+
+			String listaFormateada = "'" + listaId[0] + "'";
+
+			if (listaId.length > 1) {
+				for (int i = 1; i < listaId.length; i++) {
+					listaFormateada += ",'" + listaId[i] + "'";
+				}
+			}
+
+			sql.WHERE("procedimiento.IDJURISDICCION in (" + listaFormateada + ")");
+		}
+		
+		if (moduloItem.getIdProcedimiento() != null && !moduloItem.getIdProcedimiento().isEmpty()) {
+			sql.WHERE("sp.IDPRETENSION IN (" + moduloItem.getIdProcedimiento() + ")");
+		}
+		
+		if (moduloItem.getJuzgados() != null && !moduloItem.getJuzgados().isEmpty()) {
+			sql.WHERE("sj.IDJUZGADO IN (" + moduloItem.getJuzgados() + ")");
+		}
+		
+		if(moduloItem.getComplemento() != null && !moduloItem.getComplemento().isEmpty()) {
+			sql.WHERE("procedimiento.complemento = " + moduloItem.getComplemento());
+		}
 
 	    if (moduloItem.getNombre() != null && !moduloItem.getNombre().isEmpty()) {
 	        sql.WHERE("UPPER(procedimiento.nombre) LIKE UPPER('%" + moduloItem.getNombre() + "%')");
-	    }
-	    if (moduloItem.getIdProcedimiento() != null && !moduloItem.getIdProcedimiento().isEmpty()) {
-	        sql.WHERE("procedimiento.idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
 	    }
 	    if (moduloItem.getCodigo() != null && !moduloItem.getCodigo().isEmpty()) {
 	        sql.WHERE("UPPER(procedimiento.codigo) LIKE UPPER('%" + moduloItem.getCodigo() + "%')");
@@ -167,9 +211,9 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	 * LEFT_OUTER_JOIN("SCS_PRETENSION pretension on (prepro.idpretension = pretension.idpretension AND pretension.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION AND PRETENSION.FECHABAJA IS NULL)"
 	 * ); sql.
 	 * INNER_JOIN("scs_jurisdiccion jurisdiccion ON jurisdiccion.idjurisdiccion = procedimiento.idjurisdiccion"
-	 * ); sql.LEFT_OUTER_JOIN("gen_recursos_catalogos juris ON (\r\n" +
-	 * "            juris.idrecurso = jurisdiccion.descripcion\r\n" +
-	 * "        AND\r\n" + "            idlenguaje = '"+ idioma +"' \r\n" +
+	 * ); sql.LEFT_OUTER_JOIN("gen_recursos_catalogos juris ON (" +
+	 * "            juris.idrecurso = jurisdiccion.descripcion" +
+	 * "        AND" + "            idlenguaje = '"+ idioma +"' " +
 	 * "    )");
 	 * 
 	 * if(moduloItem.getPrecio() == null) { if(moduloItem.getNombre() != null &&
