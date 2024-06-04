@@ -117,18 +117,29 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	    if (!moduloItem.isHistorico()) {
 	        sql.WHERE("procedimiento.fechabaja IS NULL");
 	        
-	        if (moduloItem.getFechadesdevigor() != null) {
-				SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-				String fechaFormateada = formato.format(moduloItem.getFechadesdevigor());
-				
-				sql.WHERE("(procedimiento.fechahastavigor >= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy') OR procedimiento.fechahastavigor IS NULL)");
-			}
-	        
-	        if (moduloItem.getFechahastavigor() != null) {
+	        if (moduloItem.getFechadesdevigor() != null && moduloItem.getFechahastavigor() != null) {
 	        	SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-				String fechaFormateada = formato.format(moduloItem.getFechahastavigor());
-				
-				sql.WHERE("procedimiento.fechadesdevigor <= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+	        	String fechaDesdeFormateada = formato.format(moduloItem.getFechadesdevigor());
+	        	String fechaHastaFormateada = formato.format(moduloItem.getFechahastavigor());
+	        	
+	        	sql.WHERE("procedimiento.fechadesdevigor >= TO_DATE('" + fechaDesdeFormateada + "', 'dd/MM/yyyy')"
+	        			+ " AND procedimiento.fechadesdevigor <= TO_DATE('" + fechaHastaFormateada + "', 'dd/MM/yyyy')"
+	        			+ " AND ((procedimiento.fechahastavigor >= TO_DATE('" + fechaDesdeFormateada + "', 'dd/MM/yyyy')"
+	        			+ " AND procedimiento.fechahastavigor <= TO_DATE('" + fechaHastaFormateada + "', 'dd/MM/yyyy')) OR procedimiento.fechahastavigor IS NULL)");
+	        } else {
+	        	if (moduloItem.getFechadesdevigor() != null) {
+					SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+					String fechaFormateada = formato.format(moduloItem.getFechadesdevigor());
+					
+					sql.WHERE("(procedimiento.fechahastavigor >= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy') OR procedimiento.fechahastavigor IS NULL)");
+				}
+		        
+		        if (moduloItem.getFechahastavigor() != null) {
+		        	SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+					String fechaFormateada = formato.format(moduloItem.getFechahastavigor());
+					
+					sql.WHERE("procedimiento.fechadesdevigor <= TO_DATE('" + fechaFormateada + "', 'dd/MM/yyyy')");
+		        }
 	        }
 	    }
 	    
