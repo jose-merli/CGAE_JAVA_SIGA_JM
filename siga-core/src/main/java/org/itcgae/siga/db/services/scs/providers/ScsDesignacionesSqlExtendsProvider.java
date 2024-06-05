@@ -2363,7 +2363,7 @@ public class ScsDesignacionesSqlExtendsProvider extends ScsDesignaSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("DESIGNA.IDINSTITUCION");
-		sql.SELECT("concat('D' || DESIGNA.anio || '/', CASE WHEN LENGTH(TO_NUMBER(DESIGNA.codigo)) < 5 THEN LPAD(TO_NUMBER(DESIGNA.codigo),5,'0') ELSE TO_CHAR(TO_NUMBER(DESIGNA.codigo)) END ) as asunto");
+		sql.SELECT("('D' || DESIGNA.anio || '/' || DESIGNA.codigo) as asunto");
 		sql.SELECT("DESIGNA.FECHAENTRADA as fecha");
 		sql.SELECT("DESIGNA.ANIO");
 		sql.SELECT("DESIGNA.NUMERO");
