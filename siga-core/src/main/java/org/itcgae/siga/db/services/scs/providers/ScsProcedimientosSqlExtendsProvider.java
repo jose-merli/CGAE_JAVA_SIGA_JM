@@ -157,8 +157,13 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 			sql.WHERE("procedimiento.IDJURISDICCION in (" + listaFormateada + ")");
 		}
 		
+//        if (moduloItem.getIdProcedimiento() != null && !moduloItem.getIdProcedimiento().isEmpty()) {
+//            sql.WHERE("sp.IDPRETENSION IN (" + moduloItem.getIdProcedimiento() + ")");
+//            sql.WHERE("procedimiento.idprocedimiento IN (" + moduloItem.getIdProcedimiento() + ")");
+//        }
+		
 		if (moduloItem.getIdProcedimiento() != null && !moduloItem.getIdProcedimiento().isEmpty()) {
-			sql.WHERE("sp.IDPRETENSION IN (" + moduloItem.getIdProcedimiento() + ")");
+			sql.WHERE("procedimiento.idprocedimiento IN (" + moduloItem.getIdProcedimiento() + ")");
 		}
 		
 		if (moduloItem.getJuzgados() != null && !moduloItem.getJuzgados().isEmpty()) {
