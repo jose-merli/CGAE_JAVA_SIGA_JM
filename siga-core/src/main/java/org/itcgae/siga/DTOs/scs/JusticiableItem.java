@@ -153,7 +153,7 @@ public class JusticiableItem {
 	private String idProvincia;
 
 	@JsonProperty("idpoblacion")
-	@Size(max = 10)
+	@Size(max = 11)
 	@Pattern(regexp = "\\d+", message = "El id poblacion debe contener solo números")
 	private String idPoblacion;
 
