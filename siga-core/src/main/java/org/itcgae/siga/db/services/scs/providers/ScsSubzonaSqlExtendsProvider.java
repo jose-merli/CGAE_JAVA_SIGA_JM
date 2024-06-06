@@ -42,8 +42,8 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		sql.SELECT("sub.idzona");
 		sql.SELECT("sub.idsubzona");
 		sql.SELECT("sub.nombre as descripcionsubzona");
-		sql.SELECT("LISTAGG(parjud.idpartido, ';') WITHIN GROUP (ORDER BY parjud.nombre) AS jurisdiccion");
-		sql.SELECT("LISTAGG(parjud.nombre, ';') WITHIN GROUP (ORDER BY parjud.nombre) AS nombrePartidosJudiciales");
+		sql.SELECT("LISTAGG(parjud.idpartido, '; ') WITHIN GROUP (ORDER BY parjud.nombre) AS jurisdiccion");
+		sql.SELECT("LISTAGG(parjud.nombre, '; ') WITHIN GROUP (ORDER BY parjud.nombre) AS nombrePartidosJudiciales");
 		sql.SELECT("sub.fechabaja");
 		
 		
