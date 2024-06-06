@@ -16,8 +16,8 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql.SELECT("scs_zona.nombre");
 		sql.SELECT("scs_zona.idinstitucion");
 		sql.SELECT("scs_zona.fechabaja");
-		sql.SELECT("LISTAGG(subzona.nombre, ';') WITHIN GROUP (ORDER BY scs_zona.idinstitucion, scs_zona.idzona) AS nombresubzonas");
-		sql.SELECT("LISTAGG(subzona.idsubzona,';') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona ) AS idsConjuntoSubzonas");
+		sql.SELECT("LISTAGG(subzona.nombre, '; ') WITHIN GROUP (ORDER BY scs_zona.idinstitucion, scs_zona.idzona) AS nombresubzonas");
+		sql.SELECT("LISTAGG(subzona.idsubzona,'; ') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona ) AS idsConjuntoSubzonas");
 		sql.SELECT("NVL(scs_zona.partidosjudiciales,' ') as partidosjudiciales");
 		sql.SELECT("nvl(scs_zona.idpartidosjudiciales,' ') AS idpartidosjudiciales");
 		
@@ -26,8 +26,8 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql2.SELECT_DISTINCT("scs_zona.idzona");
 		sql2.SELECT("scs_zona.nombre");
 		sql2.SELECT("scs_zona.idinstitucion");
-		sql2.SELECT("LISTAGG(partidojudicial.nombre, ';') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona) AS partidosjudiciales");
-		sql2.SELECT("LISTAGG(partidojudicial.idpartido, ';') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona) AS idpartidosjudiciales");
+		sql2.SELECT("LISTAGG(partidojudicial.nombre, '; ') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona) AS partidosjudiciales");
+		sql2.SELECT("LISTAGG(partidojudicial.idpartido, '; ') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona) AS idpartidosjudiciales");
 		sql2.SELECT("scs_zona.fechabaja");
 
 		sql2.FROM("SCS_ZONA");
