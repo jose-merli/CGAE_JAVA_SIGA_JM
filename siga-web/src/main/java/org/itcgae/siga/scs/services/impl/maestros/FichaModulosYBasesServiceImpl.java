@@ -806,6 +806,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						if(modulosDTO.getBaja().equals("bajalogica") || modulosItem.isUsado()) {
 							modulo.setFechahastavigor(modulosItem.getFechahastavigor());
 							modulo.setFechabaja(new Date());
+							modulo.setVigente("0");
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 						}else if (modulosDTO.getBaja().equals("bajafisica")) {
 							eliminaRelacionesProcedimiento(idInstitucion, modulosItem);
@@ -813,6 +814,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						}else if(modulosDTO.getBaja().equals("reactivar")) {
 							modulo.setFechahastavigor(null);
 							modulo.setFechabaja(null);
+							modulo.setVigente("1");
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 						}
 						
