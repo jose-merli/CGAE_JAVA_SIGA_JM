@@ -814,7 +814,17 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						}else if(modulosDTO.getBaja().equals("reactivar")) {
 							modulo.setFechahastavigor(null);
 							modulo.setFechabaja(null);
-							modulo.setVigente("1");
+							
+							Date fechaActual = new Date();
+							
+							if (modulosItem.getFechadesdevigor().compareTo(fechaActual) <= 0
+									&& (modulosItem.getFechahastavigor() == null
+											|| modulosItem.getFechahastavigor().compareTo(fechaActual) > 0)
+									&& modulosItem.getFechabaja() == null) {
+								modulo.setVigente("1");
+							} else {
+								modulo.setVigente("0");
+							}
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 						}
 						
