@@ -178,7 +178,7 @@ public class ScsAsistenciaSqlExtendsProvider extends ScsAsistenciaSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("ASISTENCIA.IDINSTITUCION");
-		sql.SELECT("concat('A' || ASISTENCIA.anio || '/',lpad(ASISTENCIA.NUMERO,5,'0') ) as asunto");
+		sql.SELECT("'A' || ASISTENCIA.anio || '/' || ASISTENCIA.NUMERO as asunto");
 		sql.SELECT("ASISTENCIA.FECHAHORA as fecha");
 		sql.SELECT("ASISTENCIA.ANIO");
 		sql.SELECT("ASISTENCIA.NUMERO");
