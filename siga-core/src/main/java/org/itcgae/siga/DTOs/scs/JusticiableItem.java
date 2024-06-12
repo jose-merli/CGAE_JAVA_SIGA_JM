@@ -139,9 +139,9 @@ public class JusticiableItem {
 
 	@JsonProperty("idpaisdir1")
 	@Size(max = 10)
-	@NotBlank(message = "El pais del justiciable no puede estar en blanco")
+	@Pattern(regexp = "^$|\\d+", message = "El pais debe contener solo números")
 	private String idpaisDir1;
-
+	
 	@JsonProperty("codigopostal")
 	@Pattern(regexp = "^$|\\d+", message = "El código postal debe contener solo números")
 	@Size(max = 5)
