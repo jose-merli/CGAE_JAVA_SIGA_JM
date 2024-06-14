@@ -72,8 +72,8 @@ public class JusticiableItem {
 	@Pattern(regexp = "^$|\\d+", message = "El id pais debe contener solo números")
 	private String idPais;
 
+	//@NotNull(message = "La fecha de alta del justiciable no puede estar en blanco")
 	@JsonProperty("fechaalta")
-	@NotNull(message = "La fecha de alta del justiciable no puede estar en blanco")
 	private Date fechaAlta;
 
 	@JsonProperty("idlenguaje")
@@ -84,7 +84,7 @@ public class JusticiableItem {
 	@JsonProperty("sexo")
 	@Size(max = 1)
 	@NotBlank(message = "El sexo del justiciable no puede estar en blanco")
-	@Pattern(regexp = "[HMN]", message = "El sexo debe ser H, M o N")
+	@Pattern(regexp = "^$|[HMN]", message = "El sexo debe ser H, M o N")
 	private String sexo;
 
 	@JsonProperty("idestadocivil")
