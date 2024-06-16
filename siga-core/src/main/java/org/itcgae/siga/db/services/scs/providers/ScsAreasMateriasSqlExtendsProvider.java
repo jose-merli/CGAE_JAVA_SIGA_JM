@@ -51,12 +51,12 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsAreaSqlProvider {
 		SQL sql3 = new SQL();
 		
 		sql1.SELECT("*");
-		sql.SELECT("scs_area.idarea, scs_area.nombre, scs_area.contenido, scs_area.fechabaja, scs_area.idinstitucion,LISTAGG(materia.nombre, '; ') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS nombremateriagrup "
+		sql.SELECT("scs_area.idarea, scs_area.nombre, scs_area.contenido, scs_area.fechabaja, scs_area.idinstitucion,LISTAGG(materia.nombre, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS nombremateriagrup "
 				+ ",scs_area.jurisdicciones, scs_area.idjurisdicciones").ORDER_BY("scs_area.nombre");
 
 		sql2.SELECT("scs_area.idarea, scs_area.nombre, scs_area.contenido, scs_area.fechabaja, scs_area.idinstitucion,"
-				+ "LISTAGG(materiajurisdiccion.descripcion, '; ') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS jurisdicciones,"
-				+ "LISTAGG(materiajurisdiccion.idjurisdiccion, '; ') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS idjurisdicciones");
+				+ "LISTAGG(materiajurisdiccion.descripcion, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS jurisdicciones,"
+				+ "LISTAGG(materiajurisdiccion.idjurisdiccion, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS idjurisdicciones");
 		sql2.FROM("scs_area");
 		
 		sql3.SELECT("distinct materiajurisdiccion.idinstitucion, materiajurisdiccion.idarea,rec.descripcion, jurisdiccion.idjurisdiccion from SCS_MATERIAJURISDICCION materiajurisdiccion "

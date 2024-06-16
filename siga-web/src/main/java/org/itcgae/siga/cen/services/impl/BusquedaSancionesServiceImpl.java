@@ -195,13 +195,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 										String fechaDesde = format
 												.format(sancionesColegiados.getFechaInicio().getTime());
 										busquedaSancionesItem.setFechaDesde(fechaDesde);
-										busquedaSancionesItem.setFechaDesdeDate(sancionesColegiados.getFechaInicio().getTime());
 									}
 
 									if (sancionesColegiados.getFechaFin() != null) {
 										String fechaHasta = format.format(sancionesColegiados.getFechaFin().getTime());
 										busquedaSancionesItem.setFechaHasta(fechaHasta);
-										busquedaSancionesItem.setFechaHastaDate(sancionesColegiados.getFechaFin().getTime());
 									}
 
 									if (sancionesColegiados.getFechaRehabilitacion() != null) {

@@ -36,20 +36,15 @@ public interface ScsProcedimientosExtendsMapper extends ScsProcedimientosMapper{
 
 	@SelectProvider(type = ScsProcedimientosSqlExtendsProvider.class, method = "searchModulo")
 	@Results({
-	    @Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "FECHAHASTAVIGOR", property = "fechahastavigor", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "FECHADESDEVIGOR", property = "fechadesdevigor", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "JURISDICCIONDES", property = "jurisdiccionDes", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "PRETENSIONES", property = "pretensiones", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "JUZGADOS", property = "juzgados", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "ACREDITACIONES", property = "acreditaciones", jdbcType = JdbcType.VARCHAR),
-	    @Result(column = "NUMJUZGADOS", property = "numJuzgados", jdbcType = JdbcType.INTEGER),
-	    @Result(column = "NUMACREDITACIONES", property = "numAcreditaciones", jdbcType = JdbcType.INTEGER)
+		@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAHASTAVIGOR", property = "fechahastavigor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHADESDEVIGOR", property = "fechadesdevigor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "JURISDICCIONDES", property = "jurisdiccionDes", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ModulosItem> searchModulo(ModulosItem moduloItem, String idioma, String idJuzgado);
 	

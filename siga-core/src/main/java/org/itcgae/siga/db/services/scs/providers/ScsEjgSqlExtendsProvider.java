@@ -2211,7 +2211,7 @@ public class ScsEjgSqlExtendsProvider extends ScsEjgSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("EJG.IDINSTITUCION");
-		sql.SELECT("concat('E' || EJG.anio || '/',EJG.numejg ) as asunto");
+		sql.SELECT("'E' || EJG.anio || '/' || EJG.numejg as asunto");
 		sql.SELECT("EJG.FECHAAPERTURA AS fecha");
 		sql.SELECT("EJG.ANIO");
 		sql.SELECT("EJG.NUMERO");

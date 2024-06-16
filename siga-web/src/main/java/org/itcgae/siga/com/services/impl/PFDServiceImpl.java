@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.com.services.IPFDService;
@@ -19,12 +18,17 @@ import org.itcgae.siga.ws.client.ClientPFD;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pfd.ws.validacionFirma.ResultSolicitudDocumentoTO;
-import com.pfd.ws.validacionFirma.SolicitudDocumentoTO;
-import com.sis.firma.core.TO.DatosSelloFirmaPDFTO;
-import com.sis.firma.core.TO.FirmaResultadoTO;
-import com.sis.firma.core.tipos.TipoResultadoFirma;
-import com.sis.firma.core.tipos.TipoResultadoObtencionDoc;
+import com.pfd.ws.firma.FirmaCorporativaPDFTO;
+import com.pfd.ws.firma.SelloFirmaPDFTO;
+import com.pfd.ws.service.FirmaCorporativaPDFDocument;
+import com.pfd.ws.service.FirmaCorporativaPDFDocument.FirmaCorporativaPDF;
+import com.pfd.ws.service.FirmaCorporativaPDFResponseDocument;
+import com.pfd.ws.service.FirmaCorporativaPDFResponseDocument.FirmaCorporativaPDFResponse;
+import com.pfd.ws.service.ObtenerDocumentoDocument;
+import com.pfd.ws.service.ObtenerDocumentoDocument.ObtenerDocumento;
+import com.pfd.ws.service.ObtenerDocumentoResponseDocument;
+import com.pfd.ws.service.ObtenerDocumentoResponseDocument.ObtenerDocumentoResponse;
+import com.pfd.ws.validacionfirma.SolicitudDocumentoTO;
 
 @Service
 public class PFDServiceImpl implements IPFDService {
@@ -42,6 +46,8 @@ public class PFDServiceImpl implements IPFDService {
 
 	@Override
 	public String firmarPDF(File fichero) throws Exception {
+		FirmaCorporativaPDFTO request = FirmaCorporativaPDFTO.Factory.newInstance();
+
 		GenParametrosKey keyParam = new GenParametrosKey();
 
 		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
@@ -80,8 +86,9 @@ public class PFDServiceImpl implements IPFDService {
 		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 		String razon = param.getValor();
 
+		request.setIdCliente(idClientePFD);
 		String base64File = "";
-		//String csv = "";
+		String csv = "";
 
 		if (fichero != null) {
 			try (FileInputStream inFile = new FileInputStream(fichero)) {
@@ -98,15 +105,25 @@ public class PFDServiceImpl implements IPFDService {
 		}
 
 		if (base64File != null && !"".equals(base64File)) {
+			request.setPdfB64(base64File);
 
-			DatosSelloFirmaPDFTO datosSelloFirma =new DatosSelloFirmaPDFTO();
-			datosSelloFirma.setVisible(Integer.parseInt(firmaVisible));
-			datosSelloFirma.setRazon(razon);
-			datosSelloFirma.setLocation(firmaLocation);
-			Calendar cal = Calendar.getInstance();
-			datosSelloFirma.setFechaFirma(cal, "DD/MM/YYYY");
+			SelloFirmaPDFTO sello = SelloFirmaPDFTO.Factory.newInstance();
 
-			FirmaResultadoTO response = null;
+			sello.setLocalidad(firmaLocation);
+			sello.setRazon(razon);
+			sello.setVisible(Integer.parseInt(firmaVisible));
+
+			request.setSelloFirma(sello);
+			// request.setIdColegio(AppConstants.IDCOLEGIOCGAE);
+
+			FirmaCorporativaPDFDocument requestDoc = FirmaCorporativaPDFDocument.Factory.newInstance();
+
+			FirmaCorporativaPDF firma = FirmaCorporativaPDF.Factory.newInstance();
+			firma.setFirmaCorporativaPDFRequest(request);
+
+			requestDoc.setFirmaCorporativaPDF(firma);
+
+			FirmaCorporativaPDFResponseDocument response = null;
 			try {
 
 				keyParam = new GenParametrosKey();
@@ -118,15 +135,14 @@ public class PFDServiceImpl implements IPFDService {
 				param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 				String uriService = param.getValor();
 
-				response = clientPFD.firmarPDF(idClientePFD, uriService, datosSelloFirma, base64File);
-				if (response != null) {				    
-			    	
-					//tratamos la firma
-			    	String resultado = response.getB64();
+				response = clientPFD.firmarPDF(uriService, requestDoc);
+				if (response != null) {
+					FirmaCorporativaPDFResponse responseDoc = response.getFirmaCorporativaPDFResponse();
+					String resultado = responseDoc.getFirmaCorporativaPDFResponse().getResultado();
 
-					if (response.getResultado().toUpperCase().equals(TipoResultadoFirma.FIRMA_OK)) {
+					if (SigaConstants.FIRMA_OK.equalsIgnoreCase(resultado)) {
 						LOGGER.debug("PFDServiceImpl.firmarPDF :: Documento firmado correctamente");
-						base64File = resultado;
+						base64File = responseDoc.getFirmaCorporativaPDFResponse().getFirmaB64();
 					} else {
 						LOGGER.error("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
 						throw new Exception("PFDServiceImpl.firmarPDF :: Error al firmar el documento :: " + resultado);
@@ -153,12 +169,11 @@ public class PFDServiceImpl implements IPFDService {
 
 	@Override
 	public String obtenerDocumentoEEJGFirmado(String csv) throws Exception {
-		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.ID_INSTITUCION_0, SigaConstants.MODULO_GEN, SigaConstants.EEJG_IDSISTEMA, SigaConstants.PFD_URLWS);
+		return obtenerDocumentoFirmadoModulo(csv, SigaConstants.IDINSTITUCION_2000, SigaConstants.MODULO_SCS, SigaConstants.EEJG_IDSISTEMA, SigaConstants.PFD_URLWS);
 	}
 
 	private String obtenerDocumentoFirmadoModulo(String csv, Short idInstitucion, String modulo, String parametroIdCliente, String paramentroUrl) throws Exception {
-		SolicitudDocumentoTO solicitud = new SolicitudDocumentoTO();
-		ResultSolicitudDocumentoTO response = null;
+		SolicitudDocumentoTO solicitud = SolicitudDocumentoTO.Factory.newInstance();
 		String documentoBase64 = "";
 
 		GenParametrosKey keyParam = new GenParametrosKey();
@@ -176,6 +191,15 @@ public class PFDServiceImpl implements IPFDService {
 		// cambiar esto por el csv del fichero, para pruebas en local
 		//solicitud.setIdValidacion("DEM-JKTYO-NERK0-LNGBQ-CLB1Z");
 
+		ObtenerDocumento doc = ObtenerDocumento.Factory.newInstance();
+		doc.setObtenerDocumentoRequest(solicitud);
+
+		ObtenerDocumentoDocument requestDoc = ObtenerDocumentoDocument.Factory.newInstance();
+
+		requestDoc.setObtenerDocumento(doc);
+
+		ObtenerDocumentoResponseDocument response = null;
+
 		try {
 			keyParam = new GenParametrosKey();
 
@@ -186,21 +210,14 @@ public class PFDServiceImpl implements IPFDService {
 			param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 			String uriService = param.getValor();
 
-			response = clientPFD.obtenerDocumento(uriService, solicitud);
+			response = clientPFD.obtenerDocumento(uriService, requestDoc);
 			if (response != null) {
-				String resultado = response.getDocumento().getResultado();
-				LOGGER.debug(resultado);
-				
-				if (response.getResultado().toUpperCase().equals (TipoResultadoObtencionDoc.SOLICITUD_DOCUMENTO_OK))
-					{
-				String idValidacion=(response.getDocumento().getIdValidacion());
-				String idCliente=(response.getDocumento().getCliente());
-				String procesoFirma=(response.getDocumento().getProcesoFirma());
-				String fecha=(response.getDocumento().getFecha());
-				String cn=(response.getDocumento().getCn());
-				String certificadoB64=(response.getDocumento().getCertificadoB64().toString());
-				documentoBase64=(response.getDocumento().getFirmab64().toString());
-			
+				ObtenerDocumentoResponse responseDoc = response.getObtenerDocumentoResponse();
+				String resultado = responseDoc.getObtenerDocumentoResponse().getResultado();
+				LOGGER.debug(responseDoc.xmlText());
+				if (SigaConstants.SOLICITUD_DOCUMENTO_OK.equalsIgnoreCase(resultado)) {
+					LOGGER.debug("Documento encontrado en la PFD");
+					documentoBase64 = responseDoc.getObtenerDocumentoResponse().getDocumento().getFirmab64();
 				} else {
 					LOGGER.error("PFDServiceImpl.obtenerDocumentoFirmado :: Error al obtener el documento firmado :: "
 							+ resultado);

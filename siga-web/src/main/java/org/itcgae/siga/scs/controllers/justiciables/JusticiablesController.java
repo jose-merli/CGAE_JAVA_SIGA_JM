@@ -1,6 +1,8 @@
 package org.itcgae.siga.scs.controllers.justiciables;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -24,7 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -131,7 +136,7 @@ public class JusticiablesController {
 	}
 
 	@RequestMapping(value = "/gestionJusticiables/updateJusticiable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateJusticiable(@RequestBody JusticiableItem justiciableItem,
+	ResponseEntity<UpdateResponseDTO> updateJusticiable(@Valid @RequestBody JusticiableItem justiciableItem,
 			HttpServletRequest request) {
 
 		UpdateResponseDTO response = gestionJusticiableService.updateJusticiable(justiciableItem, true, request);
@@ -143,7 +148,7 @@ public class JusticiablesController {
 	}
 	
 	@RequestMapping(value = "gestionJusticiables/updateJusticiable/datos/personales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateJusticiableDatosPersonales(@RequestBody JusticiableItem justiciableItem,
+	ResponseEntity<UpdateResponseDTO> updateJusticiableDatosPersonales(@Valid @RequestBody JusticiableItem justiciableItem,
 			HttpServletRequest request) {
 
 		UpdateResponseDTO response = gestionJusticiableService.updateJusticiableDatosPersonales(justiciableItem, true, request);
@@ -290,5 +295,15 @@ public class JusticiablesController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 }

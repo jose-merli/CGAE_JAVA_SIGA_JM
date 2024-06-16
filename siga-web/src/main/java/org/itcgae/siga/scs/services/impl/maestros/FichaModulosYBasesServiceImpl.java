@@ -170,7 +170,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Entrada a scsProcedimientosMapper para obtener los modulos");
-				modulosItem.setIdInstitucion(idInstitucion.toString());
+				modulosItem.setidInstitucion(idInstitucion.toString());
 				
 				modulosItem.setNombre(UtilidadesString.tratamientoApostrofes(modulosItem.getNombre()));
 				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosItem, usuarios.get(0).getIdlenguaje(), null);
@@ -216,7 +216,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 				LOGGER.info(
 						"searchModules() / scsProcedimientosMapper.selectByExample() -> Entrada a scsProcedimientosMapper para obtener los modulos");
-				modulosJuzgadoItem.getModulo().setIdInstitucion(idInstitucion.toString());
+				modulosJuzgadoItem.getModulo().setidInstitucion(idInstitucion.toString());
 				
 				modulosJuzgadoItem.getModulo().setNombre(UtilidadesString.tratamientoApostrofes(modulosJuzgadoItem.getModulo().getNombre()));
 				modulosItems = scsProcedimientosExtendsMapper.searchModulo(modulosJuzgadoItem.getModulo(), usuarios.get(0).getIdlenguaje(), modulosJuzgadoItem.getIdJuzgado());
@@ -323,17 +323,6 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						modulo.setObservaciones(modulosItem.getObservaciones());
 						modulo.setFechamodificacion(new Date());
 						modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
-						
-						Date fechaActual = new Date();
-						
-						if (modulosItem.getFechadesdevigor().compareTo(fechaActual) <= 0
-								&& (modulosItem.getFechahastavigor() == null
-										|| modulosItem.getFechahastavigor().compareTo(fechaActual) > 0)
-								&& modulosItem.getFechabaja() == null) {
-							modulo.setVigente("1");
-						} else {
-							modulo.setVigente("0");
-						}
 						
 						LOGGER.info(
 								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar el modulo");
@@ -479,6 +468,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							modulo.setCodigo(modulosItem.getCodigo());
 							modulo.setCodigoext(modulosItem.getCodigoext());
 							modulo.setPrecio(precio);
+							modulo.setVigente("1");
 							modulo.setOrden(0);
 							modulo.setComplemento(modulosItem.getComplemento());
 							modulo.setFechadesdevigor(modulosItem.getFechadesdevigor());
@@ -488,17 +478,6 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							modulo.setObservaciones(modulosItem.getObservaciones());
 							modulo.setFechamodificacion(new Date());
 							modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
-							
-							Date fechaActual = new Date();
-							
-							if (modulosItem.getFechadesdevigor().compareTo(fechaActual) <= 0
-									&& (modulosItem.getFechahastavigor() == null
-											|| modulosItem.getFechahastavigor().compareTo(fechaActual) > 0)
-									&& modulosItem.getFechabaja() == null) {
-								modulo.setVigente("1");
-							} else {
-								modulo.setVigente("0");
-							}
 							
 							LOGGER.info(
 									"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
@@ -806,25 +785,12 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						if(modulosDTO.getBaja().equals("bajalogica") || modulosItem.isUsado()) {
 							modulo.setFechahastavigor(modulosItem.getFechahastavigor());
 							modulo.setFechabaja(new Date());
-							modulo.setVigente("0");
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 						}else if (modulosDTO.getBaja().equals("bajafisica")) {
 							eliminaRelacionesProcedimiento(idInstitucion, modulosItem);
 							response = scsProcedimientosExtendsMapper.deleteByPrimaryKey(modulo);
 						}else if(modulosDTO.getBaja().equals("reactivar")) {
 							modulo.setFechahastavigor(null);
-							modulo.setFechabaja(null);
-							
-							Date fechaActual = new Date();
-							
-							if (modulosItem.getFechadesdevigor().compareTo(fechaActual) <= 0
-									&& (modulosItem.getFechahastavigor() == null
-											|| modulosItem.getFechahastavigor().compareTo(fechaActual) > 0)
-									&& modulosItem.getFechabaja() == null) {
-								modulo.setVigente("1");
-							} else {
-								modulo.setVigente("0");
-							}
 							response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 						}
 						
@@ -1097,7 +1063,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 				ModulosItem moduloItem = new ModulosItem();
 				moduloItem.setIdProcedimiento(idProcedimiento);
-				moduloItem.setIdInstitucion(idInstitucion.toString());
+				moduloItem.setidInstitucion(idInstitucion.toString());
 				
 				acreditaciones = scsAcreditacionExtendsMapper.searchAcreditaciones(moduloItem);
 

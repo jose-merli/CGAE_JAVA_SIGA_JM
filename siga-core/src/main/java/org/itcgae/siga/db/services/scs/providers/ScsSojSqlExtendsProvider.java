@@ -205,7 +205,7 @@ public class ScsSojSqlExtendsProvider extends ScsSojSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("SOJ.IDINSTITUCION");
-		sql.SELECT("concat('S' || SOJ.anio || '/',lpad(SOJ.NUMSOJ,5,'0') ) as asunto");
+		sql.SELECT("'S' || SOJ.anio || '/' || SOJ.NUMSOJ as asunto");
 		sql.SELECT("SOJ.FECHAAPERTURA as fecha");
 		sql.SELECT("SOJ.ANIO");
 		sql.SELECT("SOJ.NUMERO");

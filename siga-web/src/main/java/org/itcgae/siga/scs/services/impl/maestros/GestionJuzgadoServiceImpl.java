@@ -504,7 +504,6 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("maestros.modulos.errorAsociar");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);

@@ -69,11 +69,11 @@ public class JusticiableItem {
 
 	@JsonProperty("idpais")
 	@Size(max = 3)
-	@Pattern(regexp = "\\d+", message = "La edad debe contener solo números")
+	@Pattern(regexp = "^$|\\d+", message = "El id pais debe contener solo números")
 	private String idPais;
 
+	//@NotNull(message = "La fecha de alta del justiciable no puede estar en blanco")
 	@JsonProperty("fechaalta")
-	@NotNull(message = "La fecha de alta del justiciable no puede estar en blanco")
 	private Date fechaAlta;
 
 	@JsonProperty("idlenguaje")
@@ -84,7 +84,7 @@ public class JusticiableItem {
 	@JsonProperty("sexo")
 	@Size(max = 1)
 	@NotBlank(message = "El sexo del justiciable no puede estar en blanco")
-	@Pattern(regexp = "[HMN]", message = "El sexo debe ser H, M o N")
+	@Pattern(regexp = "^$|[HMN]", message = "El sexo debe ser H, M o N")
 	private String sexo;
 
 	@JsonProperty("idestadocivil")
@@ -111,7 +111,7 @@ public class JusticiableItem {
 
 	@JsonProperty("idtipovia")
 	@Size(max = 3)
-	@Pattern(regexp = "\\d+", message = "El id del tipo via debe contener solo números")
+	@Pattern(regexp = "^$|\\d+", message = "El id del tipo via debe contener solo números")
 	private String idTipoVia;
 
 	@JsonProperty("direccion")
@@ -139,22 +139,22 @@ public class JusticiableItem {
 
 	@JsonProperty("idpaisdir1")
 	@Size(max = 10)
-	@NotBlank(message = "El pais del justiciable no puede estar en blanco")
+	@Pattern(regexp = "^$|\\d+", message = "El pais debe contener solo números")
 	private String idpaisDir1;
-
+	
 	@JsonProperty("codigopostal")
-	@Pattern(regexp = "\\d+", message = "El código postal debe contener solo números")
+	@Pattern(regexp = "^$|\\d+", message = "El código postal debe contener solo números")
 	@Size(max = 5)
 	private String codigoPostal;
 
 	@JsonProperty("idprovincia")
 	@Size(max = 2)
-	@Pattern(regexp = "\\d+", message = "El idprovincia debe contener solo números")
+	@Pattern(regexp = "^$|\\d+", message = "El idprovincia debe contener solo números")
 	private String idProvincia;
 
 	@JsonProperty("idpoblacion")
 	@Size(max = 11)
-	@Pattern(regexp = "\\d+", message = "El id poblacion debe contener solo números")
+	@Pattern(regexp = "^$|\\d+", message = "El id poblacion debe contener solo números")
 	private String idPoblacion;
 
 	@JsonProperty("correoelectronico")
@@ -861,5 +861,4 @@ public class JusticiableItem {
 		return "JusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", nif=" + nif + ", nombre=" + nombre + ", asuntos=" + asuntos + ", fechaModificacion=" + fechaModificacion + ", fechaNacimiento=" + fechaNacimiento + ", fechaAlta=" + fechaAlta + ", idPais=" + idPais + ", apellidos=" + apellidos + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", direccion=" + direccion + ", codigoPostal=" + codigoPostal + ", idProfesion=" + idProfesion + ", regimen_conyugal=" + regimen_conyugal + ", idProvincia=" + idProvincia + ", idPoblacion=" + idPoblacion + ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonajg=" + tipoPersonaJG + ", idTipoIdentificacion=" + idTipoIdentificacion + ", idRepresentantejg=" + idRepresentantejg + ", sexo=" + sexo + ", idLenguaje=" + idLenguaje + ", fax=" + fax + ", correoElectronico=" + correoElectronico + ", edad=" + edad + ", idMinusvalia=" + idMinusvalia + ", idTipoVia=" + idTipoVia + ", numeroDir=" + numeroDir
 				+ ", escaleraDir=" + escaleraDir + ", pisoDir=" + pisoDir + ", puertaDir=" + puertaDir + ", idpaisDir1=" + idpaisDir1 + ", asistidoSolicitajg=" + asistidoSolicitajg + ", asistidoAutorizaeejg=" + asistidoAutorizaeejg + ", autorizaAvisoTelematico=" + autorizaAvisoTelematico + ", telefonos=" + telefonos + ", tipoJusticiable=" + tipoJusticiable + ", datosAsuntos=" + Arrays.toString(datosAsuntos) + ", validacionRepeticion=" + validacionRepeticion + ", asociarRepresentante=" + asociarRepresentante + ", direccionExtranjera=" + direccionExtranjera + "]";
 	}
-
 }
