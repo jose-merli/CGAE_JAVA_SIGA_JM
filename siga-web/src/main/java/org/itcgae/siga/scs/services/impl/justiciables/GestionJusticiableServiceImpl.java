@@ -832,8 +832,9 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 			// scsPersonajg.setPisodir2(justiciableItem.getPisoDir2());
 			// scsPersonajg.setPuertadir2(justiciableItem.getPuertaDir2());
 
-			scsPersonajg.setFechaalta(new Date());
-
+			if(datosGenerales == null) {
+				scsPersonajg.setFechaalta(new Date());
+			}
 		}
 
 		if (datosGenerales == null || !datosGenerales) {
